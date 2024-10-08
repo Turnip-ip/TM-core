@@ -19,4 +19,6 @@ release: test
 .PHONY: debug
 debug: test
 	wasm-pack build --target web --dev --out-dir $(PKG_NAME)
+	cp -r $(PKG_NAME) tests/website
+	cd tests/website; python -m http.server
 

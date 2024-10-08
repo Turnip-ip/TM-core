@@ -76,7 +76,7 @@ pub fn tm_string_to_dot(input_string: &str, tm_name: &str) -> String {
     }
 
     return format!(
-        "digraph {name}{{
+        "digraph {name} {{
 label=\"{name}\"
 rankdir=LR
 node [style=filled]
@@ -84,7 +84,8 @@ node [style=filled]
 {states}
 START [shape=cds,fillcolor=\"#38ef59\"]
 END [shape=doublecircle,fillcolor=\"#efa038\"]
-}}",
+}}
+",
         name = tm_name,
         states = dot_states
     );
@@ -102,19 +103,7 @@ mod tests {
         print!("{}", tm_string_to_dot(&input_string, "INCREMENT"));
         assert_eq!(
             tm_string_to_dot(&input_string, "INCREMENT"),
-            "digraph INCREMENT{
-label=\"INCREMENT\"
-rankdir=LR
-node [style=filled]
-
-START -> START [label=\"b → b, R\"]
-START -> q [label=\"_ → _, L\"]
-q -> q [label=\"1 → 0, L\"]
-q -> END [label=\"0 → 1, L\"]
-
-START [shape=cds,fillcolor=\"#38ef59\"]
-END [shape=doublecircle,fillcolor=\"#efa038\"]
-}"
+            fs::read_to_string("tests/INCR.tm.result").expect("cannot read file..")
         );
     }
 }
