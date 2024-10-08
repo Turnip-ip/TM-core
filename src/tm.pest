@@ -1,0 +1,16 @@
+// Implicit rules that will apply everywhere
+WHITESPACE = _{ " " }
+// State name
+sname = { (LETTER ~ (LETTER | NUMBER)* | EMOJI) }
+// What can be matched by a rule
+tape_symbol = { '0'..'1'|"_"|"b" }
+// Head movement
+head_move = { "L"|"R" }
+// Transition condition
+tape_action = { tape_symbol ~ "->" ~ "(" ~ tape_symbol ~ "," ~ head_move ~ ")" }
+// Match rule of a state
+state_rule = { "|" ~ tape_action ~ "," ~ sname ~ (NEWLINE|EOI) }
+// A state with its match rules
+state = { sname ~ NEWLINE+ ~ state_rule+ }
+// All states of a turing machine
+file = { SOI ~ (state|NEWLINE)* ~ EOI? }
