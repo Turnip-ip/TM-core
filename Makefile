@@ -5,8 +5,12 @@ all: doc release
 
 .PHONY: test
 test:
-	cargo fmt
 	cargo test
+
+.PHONY: lint
+lint:
+	cargo clippy
+	cargo fmt
 
 .PHONY: doc
 doc:
