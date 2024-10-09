@@ -5,15 +5,19 @@ all: doc release
 
 .PHONY: test
 test:
-	cargo fmt
 	cargo test
+
+.PHONY: lint
+lint:
+	cargo clippy
+	cargo fmt
 
 .PHONY: doc
 doc:
 	cargo doc
 
 .PHONY: release
-release: test
+release: lint test
 	wasm-pack build --target web --release --out-dir $(PKG_NAME)
 
 .PHONY: debug
