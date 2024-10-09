@@ -17,7 +17,7 @@ doc:
 	cargo doc
 
 .PHONY: release
-release: test
+release: lint test
 	wasm-pack build --target web --release --out-dir $(PKG_NAME)
 
 .PHONY: debug
