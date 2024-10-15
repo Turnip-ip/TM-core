@@ -1,0 +1,22 @@
+name: Test
+
+on:
+  pull_request:
+    types: [opened, edited, ready_for_review, synchronize]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install wasm-pack
+        run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+
+      - name: Build
+        run: cargo build --verbose
+      - name: Build wasm
+        run: wasm-pack build --target web --release
+      - name: Test
+        run: cargo test --verbose

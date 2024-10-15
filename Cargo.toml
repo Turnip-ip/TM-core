@@ -1,7 +1,9 @@
 [package]
 name = "tm_parser"
+description = "Core parser and Turing Machine manipulation for the Turnip project at ENS de Lyon."
 version = "0.1.0"
 edition = "2021"
+repository = "https://github.com/Turnip-ip/TM-core"
 
 [lib]
 crate-type = ["cdylib"]

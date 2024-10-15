@@ -1,0 +1,21 @@
+name: Lint and format
+
+# Make sure CI fails on all warnings, including Clippy lints
+env:
+  RUSTFLAGS: "-Dwarnings"
+
+on:
+  pull_request:
+    types: [opened, edited, ready_for_review, synchronize]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Clippy
+        run: cargo clippy --all-targets --all-features
+      - name: Format
+        run: cargo fmt --check

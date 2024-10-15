@@ -15,7 +15,7 @@ pub fn tm_string_to_dot(input_string: &str, tm_name: &str) -> String {
     use pest::iterators::Pairs;
 
     // Use pest to do the lexing and parsing
-    let ast_file: Pair<Rule> = TMParser::parse(Rule::file, &input_string)
+    let ast_file: Pair<Rule> = TMParser::parse(Rule::file, input_string)
         .expect("Unsuccessful parse...") // Unwrap parse result
         .next()
         .unwrap(); // Get and unwrap the 'file' rule
@@ -34,31 +34,29 @@ pub fn tm_string_to_dot(input_string: &str, tm_name: &str) -> String {
         // Iterate over rules of this state
         for state_rule_pair in state.into_inner() {
             println!("> {}", state_rule_pair.as_str()); // DEBUG
-            match state_rule_pair.as_rule() {
-                Rule::state_rule => {
-                    let mut state_rule_iter: Pairs<Rule> = state_rule_pair.into_inner();
-                    // Define what we want to get from the state rule
-                    let tape_action_pair: Pair<Rule> = state_rule_iter.next().unwrap();
-                    println!("GOT TAPE ACTION PAIR"); // DEBUG
-                    println!("+ {}", tape_action_pair.as_str()); // DEBUG
-                    let next_state_name: &str = state_rule_iter.next().unwrap().as_str();
-                    println!("+ {}", next_state_name); // DEBUG
+                                                        // Skip newlines & sname
+            if state_rule_pair.as_rule() == Rule::state_rule {
+                let mut state_rule_iter: Pairs<Rule> = state_rule_pair.into_inner();
+                // Define what we want to get from the state rule
+                let tape_action_pair: Pair<Rule> = state_rule_iter.next().unwrap();
+                println!("GOT TAPE ACTION PAIR"); // DEBUG
+                println!("+ {}", tape_action_pair.as_str()); // DEBUG
+                let next_state_name: &str = state_rule_iter.next().unwrap().as_str();
+                println!("+ {}", next_state_name); // DEBUG
 
-                    // Get action rule strings
-                    let mut tape_action_iter: Pairs<Rule> = tape_action_pair.into_inner();
-                    let read_letter: &str = tape_action_iter.next().unwrap().as_str();
-                    println!("+ {}", read_letter); // DEBUG
-                    let written_letter: &str = tape_action_iter.next().unwrap().as_str();
-                    println!("+ {}", written_letter); // DEBUG
-                    let head_move: &str = tape_action_iter.next().unwrap().as_str();
+                // Get action rule strings
+                let mut tape_action_iter: Pairs<Rule> = tape_action_pair.into_inner();
+                let read_letter: &str = tape_action_iter.next().unwrap().as_str();
+                println!("+ {}", read_letter); // DEBUG
+                let written_letter: &str = tape_action_iter.next().unwrap().as_str();
+                println!("+ {}", written_letter); // DEBUG
+                let head_move: &str = tape_action_iter.next().unwrap().as_str();
 
-                    // Format the strings into a dot string for DiGraph edges
-                    output_string.push_str(f!("{curr_state_name} -> {next_state_name} [label=\"{read_letter} → {written_letter}, {head_move}\"]\n").as_str());
-                }
-                _ => (), // Skip newlines & sname
+                // Format the strings into a dot string for DiGraph edges
+                output_string.push_str(f!("{curr_state_name} -> {next_state_name} [label=\"{read_letter} → {written_letter}, {head_move}\"]\n").as_str());
             }
         }
-        return output_string;
+        output_string
     }
 
     // Iterate over states to write the .dot string
@@ -75,7 +73,7 @@ pub fn tm_string_to_dot(input_string: &str, tm_name: &str) -> String {
         }
     }
 
-    return format!(
+    format!(
         "digraph {name} {{
 label=\"{name}\"
 rankdir=LR
@@ -88,7 +86,7 @@ END [shape=doublecircle,fillcolor=\"#efa038\"]
 ",
         name = tm_name,
         states = dot_states
-    );
+    )
 }
 
 #[cfg(test)]
