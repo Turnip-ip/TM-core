@@ -9,7 +9,7 @@ test:
 
 .PHONY: lint
 lint:
-	cargo clippy
+	cargo clippy --all-targets --all-features
 	cargo fmt
 
 .PHONY: doc
