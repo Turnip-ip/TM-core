@@ -1,0 +1,20 @@
+{
+  "name": "tm_parser",
+  "type": "module",
+  "description": "Core parser and Turing Machine manipulation for the Turnip project at ENS de Lyon.",
+  "version": "0.1.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Turnip-ip/TM-core"
+  },
+  "files": [
+    "tm_parser_bg.wasm",
+    "tm_parser.js",
+    "tm_parser.d.ts"
+  ],
+  "main": "tm_parser.js",
+  "types": "tm_parser.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}
