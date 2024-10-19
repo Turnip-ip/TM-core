@@ -21,6 +21,9 @@ jobs:
       - name: Build
         run: wasm-pack build --target web --release --out-dir ./dist
 
+      - name: Remove dist gitignore
+        run: rm ./dist/.gitignore
+
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v4
         if: github.ref == 'refs/heads/main'
