@@ -19,13 +19,13 @@ jobs:
         run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
 
       - name: Build
-        run: wasm-pack build --target web --release --out-dir /dist
+        run: wasm-pack build --target web --release --out-dir ./dist
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v4
         if: github.ref == 'refs/heads/main'
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: /dist
+          publish_dir: ./dist
           publish_branch: deployment
           commit_message: ${{ github.event.head_commit.message }}
