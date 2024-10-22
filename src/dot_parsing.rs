@@ -1,4 +1,5 @@
 //! TODO documentation
+#![warn(missing_docs)]
 
 /// Module to import when you want to parse Turing machines code
 ///
@@ -8,46 +9,161 @@
 pub mod parser {
     use wasm_bindgen::prelude::wasm_bindgen;
 
-    use fstrings::f;
-    use fstrings::format_args_f;
-    use pest::iterators::Pair;
-    use pest::iterators::Pairs;
-    use pest::Parser;
-    use pest_derive::Parser;
-
-    #[derive(Parser)]
-    #[grammar = "grammars/tm_v1.pest"]
-    pub struct TMParserV1;
-
-    /// Helper function to get the current state name
-    fn state_name_to_string(state: Pair<Rule>) -> &str {
-        return state.into_inner().next().unwrap().as_str();
+    #[derive(Debug)]
+    pub struct State {
+        name: String,
+        transitions: Vec<Transition>,
     }
 
-    /// Helper function to get the edges of the dot graph from a parsed state Rule
-    fn state_rules_to_string(state: Pair<Rule>, curr_state_name: &str) -> String {
-        let mut output_string: String = "".to_string();
+    #[derive(Debug)]
+    pub struct Transition {
+        read: ReadEnv,
+        write: WriteEnv,
+        target: String,
+    }
 
-        // Iterate over rules of this state
-        for state_rule_pair in state.into_inner() {
-            // Skip newlines & sname
-            if state_rule_pair.as_rule() == Rule::state_rule {
-                let mut state_rule_iter: Pairs<Rule> = state_rule_pair.into_inner();
-                // Define what we want to get from the state rule
-                let tape_action_pair: Pair<Rule> = state_rule_iter.next().unwrap();
-                let next_state_name: &str = state_rule_iter.next().unwrap().as_str();
+    #[derive(Debug)]
+    pub struct ReadEnv {
+        main: String,
+        working: String,
+    }
 
-                // Get action rule strings
-                let mut tape_action_iter: Pairs<Rule> = tape_action_pair.into_inner();
-                let read_letter: &str = tape_action_iter.next().unwrap().as_str();
-                let written_letter: &str = tape_action_iter.next().unwrap().as_str();
-                let head_move: &str = tape_action_iter.next().unwrap().as_str();
+    #[derive(Debug)]
+    pub struct WriteEnv {
+        main: WriteAtom,
+        working: WriteAtom,
+    }
 
-                // Format the strings into a dot string for DiGraph edges
-                output_string.push_str(f!("{curr_state_name} -> {next_state_name} [label=\"{read_letter} → {written_letter}, {head_move}\"]\n").as_str());
+    #[derive(Debug)]
+    pub enum WriteAtom {
+        Fun(String),
+        Pair { c: String, h: String },
+    }
+
+    // Parsers
+    mod v0 {
+        use pest::iterators::Pair;
+        use pest_derive::Parser;
+
+        #[derive(Parser)]
+        #[grammar = "grammars/tm_v0.pest"]
+        pub struct TMParser;
+
+        /// TODO
+        /// We have only one tape
+        pub fn state_rule_to_transition(state_rule_pair: Pair<Rule>) -> super::Transition {
+            use pest::iterators::Pairs;
+
+            let mut state_rule_iter: Pairs<Rule> = state_rule_pair.into_inner();
+            // Define what we want to get from the state rule
+            let tape_action_pair: Pair<Rule> = state_rule_iter.next().unwrap();
+            let next_state_name: &str = state_rule_iter.next().unwrap().as_str();
+
+            // Get action rule strings
+            let mut tape_action_iter: Pairs<Rule> = tape_action_pair.into_inner();
+            let read_letter: &str = tape_action_iter.next().unwrap().as_str();
+            let written_letter: &str = tape_action_iter.next().unwrap().as_str();
+            let head_move: &str = tape_action_iter.next().unwrap().as_str();
+
+            // Output the Transition object from the parsed structure
+            super::Transition {
+                read: super::ReadEnv {
+                    main: read_letter.to_string(),
+                    working: "".to_string(),
+                },
+                write: super::WriteEnv {
+                    main: super::WriteAtom::Pair {
+                        c: written_letter.to_string(),
+                        h: head_move.to_string(),
+                    },
+                    working: super::WriteAtom::Pair {
+                        c: "".to_string(),
+                        h: "".to_string(),
+                    },
+                },
+                target: next_state_name.to_string(),
             }
         }
-        output_string
+    }
+
+    mod v1 {
+        use pest_derive::Parser;
+        #[derive(Parser)]
+        #[grammar = "grammars/tm_v1.pest"]
+        pub struct TMParser;
+    }
+
+    /// Get the parsed file
+    /// We use pest to do the lexing and parsing
+    fn get_parsed_file(input_string: &str, grammar_version: i8) -> Result<Vec<State>, String> {
+        use pest::{
+            error::Error,
+            iterators::{Pair, Pairs},
+            Parser,
+        };
+
+        match grammar_version {
+            0 => {
+                v0::TMParser::parse(v0::Rule::file, input_string).map_or_else(
+                    |e: Error<v0::Rule>| Err(format!("error {reason}", reason = e)),
+                    |mut grammar_it: Pairs<v0::Rule>| {
+                        let file_pair: Pair<v0::Rule> = grammar_it.next().unwrap();// skip SOI
+
+                        // Build the vector containing all the states of the given
+                        // parsed file using a fold onto the states
+                        Ok(file_pair.into_inner().fold(vec![], |mut states: Vec<State>, state_pair: Pair<v0::Rule>| {
+                            if state_pair.as_rule() == v0::Rule::state {
+                                // Iterator on state elements                            
+                                let mut state_iter: Pairs<v0::Rule> = state_pair.clone().into_inner();
+                                dbg!(state_pair.clone().as_str());
+                                // First the name of the state
+                                let state_name: &str = state_iter.next().unwrap().as_str();
+                                // Then, all the state rules as Transitions structs
+                                let state_transitions: Vec<Transition> = state_iter.fold(vec![], |mut transitions: Vec<Transition>, state_rule_pair: Pair<v0::Rule>| {
+                                    transitions.push(v0::state_rule_to_transition(state_rule_pair));
+                                    transitions
+                                });
+
+                                // Append the new state to the vector
+                                states.push(State {
+                                    name: state_name.to_string(),
+                                    transitions: state_transitions,
+                                })
+                            }
+                            states
+                        }))
+                    },
+                )
+            }
+            1 => {
+                v1::TMParser::parse(v1::Rule::file, input_string).map_or_else(
+                    |e| Err(format!("error {reason}", reason = e)),
+                    |mut _it| Err("NOT IMPLEMENTED YET".to_string()), // Get and unwrap the file rule
+                )
+            }
+            _ => Err("error Invalid grammar version.".to_string()),
+        }
+    }
+
+    /// TODO: doc
+    fn state_to_dot(state: State) -> String {
+        use fstrings::f;
+        use fstrings::format_args_f;
+
+        // Append all transitions into .dot edges format
+        state.transitions.into_iter().fold(
+            "".to_string(), |mut s: String, t: Transition| {
+                let name: &str = state.name.as_str();
+                let target: &str = t.target.as_str();
+                let read_letter: &str = t.read.main.as_str();
+                let (written_letter, head_move): (&str,&str) = match &t.write.main {
+                    WriteAtom::Pair { c, h } => (c.as_str(),h.as_str()),
+                    _ => ("","")// This case will not happen
+                };
+                s.push_str(f!("{name} -> {target} [label=\"{read_letter} → {written_letter}, {head_move}\"]\n").as_str());
+                s
+            }
+        )
     }
 
     /// Takes a TM machine (.tm) code and turns it into a .dot graph code.
@@ -89,32 +205,19 @@ pub mod parser {
     /// </html>
     /// ```
     #[wasm_bindgen]
-    pub fn tm_string_to_dot(input_string: &str, tm_name: &str) -> String {
-        // Use pest to do the lexing and parsing
-        let ast_file: Pair<Rule> = TMParserV1::parse(Rule::file, input_string)
-            .expect("Unsuccessful parse...") // Unwrap parse result
-            .next()
-            .unwrap(); // Get and unwrap the 'file' rule
+    pub fn tm_string_to_dot(input_string: &str, tm_name: &str, grammar_version: i8) -> String {
+        let states: Vec<State> = match get_parsed_file(input_string, grammar_version) {
+            Err(s) => return s,
+            Ok(v) => v,
+        };
 
-        // Build the dot string
-        let mut dot_states: String = "".to_string();
-
-        // Iterate over states to write the .dot string
-        for state in ast_file.into_inner() {
-            match state.as_rule() {
-                Rule::state => {
-                    // Get the current state name
-                    let curr_state: &str = state_name_to_string(state.clone());
-                    // Add the arrows
-                    dot_states.push_str(&state_rules_to_string(state.clone(), curr_state));
-                }
-                Rule::EOI => (),
-                _ => {
-                    // unreachable!(),
-                    return format!("error {reason}", reason = state.as_str());
-                }
-            }
-        }
+        // parse the AST from states
+        let states_dot = states
+            .into_iter()
+            .fold("".to_string(), |mut s: String, state: State| {
+                s.push_str(state_to_dot(state).as_str());
+                s
+            });
 
         format!(
             "digraph {name} {{
@@ -122,13 +225,13 @@ label=\"{name}\"
 rankdir=LR
 node [style=filled]
 
-{states}
+{states_dot}
 START [shape=cds,fillcolor=\"#38ef59\"]
 END [shape=doublecircle,fillcolor=\"#efa038\"]
 }}
 ",
             name = tm_name,
-            states = dot_states
+            states_dot = states_dot
         )
     }
 }

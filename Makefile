@@ -13,8 +13,8 @@ lint:
 	cargo fmt
 
 .PHONY: doc
-doc:
-	cargo doc
+doc: lint
+	cargo doc --document-private-items
 
 .PHONY: release
 release: lint test
