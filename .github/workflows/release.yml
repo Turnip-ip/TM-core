@@ -32,3 +32,15 @@ jobs:
           publish_dir: ./dist
           publish_branch: deployment
           commit_message: ${{ github.event.head_commit.message }}
+
+      - name: Build documentation
+        run: cargo doc
+
+      - name: Deploy documentation
+        uses: peaceiris/actions-gh-pages@v4
+        if: github.ref == 'refs/heads/main'
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./target/doc
+          publish_branch: gh-pages
+          commit_message: ${{ github.event.head_commit.message }}
