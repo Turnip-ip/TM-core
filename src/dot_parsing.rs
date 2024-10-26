@@ -7,6 +7,7 @@
 ///
 /// [pest]: https://pest.rs/
 pub mod parser {
+
     use wasm_bindgen::prelude::wasm_bindgen;
 
     #[derive(Debug)]
@@ -29,15 +30,21 @@ pub mod parser {
     }
 
     #[derive(Debug)]
-    pub struct WriteEnv {
-        main: WriteAtom,
-        working: WriteAtom,
+    pub enum WriteEnv {
+        Pairs { main: WritePair, working: WritePair },
+        Fun(Vec<WriteFun>),
     }
 
     #[derive(Debug)]
-    pub enum WriteAtom {
-        Fun(String),
-        Pair { c: String, h: String },
+    pub struct WritePair {
+        written: String,
+        head_move: String,
+    }
+
+    #[derive(Debug)]
+    pub struct WriteFun {
+        name: String,
+        arg: String,
     }
 
     // Parsers
@@ -49,39 +56,66 @@ pub mod parser {
         #[grammar = "grammars/tm_v0.pest"]
         pub struct TMParser;
 
-        /// TODO
+        /// TODO: better documentation
+        /// Surely to many to_string and as_str calls
         /// We have only one tape
         pub fn state_rule_to_transition(state_rule_pair: Pair<Rule>) -> super::Transition {
             use pest::iterators::Pairs;
 
+            // Iterator on the matched state_rule elements
             let mut state_rule_iter: Pairs<Rule> = state_rule_pair.into_inner();
-            // Define what we want to get from the state rule
-            let tape_action_pair: Pair<Rule> = state_rule_iter.next().unwrap();
-            let next_state_name: &str = state_rule_iter.next().unwrap().as_str();
 
-            // Get action rule strings
-            let mut tape_action_iter: Pairs<Rule> = tape_action_pair.into_inner();
-            let read_letter: &str = tape_action_iter.next().unwrap().as_str();
-            let written_letter: &str = tape_action_iter.next().unwrap().as_str();
-            let head_move: &str = tape_action_iter.next().unwrap().as_str();
+            // Get the read symbol from the first matched element of the state rule
+            let read_tape_symbol: String = state_rule_iter.next().unwrap().as_str().to_string();
+
+            // Get the tape action
+            let written_tape_action_pair: Pair<Rule> = state_rule_iter.next().unwrap();
+            let mut tape_action_iter: Pairs<Rule> = written_tape_action_pair.into_inner();
+            let first_tape_action: Pair<Rule> = tape_action_iter.next().unwrap();
+
+            // Get the target state of this state's rule
+            let target_state_name: &str = state_rule_iter.next().unwrap().as_str();
 
             // Output the Transition object from the parsed structure
             super::Transition {
                 read: super::ReadEnv {
-                    main: read_letter.to_string(),
+                    main: read_tape_symbol,
                     working: "".to_string(),
                 },
-                write: super::WriteEnv {
-                    main: super::WriteAtom::Pair {
-                        c: written_letter.to_string(),
-                        h: head_move.to_string(),
+                write: (match first_tape_action.as_rule() {
+                    Rule::fun_sequence => {
+                        super::WriteEnv::Fun(first_tape_action.into_inner().fold(
+                            vec![],
+                            |mut v: Vec<super::WriteFun>, f: Pair<Rule>| {
+                                // Get an iterator on the items of a function
+                                let mut f_iter: Pairs<Rule> = f.into_inner();
+                                v.push(super::WriteFun {
+                                    name: f_iter.next().unwrap().to_string(),
+                                    arg: f_iter.next().unwrap().to_string(),
+                                });
+                                v
+                            },
+                        ))
                     },
-                    working: super::WriteAtom::Pair {
-                        c: "".to_string(),
-                        h: "".to_string(),
+                    Rule::tape_symbol => {
+                        dbg!(first_tape_action.as_str().to_string());
+                        let head_move_value = tape_action_iter.next().unwrap();
+                        dbg!(head_move_value.as_str().to_string());
+                        
+                        super::WriteEnv::Pairs {
+                            main: super::WritePair {
+                                written: first_tape_action.as_str().to_string(),
+                                head_move: head_move_value.as_str().to_string(),
+                            },
+                            working: super::WritePair {
+                                written: "".to_string(),
+                                head_move: "".to_string(),
+                            },
+                        }
                     },
-                },
-                target: next_state_name.to_string(),
+                    _ => super::WriteEnv::Fun(vec![]),
+                }),
+                target: target_state_name.to_string(),
             }
         }
     }
@@ -115,7 +149,6 @@ pub mod parser {
                             if state_pair.as_rule() == v0::Rule::state {
                                 // Iterator on state elements                            
                                 let mut state_iter: Pairs<v0::Rule> = state_pair.clone().into_inner();
-                                dbg!(state_pair.clone().as_str());
                                 // First the name of the state
                                 let state_name: &str = state_iter.next().unwrap().as_str();
                                 // Then, all the state rules as Transitions structs
@@ -138,7 +171,10 @@ pub mod parser {
             1 => {
                 v1::TMParser::parse(v1::Rule::file, input_string).map_or_else(
                     |e| Err(format!("error {reason}", reason = e)),
-                    |mut _it| Err("NOT IMPLEMENTED YET".to_string()), // Get and unwrap the file rule
+                    |mut _it| {
+                        dbg!("TODO");
+                        Err("NOT IMPLEMENTED YET".to_string()) // Get and unwrap the file rule
+                    },
                 )
             }
             _ => Err("error Invalid grammar version.".to_string()),
@@ -151,19 +187,45 @@ pub mod parser {
         use fstrings::format_args_f;
 
         // Append all transitions into .dot edges format
-        state.transitions.into_iter().fold(
-            "".to_string(), |mut s: String, t: Transition| {
+        state
+            .transitions
+            .into_iter()
+            .fold("".to_string(), |mut s: String, t: Transition| {
                 let name: &str = state.name.as_str();
                 let target: &str = t.target.as_str();
-                let read_letter: &str = t.read.main.as_str();
-                let (written_letter, head_move): (&str,&str) = match &t.write.main {
-                    WriteAtom::Pair { c, h } => (c.as_str(),h.as_str()),
-                    _ => ("","")// This case will not happen
+                // Check if read has empty main
+                let read_letter_working: String = t.read.working;
+                let read_letter_main: String = t.read.main;
+                let read_letter: String = if read_letter_working != "" {
+                    f!("{read_letter_main}, {read_letter_working}")
+                } else {
+                    read_letter_main
                 };
-                s.push_str(f!("{name} -> {target} [label=\"{read_letter} → {written_letter}, {head_move}\"]\n").as_str());
+                let written_instructions: String = match t.write {
+                    WriteEnv::Pairs { main, working } => {
+                        // TODO: if written has empty main
+                        let written_symbol: &str = main.written.as_str();
+                        let head_move: &str = main.head_move.as_str();
+
+                        f!("{written_symbol}, {head_move}")
+                    }
+                    WriteEnv::Fun(v) => {
+                        let mut out =
+                            v.into_iter()
+                                .fold("[".to_string(), |s: String, fun: WriteFun| {
+                                    let s: &str = s.as_str();
+                                    f!("{s}, {fun.name}({fun.arg})")
+                                });
+                        out.push(']');
+                        out
+                    }
+                };
+                s.push_str(
+                    f!("{name} -> {target} [label=\"{read_letter} → {written_instructions}\"];\n")
+                        .as_str(),
+                );
                 s
-            }
-        )
+            })
     }
 
     /// Takes a TM machine (.tm) code and turns it into a .dot graph code.
@@ -221,13 +283,14 @@ pub mod parser {
 
         format!(
             "digraph {name} {{
-label=\"{name}\"
-rankdir=LR
-node [style=filled]
+label=\"{name}\";
+rankdir=LR;
+node [style=filled];
 
 {states_dot}
-START [shape=cds,fillcolor=\"#38ef59\"]
-END [shape=doublecircle,fillcolor=\"#efa038\"]
+START [shape=cds,fillcolor=\"#38ef59\"];
+END [shape=doublecircle,fillcolor=\"#efa038\"];
+ERROR [shape=hexagon,fillcolor=\"#f37db6\"];
 }}
 ",
             name = tm_name,

@@ -1,13 +1,14 @@
 digraph INCREMENT {
-label="INCREMENT"
-rankdir=LR
-node [style=filled]
+label="INCREMENT";
+rankdir=LR;
+node [style=filled];
 
-START -> START [label="b → b, R"]
-START -> q [label="_ → _, L"]
-q -> q [label="1 → 0, L"]
-q -> END [label="0 → 1, L"]
+START -> START [label="b → b, +1"];
+START -> q [label="_ → _, -1"];
+q -> q [label="1 → 0, -1"];
+q -> END [label="0 → 1, -1"];
 
-START [shape=cds,fillcolor="#38ef59"]
-END [shape=doublecircle,fillcolor="#efa038"]
+START [shape=cds,fillcolor="#38ef59"];
+END [shape=doublecircle,fillcolor="#efa038"];
+ERROR [shape=hexagon,fillcolor="#f37db6"];
 }
