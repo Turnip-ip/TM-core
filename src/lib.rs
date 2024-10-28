@@ -28,6 +28,28 @@ mod tests {
             fs::read_to_string("tests/v0/move0.tm.result").expect("cannot read file..")
         );
     }
+    #[test]
+    fn v0_move2R_parsing() {
+        let input_string: String =
+            fs::read_to_string("tests/v0/move2R.tm").expect("cannot read file..");
+
+        dbg!(parser::tm_string_to_dot(&input_string, "MOVE2R", 0));
+        assert_eq!(
+            parser::tm_string_to_dot(&input_string, "MOVE2R", 0),
+            fs::read_to_string("tests/v0/move2R.tm.result").expect("cannot read file..")
+        );
+    }
+    #[test]
+    fn v0_move6L_parsing() {
+        let input_string: String =
+            fs::read_to_string("tests/v0/move6L.tm").expect("cannot read file..");
+
+        dbg!(parser::tm_string_to_dot(&input_string, "MOVE6L", 0));
+        assert_eq!(
+            parser::tm_string_to_dot(&input_string, "MOVE6L", 0),
+            fs::read_to_string("tests/v0/move6L.tm.result").expect("cannot read file..")
+        );
+    }
 
     // V1 tests
     #[test]
