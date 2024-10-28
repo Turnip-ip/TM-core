@@ -86,14 +86,14 @@ mod tests {
 
     // V1 tests
     #[test]
-    fn v1_parsing() {
+    fn v1_copy_from_main_parsing() {
         let input_string: String =
-            fs::read_to_string("tests/v1/INCR.tm").expect("cannot read file..");
+            fs::read_to_string("tests/v1/copy_from_main.tm").expect("cannot read file..");
 
-        dbg!(parser::tm_string_to_dot(&input_string, "INCREMENT", 1));
+        dbg!(parser::tm_string_to_dot(&input_string, "COPY_FROM_MAIN", 1));
         assert_eq!(
-            parser::tm_string_to_dot(&input_string, "INCREMENT", 1),
-            fs::read_to_string("tests/v1/INCR.tm.result").expect("cannot read file..")
+            parser::tm_string_to_dot(&input_string, "COPY_FROM_MAIN", 1),
+            fs::read_to_string("tests/v1/copy_from_main.tm.result").expect("cannot read file..")
         );
     }
 }
