@@ -4,7 +4,7 @@
 //! we can then manipulate in the main Rust functions of the library.
 
 // Implicit rules that will apply everywhere
-WHITESPACE = _{ (" "|NEWLINE|"\t") }
+WHITESPACE = _{ (" "|NEWLINE|"\t"| "//" ~ (!"\n") ~ "\n") }
 // State name
 state_name = @{ (LETTER ~ (LETTER | NUMBER)*) | EMOJI }
 // Matching variable name
