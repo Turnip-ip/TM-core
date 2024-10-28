@@ -61,6 +61,17 @@ mod tests {
             fs::read_to_string("tests/v0/write0.tm.result").expect("cannot read file..")
         );
     }
+    #[test]
+    fn v0_add1_parsing() {
+        let input_string: String =
+            fs::read_to_string("tests/v0/add1.tm").expect("cannot read file..");
+
+        dbg!(parser::tm_string_to_dot(&input_string, "ADD1", 0));
+        assert_eq!(
+            parser::tm_string_to_dot(&input_string, "ADD1", 0),
+            fs::read_to_string("tests/v0/add1.tm.result").expect("cannot read file..")
+        );
+    }
 
     // V1 tests
     #[test]
