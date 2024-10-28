@@ -50,6 +50,17 @@ mod tests {
             fs::read_to_string("tests/v0/move6L.tm.result").expect("cannot read file..")
         );
     }
+    #[test]
+    fn v0_write0_parsing() {
+        let input_string: String =
+            fs::read_to_string("tests/v0/write0.tm").expect("cannot read file..");
+
+        dbg!(parser::tm_string_to_dot(&input_string, "WRITE0", 0));
+        assert_eq!(
+            parser::tm_string_to_dot(&input_string, "WRITE0", 0),
+            fs::read_to_string("tests/v0/write0.tm.result").expect("cannot read file..")
+        );
+    }
 
     // V1 tests
     #[test]
