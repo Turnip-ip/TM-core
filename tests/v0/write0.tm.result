@@ -1,5 +1,5 @@
-digraph WRITE0 {
-label="WRITE0";
+digraph ADD1 {
+label="ADD1";
 rankdir=LR;
 node [style=filled];
 
