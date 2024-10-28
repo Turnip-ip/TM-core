@@ -3,8 +3,8 @@
 //! This file is used by the pest parser generator to create a struct that
 //! we can then manipulate in the main Rust functions of the library.
 
-// Implicit rules that will apply everywhere
-WHITESPACE = _{ (" "|NEWLINE|"\t"| "//" ~ (!"\n") ~ "\n") }
+// Implicit rules that will apply everywhere - comments
+WHITESPACE = _{ ("//" ~ (!NEWLINE ~ ANY)* ~ NEWLINE|" "|NEWLINE|"\t") }
 // State name
 state_name = @{ (LETTER ~ (LETTER | NUMBER)*) | EMOJI }
 // Matching variable name
