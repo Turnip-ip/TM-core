@@ -1,5 +1,5 @@
-digraph MOVE6L {
-label="MOVE6L";
+digraph WRITE0 {
+label="WRITE0";
 rankdir=LR;
 node [style=filled];
 
