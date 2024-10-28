@@ -96,4 +96,15 @@ mod tests {
             fs::read_to_string("tests/v1/copy_from_main.tm.result").expect("cannot read file..")
         );
     }
+    #[test]
+    fn v1_add_parsing() {
+        let input_string: String =
+            fs::read_to_string("tests/v1/add.tm").expect("cannot read file..");
+
+        dbg!(parser::tm_string_to_dot(&input_string, "ADD", 1));
+        assert_eq!(
+            parser::tm_string_to_dot(&input_string, "ADD", 1),
+            fs::read_to_string("tests/v1/add.tm.result").expect("cannot read file..")
+        );
+    }
 }
