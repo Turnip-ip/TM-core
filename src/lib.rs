@@ -17,6 +17,17 @@ mod tests {
             fs::read_to_string("tests/v0/INCR.tm.result").expect("cannot read file..")
         );
     }
+    #[test]
+    fn v0_move0_parsing() {
+        let input_string: String =
+            fs::read_to_string("tests/v0/move0.tm").expect("cannot read file..");
+
+        dbg!(parser::tm_string_to_dot(&input_string, "MOVE0", 0));
+        assert_eq!(
+            parser::tm_string_to_dot(&input_string, "MOVE0", 0),
+            fs::read_to_string("tests/v0/move0.tm.result").expect("cannot read file..")
+        );
+    }
 
     // V1 tests
     #[test]
