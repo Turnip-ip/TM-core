@@ -7,6 +7,7 @@ mod tests {
 
     // V0 tests
     #[test]
+    #[allow(non_snake_case)]
     fn v0_parsing() {
         let input_string: String =
             fs::read_to_string("tests/v0/INCR.tm").expect("cannot read file..");
@@ -18,6 +19,7 @@ mod tests {
         );
     }
     #[test]
+    #[allow(non_snake_case)]
     fn v0_move0_parsing() {
         let input_string: String =
             fs::read_to_string("tests/v0/move0.tm").expect("cannot read file..");
@@ -29,6 +31,7 @@ mod tests {
         );
     }
     #[test]
+    #[allow(non_snake_case)]
     fn v0_move2R_parsing() {
         let input_string: String =
             fs::read_to_string("tests/v0/move2R.tm").expect("cannot read file..");
@@ -40,6 +43,7 @@ mod tests {
         );
     }
     #[test]
+    #[allow(non_snake_case)]
     fn v0_move6L_parsing() {
         let input_string: String =
             fs::read_to_string("tests/v0/move6L.tm").expect("cannot read file..");
@@ -51,6 +55,7 @@ mod tests {
         );
     }
     #[test]
+    #[allow(non_snake_case)]
     fn v0_write0_parsing() {
         let input_string: String =
             fs::read_to_string("tests/v0/write0.tm").expect("cannot read file..");
@@ -62,6 +67,7 @@ mod tests {
         );
     }
     #[test]
+    #[allow(non_snake_case)]
     fn v0_add1_parsing() {
         let input_string: String =
             fs::read_to_string("tests/v0/add1.tm").expect("cannot read file..");
@@ -73,6 +79,7 @@ mod tests {
         );
     }
     #[test]
+    #[allow(non_snake_case)]
     fn v0_sub1_parsing() {
         let input_string: String =
             fs::read_to_string("tests/v0/sub1.tm").expect("cannot read file..");
@@ -86,6 +93,7 @@ mod tests {
 
     // V1 tests
     #[test]
+    #[allow(non_snake_case)]
     fn v1_copy_from_main_parsing() {
         let input_string: String =
             fs::read_to_string("tests/v1/copy_from_main.tm").expect("cannot read file..");
@@ -97,6 +105,7 @@ mod tests {
         );
     }
     #[test]
+    #[allow(non_snake_case)]
     fn v1_add_parsing() {
         let input_string: String =
             fs::read_to_string("tests/v1/add.tm").expect("cannot read file..");

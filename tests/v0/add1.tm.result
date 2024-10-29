@@ -26,7 +26,7 @@ qp4 -> END [label="_ → MOVE(-4)"];
 qp3 -> END [label="_ → MOVE(-3)"];
 qp2 -> END [label="_ → MOVE(-2)"];
 qp1 -> END [label="_ → MOVE(-1)"];
-qp0 -> END [label="_ → MOVE(-0)"];
+qp0 -> END [label="_ → MOVE(0)"];
 
 START [shape=cds,fillcolor="#38ef59"];
 END [shape=doublecircle,fillcolor="#efa038"];
