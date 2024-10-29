@@ -1,0 +1,1 @@
+window.ALL_CRATES = ["bumpalo","cfg_if","fstrings","fstrings_proc_macro","log","memchr","once_cell","pest","pest_derive","pest_generator","pest_meta","proc_macro2","proc_macro_hack","quote","thiserror","thiserror_impl","tm_parser","ucd_trie","unicode_ident","wasm_bindgen","wasm_bindgen_backend","wasm_bindgen_macro","wasm_bindgen_macro_support","wasm_bindgen_shared"];
