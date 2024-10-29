@@ -9,19 +9,19 @@ test:
 
 .PHONY: lint
 lint:
-	cargo clippy
+	cargo clippy --all-targets --all-features
 	cargo fmt
 
 .PHONY: doc
-doc:
-	cargo doc
+doc: lint
+	cargo doc --document-private-items
 
 .PHONY: release
 release: lint test
 	wasm-pack build --target web --release --out-dir $(PKG_NAME)
 
 .PHONY: debug
-debug: test
+debug:
 	wasm-pack build --target web --dev --out-dir $(PKG_NAME)
 	cp -r $(PKG_NAME) tests/website
 	cd tests/website; python -m http.server

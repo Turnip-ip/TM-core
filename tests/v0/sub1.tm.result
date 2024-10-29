@@ -1,0 +1,11 @@
+digraph SUB1 {
+label="SUB1";
+rankdir=LR;
+node [style=filled];
+
+START -> END [label="_ → ADD(255)"];
+
+START [shape=cds,fillcolor="#38ef59"];
+END [shape=doublecircle,fillcolor="#efa038"];
+ERROR [shape=hexagon,fillcolor="#f37db6"];
+}
