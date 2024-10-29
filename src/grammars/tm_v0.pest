@@ -4,7 +4,7 @@
 //! we can then manipulate in the main Rust functions of the library.
 
 // Implicit rules that will apply everywhere - comments
-WHITESPACE = _{ ("//" ~ (!NEWLINE ~ ANY)* ~ NEWLINE|" "|NEWLINE|"\t") }
+WHITESPACE = _{ "//" ~ (!NEWLINE ~ ANY)* ~ NEWLINE|" "|NEWLINE|"\t" }
 // State name
 state_name = @{ (LETTER ~ (LETTER | NUMBER)*) | EMOJI }
 // Matching variable name
@@ -16,7 +16,7 @@ tape_symbol = @{ '0'..'1'|"_"|var_name }
 // Head movement
 head_move = @{ "L"|"R" }
 // Function
-fun_name = @{ UPPERCASE_LETTER~("_"|UPPERCASE_LETTER)* }
+fun_name = @{ UPPERCASE_LETTER~("_"|UPPERCASE_LETTER|ASCII_DIGIT)* }
 function = { fun_name ~ "(" ~ (int|var_name) ~ ")" }
 // Function sequence
 fun_sequence = { function | "[]" | "[" ~ function ~ ("," ~ function)* ~ "]" }

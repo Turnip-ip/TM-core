@@ -8,20 +8,29 @@
     <textarea id="test-tm-code" name="test-tm-code" rows="20" cols="50">
 Turing Machine code goes here
     </textarea>
-    <p id="test-dot-output">
-      output
-    </p>
+    <label for="test-version-select">Grammar Version</label>
+    <select id="test-version-select" name="test-version-select">
+      <option value="0" selected>0</option>
+      <option value="1">1</option>
+    </select>
+    <hr />
+    <pre>
+      <code id="test-dot-output">
+        Waiting for compilation...
+      </code>
+    </pre>
     <script type="module">
       import init, { tm_string_to_dot } from "./tm_parser/tm_parser.js";
 
       init().then(() => {
         const code_editor = document.getElementById("test-tm-code");
         const dot_output = document.getElementById("test-dot-output");
+        const grammar_version = document.getElementById("test-version-select");
+
+        dot_output.innerText = tm_string_to_dot(code_editor.value, "TEST", parseInt(grammar_version.value));
 
         code_editor.addEventListener("input", (e) => {
-          console.log("RUST CALL");
-          dot_output.innerText = tm_string_to_dot(code_editor.value, "TEST");
-          console.log("PARSED");
+          dot_output.innerText = tm_string_to_dot(code_editor.value, "TEST", parseInt(grammar_version.value));
         });
       });
     </script>

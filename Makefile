@@ -21,7 +21,7 @@ release: lint test
 	wasm-pack build --target web --release --out-dir $(PKG_NAME)
 
 .PHONY: debug
-debug: test
+debug:
 	wasm-pack build --target web --dev --out-dir $(PKG_NAME)
 	cp -r $(PKG_NAME) tests/website
 	cd tests/website; python -m http.server
