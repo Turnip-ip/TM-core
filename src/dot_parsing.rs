@@ -90,17 +90,15 @@ pub mod parser {
                                 // Get an iterator on the items of a function
                                 let mut f_iter: Pairs<Rule> = f.into_inner();
                                 v.push(super::WriteFun {
-                                    name: f_iter.next().unwrap().to_string(),
-                                    arg: f_iter.next().unwrap().to_string(),
+                                    name: f_iter.next().unwrap().as_str().to_string(),
+                                    arg: f_iter.next().unwrap().as_str().to_string(),
                                 });
                                 v
                             },
                         ))
                     },
                     Rule::tape_symbol => {
-                        dbg!(first_tape_action.as_str().to_string());
                         let head_move_value = tape_action_iter.next().unwrap();
-                        dbg!(head_move_value.as_str().to_string());
                         
                         super::WriteEnv::Pairs {
                             main: super::WritePair {
@@ -196,7 +194,7 @@ pub mod parser {
                 // Check if read has empty main
                 let read_letter_working: String = t.read.working;
                 let read_letter_main: String = t.read.main;
-                let read_letter: String = if read_letter_working != "" {
+                let read_letter: String = if !read_letter_working.is_empty() {
                     f!("{read_letter_main}, {read_letter_working}")
                 } else {
                     read_letter_main
@@ -212,11 +210,13 @@ pub mod parser {
                     WriteEnv::Fun(v) => {
                         let mut out =
                             v.into_iter()
-                                .fold("[".to_string(), |s: String, fun: WriteFun| {
+                                .fold("".to_string(), |s: String, fun: WriteFun| {
                                     let s: &str = s.as_str();
-                                    f!("{s}, {fun.name}({fun.arg})")
+                                    f!("{s}{fun.name}({fun.arg}), ")
                                 });
-                        out.push(']');
+                        // Remove the last ", " characters
+                        out.pop();
+                        out.pop();
                         out
                     }
                 };

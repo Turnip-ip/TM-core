@@ -1,0 +1,17 @@
+digraph COPY_FROM_MAIN {
+label="COPY_FROM_MAIN"
+rankdir=LR
+node [style=filled]
+
+START -> q1 [label="b, _ → (b, R), (b, R)"]
+q1 -> q2 [label="b, _ → (b, R), (b, R)"]
+q2 -> q3 [label="b, _ → (b, R), (b, R)"]
+q3 -> q4 [label="b, _ → (b, R), (b, R)"]
+q4 -> q5 [label="b, _ → (b, R), (b, R)"]
+q5 -> q6 [label="b, _ → (b, R), (b, R)"]
+q6 -> qend [label="b, _ → (b, R), (b, R)"]
+qend -> END [label="_, _ → [MOVE_M(-7), MOVE_W(-7)]"]
+
+START [shape=cds,fillcolor="#38ef59"]
+END [shape=doublecircle,fillcolor="#efa038"]
+}
