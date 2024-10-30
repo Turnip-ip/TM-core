@@ -1,5 +1,5 @@
-digraph INCREMENT {
-label="INCREMENT";
+digraph UNITARY_MINUS {
+label="UNITARY_MINUS";
 rankdir=LR;
 node [style=filled];
 
