@@ -18,6 +18,6 @@ qtestp
   |1, _ -> [MOVE_BYTE_M(-2), SUB(1), MOVE_BYTE_M(2)], qcpy
 
 qcpy
-  |a, _ -> [MOVE_BYTE_M(-2), WRITE_M(a)]
+  |a, _ -> [MOVE_BYTE_M(-2), WRITE_M(a)], qtest
 
 
