@@ -30,8 +30,8 @@ qp2 -> qp1 [label="0 → 1, L"];
 qp2 -> qp1 [label="1 → 0, L"];
 qp1 -> qp0 [label="0 → 1, L"];
 qp1 -> qp0 [label="1 → 0, L"];
-qp0 -> qEND [label="0 → 1, L"];
-qp0 -> qEND [label="1 → 0, L"];
+qp0 -> qEND [label="0 → 1, R"];
+qp0 -> qEND [label="1 → 0, R"];
 qEND -> END [label="b → b, L"];
 
 START [shape=cds,fillcolor="#38ef59"];
