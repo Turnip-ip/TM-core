@@ -38,15 +38,15 @@ q0
 
 qp6
   | _ -> MOVE(-6), END
-qp6
+qp5
   | _ -> MOVE(-5), END
-qp6
+qp4
   | _ -> MOVE(-4), END
-qp6
+qp3
   | _ -> MOVE(-3), END
-qp6
+qp2
   | _ -> MOVE(-2), END
-qp6
+qp1
   | _ -> MOVE(-1), END
 qp0
   | _ -> MOVE(0), END
