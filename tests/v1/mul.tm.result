@@ -1,0 +1,13 @@
+digraph MUL {
+label="MUL";
+rankdir=LR;
+node [style=filled];
+
+START -> q [label="a, _ → [WRITE_W(a), MOVE_BYTE_M(2), WRITE_M(0), MOVE_BYTE_M(-1)]"];
+q -> END [label="b, 0 → MOVE_BYTE_M(-1)"];
+q -> q [label="b, c → [SUB1_W(1), MOVE_BYTE_M(1), ADD1_M(b), MOVE_BYTE_M(-1)]"];
+
+START [shape=cds,fillcolor="#38ef59"];
+END [shape=doublecircle,fillcolor="#efa038"];
+ERROR [shape=hexagon,fillcolor="#f37db6"];
+}

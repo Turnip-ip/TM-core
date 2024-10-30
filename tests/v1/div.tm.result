@@ -1,0 +1,16 @@
+digraph DIV {
+label="DIV";
+rankdir=LR;
+node [style=filled];
+
+START -> qi [label="a, _ → [MOVE_BYTE_M(2), WRITE_M(a), MOVE_BYTE_M(-1)]"];
+qi -> qtest [label="b, _ → [MOVE_BYTE_M(2), WRITE_M(b), MOVE_BYTE_M(-1), WRITE_W(0), MOVE_BYTE_W(1)]"];
+qtest -> q [label="_, _ → [GEQ(1), MOVE_BYTE_M(2), MOVE_BYTE_W(-1)]"];
+qtestp -> END [label="0, res → [MOVE_BYTE_M(-2), WRITE_M(res), MOVE_BYTE_M(-2)]"];
+qtestp -> qcpy [label="1, res → [ADD1_W(1), MOVE_BYTE_W(1), MOVE_BYTE_M(-2), SUB(1), MOVE_BYTE_M(2)]"];
+qcpy -> qtest [label="a, _ → [MOVE_BYTE_M(-2), WRITE_M(a)]"];
+
+START [shape=cds,fillcolor="#38ef59"];
+END [shape=doublecircle,fillcolor="#efa038"];
+ERROR [shape=hexagon,fillcolor="#f37db6"];
+}

@@ -1,0 +1,14 @@
+digraph GEQ {
+label="GEQ";
+rankdir=LR;
+node [style=filled];
+
+START -> qi [label="a, _ → [MOVE_BYTE_M(3), WRITE_M(a), MOVE_BYTE_M(-2)]"];
+qi -> q [label="b, _ → [MOVE_BYTE_M(1), WRITE_M(b)]"];
+q -> qres [label="b, _ → [LEQ(1), MOVE_BYTE_M(2)]"];
+qres -> END [label="res, _ → [MOVE_BYTE_M(-2), WRITE_M(res), MOVE_BYTE_M(-2)]"];
+
+START [shape=cds,fillcolor="#38ef59"];
+END [shape=doublecircle,fillcolor="#efa038"];
+ERROR [shape=hexagon,fillcolor="#f37db6"];
+}

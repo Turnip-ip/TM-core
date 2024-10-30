@@ -1,0 +1,16 @@
+digraph LEQ {
+label="LEQ";
+rankdir=LR;
+node [style=filled];
+
+START -> qi [label="a, _ → [WRITE_W(a), MOVE_BYTE_M(1), MOVE_BYTE_W(1)]"];
+qi -> qa [label="b, _ → [WRITE_W(b), MOVE_BYTE_M(1), MOVE_BYTE_W(-1)]"];
+qb -> END [label="_, 0 → [WRITE_M(0), MOVE_BYTE_M(-2), MOVE_BYTE_W(-1)]"];
+qb -> qa [label="_, b → [SUB1_W(1), MOVE_BYTE_W(-1)]"];
+qa -> END [label="_, 0 → [WRITE_M(1), MOVE_BYTE_M(-2)]"];
+qa -> qb [label="_, a → [SUB1_W(1), MOVE_BYTE_W(1)]"];
+
+START [shape=cds,fillcolor="#38ef59"];
+END [shape=doublecircle,fillcolor="#efa038"];
+ERROR [shape=hexagon,fillcolor="#f37db6"];
+}
