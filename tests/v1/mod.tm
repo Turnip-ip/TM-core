@@ -11,7 +11,7 @@ qi
   |b, _ -> [MOVE_BYTE_M(2), WRITE_M(b), MOVE_BYTE_M(-1)], qtest
 
 qtest
-  |_, _ -> [GEQ(1), MOVE_BYTE_M(2)], q
+  |_, _ -> [GEQ(1), MOVE_BYTE_M(2)], qtestp
 
 qtestp
   |0, _ -> [MOVE_BYTE_M(-4)], END
