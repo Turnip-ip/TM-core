@@ -14,7 +14,7 @@ qtest
   |_, _ -> [GEQ(1), MOVE_BYTE_M(2)], qtestp
 
 qtestp
-  |0, _ -> [MOVE_BYTE_M(-4)], END
+  |0, _ -> MOVE_BYTE_M(-4), END
   |1, _ -> [MOVE_BYTE_M(-2), SUB(1), MOVE_BYTE_M(2)], qcpy
 
 qcpy
