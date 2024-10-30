@@ -8,7 +8,7 @@ START
   |n, _ -> [MOVE_BYTE_M(1), WRITE_M(n), WRITE_W(0)], qTestEnd
 
 qTestEnd
-  |1, cpt -> [WRITE_M(cpt)], END
+  |1, cpt -> [WRITE_M(cpt), MOVE_BYTE_M(-1)], END
   |u, cpt -> [ADD1_W(1), MOVE_BYTE_W(1), MOVE_BYTE_M(1), WRITE_M(2), MOVE_BYTE_M(-1), MOD(1), MOVE_BYTE_M(2)], qTestMod
 
 qTestMod
