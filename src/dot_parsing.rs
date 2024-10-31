@@ -322,9 +322,11 @@ pub mod parser {
                                     let s: &str = s.as_str();
                                     f!("{s}{fun.name}({fun.arg}), ")
                                 });
-                        // Remove the last ", " characters
-                        out.pop();
-                        out.pop();
+                        // Remove the last ", " characters if v is not empty
+                        if out.len() != 1 {
+                            out.pop();
+                            out.pop();
+                        }
                         out.push(']');
                         out
                         }
