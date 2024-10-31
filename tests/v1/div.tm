@@ -8,6 +8,7 @@ START
   |a, _ -> [MOVE_BYTE_M(2), WRITE_M(a), MOVE_BYTE_M(-1)], qi
 
 qi
+  |0, _ -> [], ERROR
   |b, _ -> [MOVE_BYTE_M(2), WRITE_M(b), MOVE_BYTE_M(-1), WRITE_W(0), MOVE_BYTE_W(1)], qtest
 
 qtest
