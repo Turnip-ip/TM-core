@@ -4,6 +4,7 @@ rankdir=LR;
 node [style=filled];
 
 START -> qi [label="a, _ → [MOVE_BYTE_M(2), WRITE_M(a), MOVE_BYTE_M(-1)]"];
+qi -> ERROR [label="0, _ → []"];
 qi -> qtest [label="b, _ → [MOVE_BYTE_M(2), WRITE_M(b), MOVE_BYTE_M(-1)]"];
 qtest -> qtestp [label="_, _ → [GEQ(1), MOVE_BYTE_M(2)]"];
 qtestp -> END [label="0, _ → MOVE_BYTE_M(-4)"];
