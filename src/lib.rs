@@ -242,7 +242,11 @@ mod tests {
         let input_string: String =
             fs::read_to_string("tests/v1/lenght_syracuse.tm").expect("cannot read file..");
 
-        dbg!(parser::tm_string_to_dot(&input_string, "LENGHT_SYRACUSE", 1));
+        dbg!(parser::tm_string_to_dot(
+            &input_string,
+            "LENGHT_SYRACUSE",
+            1
+        ));
         assert_eq!(
             parser::tm_string_to_dot(&input_string, "LENGHT_SYRACUSE", 1),
             fs::read_to_string("tests/v1/lenght_syracuse.tm.result").expect("cannot read file..")
