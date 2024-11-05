@@ -1,0 +1,15 @@
+digraph EXP {
+label="EXP";
+rankdir=LR;
+node [style=filled];
+
+START -> qi [label="a, _ → [MOVE_BYTE_M(2), WRITE_M(1), MOVE_BYTE_M(1), WRITE_M(a), MOVE_BYTE_M(-2)]"];
+qi -> q [label="b, _ → [WRITE_W(b), MOVE_BYTE_M(1)]"];
+q -> END [label="res, 0 → MOVE_BYTE_M(-2)"];
+q -> qp [label="res, b → [SUB1_W(1), MUL_M(1), MOVE_BYTE_M(2)]"];
+qp -> q [label="res, _ → [MOVE_BYTE_M(-2), WRITE_M(res)]"];
+
+START [shape=cds,fillcolor="#38ef59"];
+END [shape=doublecircle,fillcolor="#efa038"];
+ERROR [shape=hexagon,fillcolor="#f37db6"];
+}

@@ -1,0 +1,12 @@
+digraph MINUS {
+label="MINUS";
+rankdir=LR;
+node [style=filled];
+
+START -> q [label="a, _ → [MOVE_BYTE_M(2), WRITE_M(a), MOVE_BYTE_M(-1)]"];
+q -> END [label="b, _ → [MOVE_BYTE_M(1), SUB1_M(b), MOVE_BYTE_M(-2)]"];
+
+START [shape=cds,fillcolor="#38ef59"];
+END [shape=doublecircle,fillcolor="#efa038"];
+ERROR [shape=hexagon,fillcolor="#f37db6"];
+}
