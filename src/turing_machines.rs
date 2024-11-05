@@ -9,23 +9,41 @@ pub mod machines {
     #[derive(Debug, Clone, Copy)]
     pub enum Movement {
         Left,
-        Idle,
         Right,
     }
-    type State = u32;
-    type TapePos = u32;
-    type Gamma = u8;
+    pub type State = u32;
+    pub type TapePos = u32;
+    pub type Gamma = u8;
 
     #[derive(Debug, Clone, Copy)]
-    struct Outcome {
+    pub struct ClassOutcome {
         state: State,
         letter: Gamma,
         mov: Movement,
     }
 
+    #[derive(Debug, Clone, Copy)]
+    pub enum Fun {
+        Mv(i32),
+    }
+
+    impl Fun {
+        fn eval(&self, state: &mut State, pos: &mut TapePos, tape: &mut Vec<Gamma>) {
+            match &self {
+                Fun::Mv(i) => *pos = *pos + (*i as u32),
+            }
+        }
+    }
+
+    #[derive(Debug, Clone)]
+    pub enum Outcome {
+        Classical(ClassOutcome),
+        Funs(Vec<Fun>),
+    }
+
     #[wasm_bindgen]
-    #[derive(Debug)]
-    struct TM {
+    #[derive(Debug, Clone)]
+    pub struct TM {
         _state_of_string: HashMap<String, State>,
         _string_of_state: HashMap<State, String>,
         _cur_state: State,
@@ -65,15 +83,22 @@ pub mod machines {
         pub fn step(&mut self) {
             let cur_state = self._cur_state as usize;
             let tape_letter = self._tape[self._head_pos as usize] as usize;
-            let out = self.delta[cur_state][tape_letter];
-            self._tape[self._head_pos as usize] = out.letter;
-            self._cur_state = out.state;
-            self._head_pos = match out.mov {
-                // TODO check bounds
-                Movement::Left => self._head_pos - 1,
-                Movement::Idle => self._head_pos,
-                Movement::Right => self._head_pos + 1,
-            };
+            match &(self.delta[cur_state][tape_letter]) {
+                Outcome::Classical(oc) => {
+                    self._tape[self._head_pos as usize] = oc.letter;
+                    self._cur_state = oc.state;
+                    self._head_pos = match oc.mov {
+                        // TODO check bounds
+                        Movement::Left => self._head_pos - 1,
+                        Movement::Right => self._head_pos + 1,
+                    };
+                }
+                Outcome::Funs(fs) => {
+                    for f in fs.iter() {
+                        f.eval(&mut self._cur_state, &mut self._head_pos, &mut self._tape);
+                    }
+                }
+            }
         }
     }
 }
