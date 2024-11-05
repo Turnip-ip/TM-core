@@ -3,6 +3,7 @@
   "type": "module",
   "description": "Core parser and Turing Machine manipulation for the Turnip project at ENS de Lyon.",
   "version": "0.1.0",
+  "license": "SEE LICENSE IN LICENSE",
   "repository": {
     "type": "git",
     "url": "https://github.com/Turnip-ip/TM-core"
