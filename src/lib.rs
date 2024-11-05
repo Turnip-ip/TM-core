@@ -1,4 +1,5 @@
 mod dot_parsing;
+mod turing_machines;
 
 #[cfg(test)]
 mod tests {
@@ -116,4 +117,6 @@ mod tests {
             fs::read_to_string("tests/v1/add.tm.result").expect("cannot read file..")
         );
     }
+
+    // Turing Machines tests
 }
