@@ -4,6 +4,8 @@ description = "Core parser and Turing Machine manipulation for the Turnip projec
 version = "0.1.0"
 edition = "2021"
 repository = "https://github.com/Turnip-ip/TM-core"
+license-file = "LICENSE"
+readme = "README.md"
 
 [lib]
 crate-type = ["cdylib"]
