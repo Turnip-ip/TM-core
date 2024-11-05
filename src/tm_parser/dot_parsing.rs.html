@@ -408,6 +408,8 @@
 <a href="#408" id="408">408</a>
 <a href="#409" id="409">409</a>
 <a href="#410" id="410">410</a>
+<a href="#411" id="411">411</a>
+<a href="#412" id="412">412</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! TODO documentation
 </span><span class="attr">#![warn(missing_docs)]
 
@@ -732,9 +734,11 @@
                                     <span class="kw">let </span>s: <span class="kw-2">&amp;</span>str = s.as_str();
                                     <span class="macro">f!</span>(<span class="string">"{s}{fun.name}({fun.arg}), "</span>)
                                 });
-                        <span class="comment">// Remove the last ", " characters
-                        </span>out.pop();
-                        out.pop();
+                        <span class="comment">// Remove the last ", " characters if v is not empty
+                        </span><span class="kw">if </span>out.len() != <span class="number">1 </span>{
+                            out.pop();
+                            out.pop();
+                        }
                         out.push(<span class="string">']'</span>);
                         out
                         }

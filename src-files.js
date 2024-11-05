@@ -14,7 +14,7 @@ var srcIndex = new Map(JSON.parse('[\
 ["proc_macro_hack",["",[],["error.rs","iter.rs","lib.rs","parse.rs","quote.rs"]]],\
 ["quote",["",[],["ext.rs","format.rs","ident_fragment.rs","lib.rs","runtime.rs","spanned.rs","to_tokens.rs"]]],\
 ["thiserror",["",[],["aserror.rs","display.rs","lib.rs"]]],\
-["thiserror_impl",["",[],["ast.rs","attr.rs","expand.rs","fmt.rs","generics.rs","lib.rs","prop.rs","span.rs","valid.rs"]]],\
+["thiserror_impl",["",[],["ast.rs","attr.rs","expand.rs","fmt.rs","generics.rs","lib.rs","prop.rs","scan_expr.rs","span.rs","valid.rs"]]],\
 ["tm_parser",["",[],["dot_parsing.rs","lib.rs"]]],\
 ["ucd_trie",["",[],["lib.rs","owned.rs"]]],\
 ["unicode_ident",["",[],["lib.rs","tables.rs"]]],\
