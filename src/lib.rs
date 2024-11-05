@@ -117,3 +117,48 @@ mod tests {
         );
     }
 }
+
+type State = u32;
+type Movement = i32;
+type TapePos = u32;
+type Gamma = u8;
+
+#[derive(Debug, Clone, Copy)]
+struct Outcome {
+    state: State,
+    letter: Gamma,
+    mov: Movement,
+}
+
+#[wasm_bindgen]
+#[derive(Debug)]
+struct TM {
+    _cur_state: State,
+    _head_pos: TapePos,
+    _tape: Vec<Gamma>,
+    delta: Vec<Vec<Outcome>>, // delta[state][letter]
+}
+
+#[wasm_bindgen]
+impl TM {
+    pub fn cur_state(&self) -> State {
+        self._cur_state
+    }
+
+    pub fn head_pos(&self) -> TapePos {
+        self._head_pos
+    }
+
+    pub fn tape(&self) -> *const Gamma {
+        self._tape.as_ptr()
+    }
+
+    pub fn step(&mut self) {
+        let cur_state = self._cur_state as usize;
+        let tape_letter = self._tape[self._head_pos as usize] as usize;
+        let out = self.delta[self._cur_state as usize][tape_letter];
+        self._tape[self._head_pos as usize] = out.letter;
+        self._cur_state = out.state;
+        self._head_pos = (self._head_pos as i32 + out.mov) as u32;
+    }
+}
