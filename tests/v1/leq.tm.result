@@ -1,6 +1,7 @@
 digraph LEQ {
 label="LEQ";
 rankdir=LR;
+bgcolor="transparent";
 node [style=filled];
 
 START -> qi [label="a, _ → [WRITE_W(a), MOVE_BYTE_M(1), MOVE_BYTE_W(1)]"];

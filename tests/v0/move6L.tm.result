@@ -1,6 +1,7 @@
 digraph MOVE6L {
 label="MOVE6L";
 rankdir=LR;
+bgcolor="transparent";
 node [style=filled];
 
 START -> q1 [label="b → b, L"];

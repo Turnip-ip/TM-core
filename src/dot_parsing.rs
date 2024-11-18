@@ -397,6 +397,7 @@ pub mod parser {
             "digraph {name} {{
 label=\"{name}\";
 rankdir=LR;
+bgcolor=\"transparent\";
 node [style=filled];
 
 {states_dot}

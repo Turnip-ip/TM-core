@@ -1,6 +1,7 @@
 digraph SUB1 {
 label="SUB1";
 rankdir=LR;
+bgcolor="transparent";
 node [style=filled];
 
 START -> q7 [label="_ → MOVE(7)"];
