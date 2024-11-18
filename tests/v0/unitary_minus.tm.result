@@ -1,6 +1,7 @@
 digraph UNITARY_MINUS {
 label="UNITARY_MINUS";
 rankdir=LR;
+bgcolor="transparent";
 node [style=filled];
 
 START -> q7 [label="_ → MOVE(7)"];

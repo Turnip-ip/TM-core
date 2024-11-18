@@ -1,6 +1,7 @@
 digraph IS_PRIME {
 label="IS_PRIME";
 rankdir=LR;
+bgcolor="transparent";
 node [style=filled];
 
 START -> END [label="0, _ → [MOVE_BYTE_M(1), WRITE_M(0), MOVE_BYTE_M(-1)]"];

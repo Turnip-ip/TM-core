@@ -1,6 +1,7 @@
 digraph LENGHT_SYRACUSE {
 label="LENGHT_SYRACUSE";
 rankdir=LR;
+bgcolor="transparent";
 node [style=filled];
 
 START -> qTestEnd [label="n, _ → [MOVE_BYTE_M(1), WRITE_M(n), WRITE_W(0)]"];

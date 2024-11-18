@@ -1,6 +1,7 @@
 digraph COPY_FROM_MAIN {
 label="COPY_FROM_MAIN";
 rankdir=LR;
+bgcolor="transparent";
 node [style=filled];
 
 START -> q1 [label="b, _ → (b, R), (b, R)"];

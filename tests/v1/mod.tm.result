@@ -1,6 +1,7 @@
 digraph MOD {
 label="MOD";
 rankdir=LR;
+bgcolor="transparent";
 node [style=filled];
 
 START -> qi [label="a, _ → [MOVE_BYTE_M(2), WRITE_M(a), MOVE_BYTE_M(-1)]"];
