@@ -1,27 +1,3 @@
-var srcIndex = new Map(JSON.parse('[\
-["bumpalo",["",[],["alloc.rs","lib.rs"]]],\
-["cfg_if",["",[],["lib.rs"]]],\
-["fstrings",["",[],["lib.rs"]]],\
-["fstrings_proc_macro",["",[],["macros.rs","mod.rs"]]],\
-["log",["",[],["__private_api.rs","lib.rs","macros.rs"]]],\
-["memchr",["",[["arch",[["all",[["packedpair",[],["default_rank.rs","mod.rs"]]],["memchr.rs","mod.rs","rabinkarp.rs","shiftor.rs","twoway.rs"]],["generic",[],["memchr.rs","mod.rs","packedpair.rs"]],["x86_64",[["avx2",[],["memchr.rs","mod.rs","packedpair.rs"]],["sse2",[],["memchr.rs","mod.rs","packedpair.rs"]]],["memchr.rs","mod.rs"]]],["mod.rs"]],["memmem",[],["mod.rs","searcher.rs"]]],["cow.rs","ext.rs","lib.rs","macros.rs","memchr.rs","vector.rs"]]],\
-["once_cell",["",[],["imp_std.rs","lib.rs","race.rs"]]],\
-["pest",["",[["iterators",[],["flat_pairs.rs","line_index.rs","mod.rs","pair.rs","pairs.rs","queueable_token.rs","tokens.rs"]],["unicode",[],["binary.rs","category.rs","mod.rs","script.rs"]]],["error.rs","lib.rs","macros.rs","parser.rs","parser_state.rs","position.rs","pratt_parser.rs","prec_climber.rs","span.rs","stack.rs","token.rs"]]],\
-["pest_derive",["",[],["lib.rs"]]],\
-["pest_generator",["",[],["docs.rs","generator.rs","lib.rs","macros.rs","parse_derive.rs"]]],\
-["pest_meta",["",[["optimizer",[],["concatenator.rs","factorizer.rs","lister.rs","mod.rs","restorer.rs","rotater.rs","skipper.rs","unroller.rs"]]],["ast.rs","grammar.rs","lib.rs","parser.rs","validator.rs"]]],\
-["proc_macro2",["",[],["detection.rs","extra.rs","fallback.rs","lib.rs","marker.rs","parse.rs","rcvec.rs","wrapper.rs"]]],\
-["proc_macro_hack",["",[],["error.rs","iter.rs","lib.rs","parse.rs","quote.rs"]]],\
-["quote",["",[],["ext.rs","format.rs","ident_fragment.rs","lib.rs","runtime.rs","spanned.rs","to_tokens.rs"]]],\
-["thiserror",["",[],["aserror.rs","display.rs","lib.rs"]]],\
-["thiserror_impl",["",[],["ast.rs","attr.rs","expand.rs","fmt.rs","generics.rs","lib.rs","prop.rs","scan_expr.rs","span.rs","valid.rs"]]],\
-["tm_parser",["",[],["dot_parsing.rs","lib.rs"]]],\
-["ucd_trie",["",[],["lib.rs","owned.rs"]]],\
-["unicode_ident",["",[],["lib.rs","tables.rs"]]],\
-["wasm_bindgen",["",[["cache",[],["intern.rs","mod.rs"]],["convert",[],["closures.rs","impls.rs","mod.rs","slices.rs","traits.rs"]]],["cast.rs","closure.rs","describe.rs","externref.rs","lib.rs","link.rs"]]],\
-["wasm_bindgen_backend",["",[],["ast.rs","codegen.rs","encode.rs","error.rs","lib.rs","util.rs"]]],\
-["wasm_bindgen_macro",["",[],["lib.rs"]]],\
-["wasm_bindgen_macro_support",["",[],["lib.rs","parser.rs"]]],\
-["wasm_bindgen_shared",["",[],["lib.rs"]]]\
-]'));
+var srcIndex = new Map(JSON.parse('[["bumpalo",["",[],["alloc.rs","lib.rs"]]],["cfg_if",["",[],["lib.rs"]]],["fstrings",["",[],["lib.rs"]]],["fstrings_proc_macro",["",[],["macros.rs","mod.rs"]]],["log",["",[],["__private_api.rs","lib.rs","macros.rs"]]],["memchr",["",[["arch",[["all",[["packedpair",[],["default_rank.rs","mod.rs"]]],["memchr.rs","mod.rs","rabinkarp.rs","shiftor.rs","twoway.rs"]],["generic",[],["memchr.rs","mod.rs","packedpair.rs"]],["x86_64",[["avx2",[],["memchr.rs","mod.rs","packedpair.rs"]],["sse2",[],["memchr.rs","mod.rs","packedpair.rs"]]],["memchr.rs","mod.rs"]]],["mod.rs"]],["memmem",[],["mod.rs","searcher.rs"]]],["cow.rs","ext.rs","lib.rs","macros.rs","memchr.rs","vector.rs"]]],["once_cell",["",[],["imp_std.rs","lib.rs","race.rs"]]],["pest",["",[["iterators",[],["flat_pairs.rs","line_index.rs","mod.rs","pair.rs","pairs.rs","queueable_token.rs","tokens.rs"]],["unicode",[],["binary.rs","category.rs","mod.rs","script.rs"]]],["error.rs","lib.rs","macros.rs","parser.rs","parser_state.rs","position.rs","pratt_parser.rs","prec_climber.rs","span.rs","stack.rs","token.rs"]]],["pest_derive",["",[],["lib.rs"]]],["pest_generator",["",[],["docs.rs","generator.rs","lib.rs","macros.rs","parse_derive.rs"]]],["pest_meta",["",[["optimizer",[],["concatenator.rs","factorizer.rs","lister.rs","mod.rs","restorer.rs","rotater.rs","skipper.rs","unroller.rs"]]],["ast.rs","grammar.rs","lib.rs","parser.rs","validator.rs"]]],["proc_macro2",["",[],["detection.rs","extra.rs","fallback.rs","lib.rs","marker.rs","parse.rs","rcvec.rs","wrapper.rs"]]],["proc_macro_hack",["",[],["error.rs","iter.rs","lib.rs","parse.rs","quote.rs"]]],["quote",["",[],["ext.rs","format.rs","ident_fragment.rs","lib.rs","runtime.rs","spanned.rs","to_tokens.rs"]]],["thiserror",["",[],["aserror.rs","display.rs","lib.rs"]]],["thiserror_impl",["",[],["ast.rs","attr.rs","expand.rs","fmt.rs","generics.rs","lib.rs","prop.rs","scan_expr.rs","span.rs","valid.rs"]]],["tm_parser",["",[],["dot_parsing.rs","lib.rs"]]],["ucd_trie",["",[],["lib.rs","owned.rs"]]],["unicode_ident",["",[],["lib.rs","tables.rs"]]],["wasm_bindgen",["",[["cache",[],["intern.rs","mod.rs"]],["convert",[],["closures.rs","impls.rs","mod.rs","slices.rs","traits.rs"]]],["cast.rs","closure.rs","describe.rs","externref.rs","lib.rs","link.rs"]]],["wasm_bindgen_backend",["",[],["ast.rs","codegen.rs","encode.rs","error.rs","lib.rs","util.rs"]]],["wasm_bindgen_macro",["",[],["lib.rs"]]],["wasm_bindgen_macro_support",["",[],["lib.rs","parser.rs"]]],["wasm_bindgen_shared",["",[],["lib.rs"]]]]'));
 createSrcSidebar();
+//{"start":36,"fragment_lengths":[41,30,32,55,58,456,56,340,35,93,209,122,82,111,59,138,50,43,49,208,99,42,62,43]}
