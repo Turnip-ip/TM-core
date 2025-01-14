@@ -7,30 +7,41 @@
 
 // Implicit rules that will apply everywhere
 WHITESPACE = _{ "//" ~ (!NEWLINE ~ ANY)* ~ NEWLINE|" "|NEWLINE|"\t" }
+
 // State name
 state_name = @{ (LETTER ~ (LETTER | NUMBER)*) | EMOJI }
+
 // Matching variable name
 var_name = @{ LETTER ~ (LETTER | NUMBER)* }
+
 // Integer
 int = @{ ("+"|"-")? ~ ASCII_DIGIT+ } //can be 0 if we want
+
 // What can be matched by a rule
 tape_symbol = @{ '0'..'1'|"_"|var_name }
+
 // Head movement
 head_move = @{ "L"|"R" }
 // head_move = @{ ("+"|"-")? ~ ASCII_NONZERO_DIGIT	~ ASCII_DIGIT* }
+
 // Function
 fun_name = @{ UPPERCASE_LETTER~("_"|UPPERCASE_LETTER|ASCII_DIGIT)* }
 function = { fun_name ~ "(" ~ (int|var_name) ~ ")" }
+
 // Function sequence
 fun_sequence = { function | "[]" | "[" ~ function ~ ("," ~ function)* ~ "]" }
+
 // Transition condition
 tape_action = {
     "(" ~ tape_symbol ~ "," ~ head_move ~ ")"
     ~ "," ~ "(" ~ tape_symbol ~ "," ~ head_move ~ ")" | fun_sequence
 }
+
 // Match rule of a state
 state_rule = { "|" ~ tape_symbol ~ "," ~ tape_symbol ~ "->" ~ tape_action ~ "," ~ state_name }
+
 // A state with its match rules
 state = { state_name ~ state_rule+ }
+
 // All states of a turing machine
 file = { SOI ~ state* ~ EOI }
