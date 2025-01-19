@@ -20,17 +20,21 @@ Turing Machine code goes here
       </code>
     </pre>
     <script type="module">
-      import init, { tm_string_to_dot } from "./tm_parser/tm_parser.js";
+      import init, { tm_string_to_dot, init_tm } from "./tm_parser/tm_parser.js";
 
       init().then(() => {
         const code_editor = document.getElementById("test-tm-code");
         const dot_output = document.getElementById("test-dot-output");
         const grammar_version = document.getElementById("test-version-select");
 
-        dot_output.innerText = tm_string_to_dot(code_editor.value, "TEST", parseInt(grammar_version.value));
+        const gv = parseInt(grammar_version.value);
+
+        dot_output.innerText = tm_string_to_dot(code_editor.value, "TEST", gv);
 
         code_editor.addEventListener("input", (e) => {
-          dot_output.innerText = tm_string_to_dot(code_editor.value, "TEST", parseInt(grammar_version.value));
+          dot_output.innerText = tm_string_to_dot(code_editor.value, "TEST", gv);
+
+          console.log(init_tm(code_editor.value, gv));
         });
       });
     </script>

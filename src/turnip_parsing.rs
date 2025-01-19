@@ -8,43 +8,41 @@
 /// [pest]: https://pest.rs/
 pub mod parser {
 
-    use wasm_bindgen::prelude::wasm_bindgen;
-
     #[derive(Debug)]
     pub struct State {
-        name: String,
-        transitions: Vec<Transition>,
+        pub name: String,
+        pub transitions: Vec<Transition>,
     }
 
     #[derive(Debug)]
     pub struct Transition {
-        read: ReadEnv,
-        write: WriteEnv,
-        target: String,
+        pub read: ReadEnv,
+        pub write: WriteEnv,
+        pub target: String,
     }
 
     #[derive(Debug)]
     pub struct ReadEnv {
-        main: String,
-        working: String,
+        pub main: String,
+        pub working: String,
     }
 
-    #[derive(Debug)]
+    #[derive(Debug, Clone)]
     pub enum WriteEnv {
         Pairs { main: WritePair, working: WritePair },
         Fun(Vec<WriteFun>),
     }
 
-    #[derive(Debug)]
+    #[derive(Debug, Clone)]
     pub struct WritePair {
-        written: String,
-        head_move: String,
+        pub written: String,
+        pub head_move: String,
     }
 
-    #[derive(Debug)]
+    #[derive(Debug, Clone)]
     pub struct WriteFun {
-        name: String,
-        arg: String,
+        pub name: String,
+        pub arg: String,
     }
 
     // Parsers
@@ -197,7 +195,7 @@ pub mod parser {
     /// We use pest to do the lexing and parsing
     ///
     /// Outputs a vector of states agnostic of the grammar version
-    fn get_parsed_file(input_string: &str, grammar_version: i8) -> Result<Vec<State>, String> {
+    pub fn get_parsed_file(input_string: &str, grammar_version: i8) -> Result<Vec<State>, String> {
         use pest::{
             error::Error,
             iterators::{Pair, Pairs},
@@ -271,140 +269,5 @@ pub mod parser {
             }
             _ => Err("error Invalid grammar version.".to_string()),
         }
-    }
-
-    /// TODO: doc
-    fn state_to_dot(state: State) -> String {
-        use fstrings::f;
-        use fstrings::format_args_f;
-
-        // Append all transitions into .dot edges format
-        state
-            .transitions
-            .into_iter()
-            .fold("".to_string(), |mut s: String, t: Transition| {
-                let name: &str = state.name.as_str();
-                let target: &str = t.target.as_str();
-                // Check if read has empty main
-                let read_letter_working: String = t.read.working;
-                let read_letter_main: String = t.read.main;
-                let read_letter: String = if !read_letter_working.is_empty() {
-                    f!("{read_letter_main}, {read_letter_working}")
-                } else {
-                    read_letter_main
-                };
-                let written_instructions: String = match t.write {
-                    WriteEnv::Pairs { main, working } => {
-                        let main_written_symbol: &str = main.written.as_str();
-                        let main_head_move: &str = main.head_move.as_str();
-                        let working_written_symbol: &str = working.written.as_str();
-                        let working_head_move: &str = working.head_move.as_str();
-
-                        // Check if we only use one tape (the main one)
-                        if working.written.is_empty()
-                        {
-                            f!("{main_written_symbol}, {main_head_move}")
-                        } else {
-                            f!("({main_written_symbol}, {main_head_move}), ({working_written_symbol}, {working_head_move})")
-                        }
-                    }
-                    WriteEnv::Fun(v) => {
-                        if v.len() == 1 {
-                            // Only one function in the vector
-                            let fun = v.first().unwrap();
-                            f!("{fun.name}({fun.arg})")
-                        }
-                        else {
-                            // List of functions
-                        let mut out =
-                            v.into_iter()
-                                .fold("[".to_string(), |s: String, fun: WriteFun| {
-                                    let s: &str = s.as_str();
-                                    f!("{s}{fun.name}({fun.arg}), ")
-                                });
-                        // Remove the last ", " characters
-                        out.pop();
-                        out.pop();
-                        out.push(']');
-                        out
-                        }
-                    }
-                };
-                s.push_str(
-                    f!("{name} -> {target} [label=\"{read_letter} → {written_instructions}\"];\n")
-                        .as_str(),
-                );
-                s
-            })
-    }
-
-    /// Takes a TM machine (.tm) code and turns it into a .dot graph code.
-    ///
-    /// # Examples
-    ///
-    /// In Rust, it would be used like this:
-    /// ```rust
-    /// println!("{}", parsing::tm_string_to_dot(&str, "Function Name", 1))
-    /// ```
-    ///
-    /// However, using it in an HTML context might be more understandable since this is
-    /// its main purpose.
-    /// ```html
-    /// <html>
-    ///   <head></head>
-    ///   <body>
-    ///     <textarea id="test-tm-code" name="test-tm-code" rows="20" cols="50">
-    ///       Turing Machine code goes here
-    ///     </textarea>
-    ///     <p id="test-dot-output">
-    ///       output
-    ///     </p>
-    ///     <script type="module">
-    ///       import init, { tm_string_to_dot } from "./tm_parser/tm_parser.js";
-    ///
-    ///       init().then(() => {
-    ///         const code_editor = document.getElementById("test-tm-code");
-    ///         const dot_output = document.getElementById("test-dot-output");
-    ///
-    ///         code_editor.addEventListener("input", (e) => {
-    ///           console.log("RUST CALL");
-    ///           dot_output.innerText = tm_string_to_dot(code_editor.value, "TEST");
-    ///           console.log("PARSED");
-    ///         });
-    ///       });
-    ///     </script>
-    ///   </body>
-    /// </html>
-    /// ```
-    #[wasm_bindgen]
-    pub fn tm_string_to_dot(input_string: &str, tm_name: &str, grammar_version: i8) -> String {
-        let states: Vec<State> = match get_parsed_file(input_string, grammar_version) {
-            Err(s) => return s,
-            Ok(v) => v,
-        };
-
-        // parse the AST from states
-        let states_dot = states
-            .into_iter()
-            .fold("".to_string(), |mut s: String, state: State| {
-                s.push_str(state_to_dot(state).as_str());
-                s
-            });
-
-        format!(
-            "digraph {name} {{
-label=\"{name}\";
-rankdir=LR;
-node [style=filled];
-
-{states_dot}
-START [shape=cds,fillcolor=\"#38ef59\"];
-END [shape=doublecircle,fillcolor=\"#efa038\"];
-ERROR [shape=hexagon,fillcolor=\"#f37db6\"];
-}}
-",
-            name = tm_name,
-            states_dot = states_dot
-        )
     }
 }
