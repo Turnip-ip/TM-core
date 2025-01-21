@@ -20,30 +20,30 @@ pub mod machines {
 
     #[derive(Debug, Clone, Copy)]
     pub struct BaseAction {
-        letter1: Gamma,
-        mov1: Movement,
-        letter2: Gamma,
-        mov2: Movement,
+        letter_main: Gamma,
+        mov_main: Movement,
+        letter_work: Gamma,
+        mov_work: Movement,
     }
 
     #[derive(Debug, Clone, Copy)]
     pub enum Fun {
-        Mv1(i32),
-        Mv2(i32),
+        MvMain(i32),
+        MvWork(i32),
     }
 
     impl Fun {
         fn eval(
             &self,
-            pos1: &mut TapePos,
-            _tape1: &mut [Gamma],
-            pos2: &mut TapePos,
-            _tape2: &mut [Gamma],
+            pos_main: &mut TapePos,
+            _tape_main: &mut [Gamma],
+            pos_work: &mut TapePos,
+            _tape_work: &mut [Gamma],
         ) {
             match &self {
                 // TODO check bounds
-                Fun::Mv1(i) => *pos1 = (*pos1).wrapping_add(*i as u32),
-                Fun::Mv2(i) => *pos2 = (*pos2).wrapping_add(*i as u32),
+                Fun::MvMain(i) => *pos_main = (*pos_main).wrapping_add(*i as u32),
+                Fun::MvWork(i) => *pos_work = (*pos_work).wrapping_add(*i as u32),
             }
         }
     }
@@ -60,12 +60,11 @@ pub mod machines {
         target: State,
     }
 
-    #[wasm_bindgen]
     #[derive(Debug, Clone)]
     pub struct TM {
         _state_of_string: HashMap<String, State>,
         _string_of_state: HashMap<State, String>,
-        delta: Vec<Vec<Vec<Outcome>>>, // delta[state][letter1][letter2]
+        delta: Vec<Vec<Vec<Outcome>>>, // delta[state][letter_main][letter_work]
     }
 
     #[wasm_bindgen]
@@ -73,15 +72,17 @@ pub mod machines {
     pub struct Simu {
         _tm: TM,
         _cur_state: State,
-        _head_pos1: TapePos,
-        _tape1: Vec<Gamma>,
-        _head_pos2: TapePos,
-        _tape2: Vec<Gamma>,
+        _head_pos_main: TapePos,
+        _tape_main: Vec<Gamma>,
+        _head_pos_work: TapePos,
+        _tape_work: Vec<Gamma>,
     }
 
     impl TM {
         /// Function that creates a TM object from a Vector of States
         /// from the parser.
+        ///
+        /// TODO: maybe add an option for bit mode (v0 grammar)
         pub fn from_state_vector(v: Vec<parser::State>) -> Result<TM, String> {
             // Create TM arguments that we will use in the constructor
             let mut state_of_string: HashMap<String, State> = HashMap::new();
@@ -89,7 +90,7 @@ pub mod machines {
 
             // Iterate over all states of the machine to populate hash maps
             for (i, state) in v.iter().enumerate() {
-                let state_id: u32 = i as u32;
+                let state_id: State = i as State;
                 state_of_string.insert(state.name.clone(), state_id);
                 string_of_state.insert(state_id, state.name.clone());
             }
@@ -101,10 +102,10 @@ pub mod machines {
             for state in delta.iter_mut() {
                 // We have u8_MAX possible transitions for each state
                 // Initialize them with default actions
-                state.resize(Gamma::MAX as usize, Vec::new());
-                for letter1_vec in state {
-                    letter1_vec.resize(
-                        Gamma::MAX as usize,
+                state.resize((Gamma::MAX as usize) + 1, Vec::new());
+                for letter_main_vec in state {
+                    letter_main_vec.resize(
+                        (Gamma::MAX as usize) + 1,
                         Outcome {
                             action: Action::Funs(Vec::new()),
                             target: 0,
@@ -115,19 +116,19 @@ pub mod machines {
 
             // Iterate on all states (and their id) to properly fill in delta
             for (i, state) in v.iter().enumerate() {
-                let state_id: u32 = i as u32;
+                let state_id: State = i as State;
                 let state_name: String = state.name.clone();
 
                 // Build a set of unvisited read characters to easily iterate
                 // When we encounter a 'b' representing any value
                 let mut not_seen_read: HashMap<Gamma, HashSet<Gamma>> = HashMap::new();
-                not_seen_read.reserve((Gamma::MAX as usize) * (Gamma::MAX as usize));
-                for bm in 0..Gamma::MAX {
+                not_seen_read.reserve(Gamma::MAX as usize);
+                for bm in 0..=Gamma::MAX {
                     not_seen_read.insert(
                         bm,
                         HashSet::with_capacity_and_hasher(Gamma::MAX as usize, RandomState::new()),
                     );
-                    for bw in 0..Gamma::MAX {
+                    for bw in 0..=Gamma::MAX {
                         not_seen_read.get_mut(&bm).unwrap().insert(bw);
                     }
                 }
@@ -189,10 +190,10 @@ pub mod machines {
 
                             Outcome {
                                 action: Action::BaseAction(BaseAction {
-                                    letter1: parsed_write_main.unwrap_or_default(),
-                                    mov1: parsed_head_move_main,
-                                    letter2: parsed_write_working.unwrap_or_default(),
-                                    mov2: parsed_head_move_working,
+                                    letter_main: parsed_write_main.unwrap_or_default(),
+                                    mov_main: parsed_head_move_main,
+                                    letter_work: parsed_write_working.unwrap_or_default(),
+                                    mov_work: parsed_head_move_working,
                                 }),
                                 target: *state_of_string.get(&target_name).unwrap(),
                             }
@@ -314,7 +315,6 @@ pub mod machines {
         }
     }
 
-    #[wasm_bindgen]
     impl TM {
         pub fn state_of_string(&self, s: String) -> State {
             *self._state_of_string.get(&s).unwrap()
@@ -340,10 +340,10 @@ pub mod machines {
             Ok(Simu {
                 _tm: tm,
                 _cur_state: start_state,
-                _head_pos1: 0,
-                _tape1: main_tape,
-                _head_pos2: 0,
-                _tape2: working_tape,
+                _head_pos_main: 0,
+                _tape_main: main_tape,
+                _head_pos_work: 0,
+                _tape_work: working_tape,
             })
         }
     }
@@ -352,34 +352,34 @@ pub mod machines {
         /// TODO: documentation
         pub fn next_step(&mut self) {
             let cur_state_usize = self._cur_state as usize;
-            let head_pos1_usize = self._head_pos1 as usize;
-            let head_pos2_usize = self._head_pos2 as usize;
-            let tape_letter1 = self._tape1[head_pos1_usize] as usize;
-            let tape_letter2 = self._tape2[head_pos2_usize] as usize;
+            let head_pos_main_usize = self._head_pos_main as usize;
+            let head_pos_work_usize = self._head_pos_work as usize;
+            let tape_letter_main = self._tape_main[head_pos_main_usize] as usize;
+            let tape_letter_work = self._tape_work[head_pos_work_usize] as usize;
             let tm = &self._tm;
-            let oc = &tm.delta[cur_state_usize][tape_letter1][tape_letter2];
+            let oc = &tm.delta[cur_state_usize][tape_letter_main][tape_letter_work];
             match &(oc.action) {
                 Action::BaseAction(act) => {
-                    self._tape1[head_pos1_usize] = act.letter1;
-                    self._tape2[head_pos2_usize] = act.letter2;
-                    self._head_pos1 = match act.mov1 {
+                    self._tape_main[head_pos_main_usize] = act.letter_main;
+                    self._tape_work[head_pos_work_usize] = act.letter_work;
+                    self._head_pos_main = match act.mov_main {
                         // TODO check bounds
-                        Movement::Left => self._head_pos1 - 1,
-                        Movement::Right => self._head_pos1 + 1,
+                        Movement::Left => self._head_pos_main - 1,
+                        Movement::Right => self._head_pos_main + 1,
                     };
-                    self._head_pos2 = match act.mov2 {
+                    self._head_pos_work = match act.mov_work {
                         // TODO check bounds
-                        Movement::Left => self._head_pos2 - 1,
-                        Movement::Right => self._head_pos2 + 1,
+                        Movement::Left => self._head_pos_work - 1,
+                        Movement::Right => self._head_pos_work + 1,
                     };
                 }
                 Action::Funs(fs) => {
                     for f in fs.iter() {
                         f.eval(
-                            &mut self._head_pos1,
-                            &mut self._tape1,
-                            &mut self._head_pos2,
-                            &mut self._tape2,
+                            &mut self._head_pos_main,
+                            &mut self._tape_main,
+                            &mut self._head_pos_work,
+                            &mut self._tape_work,
                         );
                     }
                 }
@@ -421,8 +421,8 @@ pub mod machines {
             if self._tm.string_of_state(self._cur_state) != "END" {
                 false
             } else {
-                for (i, letter) in self._tape1.iter().enumerate() {
-                    if expected[i] != *letter {
+                for (i, letter) in expected.iter().enumerate() {
+                    if self._tape_main[i] != *letter {
                         return false;
                     }
                 }
@@ -437,12 +437,12 @@ pub mod machines {
             self._cur_state
         }
 
-        pub fn head_pos1(&self) -> TapePos {
-            self._head_pos1
+        pub fn head_pos_main(&self) -> TapePos {
+            self._head_pos_main
         }
 
-        pub fn head_pos2(&self) -> TapePos {
-            self._head_pos2
+        pub fn head_pos_work(&self) -> TapePos {
+            self._head_pos_work
         }
     }
 }

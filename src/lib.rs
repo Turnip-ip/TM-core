@@ -125,13 +125,17 @@ mod tests {
     #[test]
     #[allow(non_snake_case)]
     fn simple_TM_generation() {
-        let states: Vec<parser::State> =
-            dbg!(parser::get_parsed_file("tests/v0/INCR.tm", 0).unwrap());
+        let input_string: String =
+            fs::read_to_string("tests/v0/INCR.tm").expect("cannot read file..");
+        let states: Vec<parser::State> = dbg!(parser::get_parsed_file(&input_string, 0).unwrap());
+        // Transform into a Turing Machine
         let tm: machines::TM = dbg!(machines::TM::from_state_vector(states).unwrap());
+        // Dumb tests for the generation
         assert_eq!(tm.state_of_string("START".to_string()), 0);
         assert_eq!(tm.state_of_string("q".to_string()), 1);
         assert_eq!("START", tm.string_of_state(0));
         assert_eq!("q", tm.string_of_state(1));
+        // TODO: add tests for transitions
     }
 
     #[test]
@@ -141,6 +145,7 @@ mod tests {
             fs::read_to_string("tests/v0/INCR.tm").expect("cannot read file..");
         let main_tape: Vec<machines::Gamma> = vec![1, 0, 1, 0, 0];
         let working_tape: Vec<machines::Gamma> = vec![0, 0, 0, 0, 0];
+        // Create a simulation
         let mut simu =
             dbg!(machines::Simu::new(&input_string, 0, main_tape, working_tape).unwrap());
         let expected_tape: Vec<machines::Gamma> = vec![1, 0, 1, 0, 1];

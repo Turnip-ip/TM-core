@@ -104,8 +104,8 @@ pub mod parser {
                                 head_move: head_move_value.as_str().to_string(),
                             },
                             working: super::WritePair {
-                                written: "".to_string(),
-                                head_move: "".to_string(),
+                                written: "".to_string(),   // DEFAULT VALUE
+                                head_move: "".to_string(), // DEFAULT VALUE
                             },
                         }
                     }
