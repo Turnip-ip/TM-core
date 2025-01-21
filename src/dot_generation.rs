@@ -5,12 +5,14 @@
 ///
 /// This module is made to be interfaced with WebAssembly from a browser.
 pub mod dot {
+    use core::panic;
+
     use wasm_bindgen::prelude::wasm_bindgen;
 
     use crate::turnip_parsing::parser;
 
     /// TODO: doc
-    fn state_to_dot(state: parser::State) -> String {
+    fn state_to_dot(state: parser::State, grammar_version: i8) -> String {
         use fstrings::f;
         use fstrings::format_args_f;
 
@@ -24,11 +26,12 @@ pub mod dot {
                 // Check if read has empty main
                 let read_letter_working: String = t.read.working;
                 let read_letter_main: String = t.read.main;
-                let read_letter: String = if !read_letter_working.is_empty() {
-                    f!("{read_letter_main}, {read_letter_working}")
-                } else {
-                    read_letter_main
-                };
+                let read_letter: String =
+                    match grammar_version {
+                        0 => format!("{read_letter_main}, {read_letter_working}"),
+                        1 => read_letter_main,
+                        _ => panic!("Unknown grammar version match 1 dot generation")
+                    };
                 let written_instructions: String = match t.write {
                     parser::WriteEnv::Pairs { main, working } => {
                         let main_written_symbol: &str = main.written.as_str();
@@ -37,11 +40,10 @@ pub mod dot {
                         let working_head_move: &str = working.head_move.as_str();
 
                         // Check if we only use one tape (the main one)
-                        if working.written.is_empty()
-                        {
-                            f!("{main_written_symbol}, {main_head_move}")
-                        } else {
-                            f!("({main_written_symbol}, {main_head_move}), ({working_written_symbol}, {working_head_move})")
+                        match grammar_version {
+                            0 => f!("{main_written_symbol}, {main_head_move}"),
+                            1 => f!("({main_written_symbol}, {main_head_move}), ({working_written_symbol}, {working_head_move})"),
+                            _ => panic!("Unknown grammar version match 2 dot generation")
                         }
                     }
                     parser::WriteEnv::Fun(v) => {
@@ -125,7 +127,7 @@ pub mod dot {
             states
                 .into_iter()
                 .fold("".to_string(), |mut s: String, state: parser::State| {
-                    s.push_str(state_to_dot(state).as_str());
+                    s.push_str(state_to_dot(state, grammar_version).as_str());
                     s
                 });
 

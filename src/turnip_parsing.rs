@@ -78,7 +78,7 @@ pub mod parser {
             super::Transition {
                 read: super::ReadEnv {
                     main: read_tape_symbol,
-                    working: "".to_string(),
+                    working: "_".to_string(),
                 },
                 write: (match first_tape_action.as_rule() {
                     Rule::fun_sequence => {
@@ -104,8 +104,8 @@ pub mod parser {
                                 head_move: head_move_value.as_str().to_string(),
                             },
                             working: super::WritePair {
-                                written: "".to_string(),   // DEFAULT VALUE
-                                head_move: "".to_string(), // DEFAULT VALUE
+                                written: "0".to_string(),   // DEFAULT VALUE
+                                head_move: "S".to_string(), // DEFAULT VALUE
                             },
                         }
                     }

@@ -13,6 +13,7 @@ pub mod machines {
     pub enum Movement {
         Left,
         Right,
+        Stay,
     }
     pub type State = u32;
     pub type TapePos = u32;
@@ -164,6 +165,7 @@ pub mod machines {
                             let parsed_head_move_main: Movement = match main_head_move.as_str() {
                                 "L" => Movement::Left,
                                 "R" => Movement::Right,
+                                "S" => Movement::Stay,
                                 _ => {
                                     return Err(format!(
                                         "Unknown HEAD Move given for the main tape: {main_head_move} (line {j})."
@@ -181,6 +183,7 @@ pub mod machines {
                             let parsed_head_move_working: Movement = match working_head_move.as_str() {
                                 "L" => Movement::Left,
                                 "R" => Movement::Right,
+                                "S" => Movement::Stay,
                                 _ => {
                                     return Err(format!(
                                         "Unknown HEAD Move given for the working tape: {working_head_move} (line {j})."
@@ -366,11 +369,13 @@ pub mod machines {
                         // TODO check bounds
                         Movement::Left => self._head_pos_main - 1,
                         Movement::Right => self._head_pos_main + 1,
+                        Movement::Stay => self._head_pos_main,
                     };
                     self._head_pos_work = match act.mov_work {
                         // TODO check bounds
                         Movement::Left => self._head_pos_work - 1,
                         Movement::Right => self._head_pos_work + 1,
+                        Movement::Stay => self._head_pos_work,
                     };
                 }
                 Action::Funs(fs) => {

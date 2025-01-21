@@ -21,7 +21,7 @@ int = @{ ("+"|"-")? ~ ASCII_DIGIT+ } //can be 0 if we want
 tape_symbol = @{ '0'..'1'|"_"|var_name }
 
 // Head movement
-head_move = @{ "L"|"R" }
+head_move = @{ "L"|"R"|"S" }
 // head_move = @{ ("+"|"-")? ~ ASCII_NONZERO_DIGIT	~ ASCII_DIGIT* }
 
 // Function
