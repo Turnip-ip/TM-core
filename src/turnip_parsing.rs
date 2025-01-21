@@ -212,7 +212,11 @@ pub mod parser {
 
                         // Build the vector containing all the states of the given
                         // parsed file using a fold onto the states
-                        Ok(file_pair.into_inner().fold(vec![], |mut states: Vec<State>, state_pair: Pair<v0::Rule>| {
+                        let base_states: Vec<State> = vec![
+                            State { name: "END".to_string(), transitions: vec![]},
+                            State { name: "ERROR".to_string(), transitions: vec![]}
+                        ];
+                        Ok(file_pair.into_inner().fold(base_states, |mut states: Vec<State>, state_pair: Pair<v0::Rule>| {
                             if state_pair.as_rule() == v0::Rule::state {
                                 // Iterator on state elements                            
                                 let mut state_iter: Pairs<v0::Rule> = state_pair.clone().into_inner();
@@ -230,6 +234,8 @@ pub mod parser {
                                     transitions: state_transitions,
                                 })
                             }
+
+                            // Add the missing ending states
                             states
                         }))
                     },
@@ -244,9 +250,13 @@ pub mod parser {
 
                         // Build the vector containing all the states of the given
                         // parsed file using a fold onto the states
-                        Ok(file_pair.into_inner().fold(vec![], |mut states: Vec<State>, state_pair: Pair<v1::Rule>| {
+                        let base_states: Vec<State> = vec![
+                            State { name: "END".to_string(), transitions: vec![]},
+                            State { name: "ERROR".to_string(), transitions: vec![]}
+                        ];
+                        Ok(file_pair.into_inner().fold(base_states, |mut states: Vec<State>, state_pair: Pair<v1::Rule>| {
                             if state_pair.as_rule() == v1::Rule::state {
-                                // Iterator on state elements                            
+                                // Iterator on state elements
                                 let mut state_iter: Pairs<v1::Rule> = state_pair.clone().into_inner();
                                 // First the name of the state
                                 let state_name: &str = state_iter.next().unwrap().as_str();
@@ -262,6 +272,10 @@ pub mod parser {
                                     transitions: state_transitions,
                                 })
                             }
+
+                            // Add the missing ending states
+                            states.push(State { name: "END".to_string(), transitions: vec![]});
+                            states.push(State { name: "ERROR".to_string(), transitions: vec![]});
                             states
                         }))
                     },

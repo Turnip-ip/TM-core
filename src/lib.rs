@@ -124,30 +124,51 @@ mod tests {
     // Turing Machines tests
     #[test]
     #[allow(non_snake_case)]
-    fn simple_TM_generation() {
+    fn v0_err_TM_generation() {
         let input_string: String =
             fs::read_to_string("tests/v0/INCR.tm").expect("cannot read file..");
-        let states: Vec<parser::State> = dbg!(parser::get_parsed_file(&input_string, 0).unwrap());
+        let states: Vec<parser::State> = parser::get_parsed_file(&input_string, 0).unwrap();
         // Transform into a Turing Machine
-        let tm: machines::TM = dbg!(machines::TM::from_state_vector(states).unwrap());
-        // Dumb tests for the generation
-        assert_eq!(tm.state_of_string("START".to_string()), 0);
-        assert_eq!(tm.state_of_string("q".to_string()), 1);
-        assert_eq!("START", tm.string_of_state(0));
-        assert_eq!("q", tm.string_of_state(1));
-        // TODO: add tests for transitions
+        assert!(machines::TM::from_state_vector(states, vec![]).is_err());
+    }
+
+    #[test]
+    #[allow(non_snake_case)]
+    fn v0_ok_TM_generation() {
+        let input_string: String =
+            fs::read_to_string("tests/v0/add1.tm").expect("cannot read file..");
+        let states: Vec<parser::State> = parser::get_parsed_file(&input_string, 0).unwrap();
+        let fun_env: Vec<String> = vec!["MOVE".to_string()];
+        // Transform into a Turing Machine
+        assert!(machines::TM::from_state_vector(states, fun_env).is_ok());
+    }
+
+    #[test]
+    #[allow(non_snake_case)]
+    fn v1_ok_TM_generation() {
+        let input_string: String =
+            fs::read_to_string("tests/v1/add.tm").expect("cannot read file..");
+        let states: Vec<parser::State> = parser::get_parsed_file(&input_string, 1).unwrap();
+        let fun_env: Vec<String> = vec![
+            "MOVE_BYTE_M".to_string(),
+            "WRITE_M".to_string(),
+            "ADD1_M".to_string(),
+        ];
+        // Transform into a Turing Machine
+        assert!(machines::TM::from_state_vector(states, fun_env).is_ok());
     }
 
     #[test]
     #[allow(non_snake_case)]
     fn simple_Simu_generation() {
         let input_string: String =
-            fs::read_to_string("tests/v0/INCR.tm").expect("cannot read file..");
+            fs::read_to_string("tests/v0/add1.tm").expect("cannot read file..");
         let main_tape: Vec<machines::Gamma> = vec![1, 0, 1, 0, 0];
         let working_tape: Vec<machines::Gamma> = vec![0, 0, 0, 0, 0];
+        let fun_env: Vec<String> = vec!["MOVE".to_string()];
         // Create a simulation
         let mut simu =
-            dbg!(machines::Simu::new(&input_string, 0, main_tape, working_tape).unwrap());
+            machines::Simu::new(&input_string, 0, main_tape, working_tape, fun_env).unwrap();
         let expected_tape: Vec<machines::Gamma> = vec![1, 0, 1, 0, 1];
         simu.all_steps();
         assert!(simu.verify_output(&expected_tape[..]));

@@ -84,7 +84,10 @@ pub mod machines {
         /// from the parser.
         ///
         /// TODO: maybe add an option for bit mode (v0 grammar)
-        pub fn from_state_vector(v: Vec<parser::State>) -> Result<TM, String> {
+        pub fn from_state_vector(
+            v: Vec<parser::State>,
+            valid_funs: Vec<String>,
+        ) -> Result<TM, String> {
             // Create TM arguments that we will use in the constructor
             let mut state_of_string: HashMap<String, State> = HashMap::new();
             let mut string_of_state: HashMap<State, String> = HashMap::new();
@@ -95,6 +98,9 @@ pub mod machines {
                 state_of_string.insert(state.name.clone(), state_id);
                 string_of_state.insert(state_id, state.name.clone());
             }
+
+            // Transform valid_fun array into a better structure
+            let valid_funs_set: HashSet<String> = HashSet::from_iter(valid_funs.iter().cloned());
 
             // Transform the transitions of the states vector into delta object
             let mut delta: Vec<Vec<Vec<Outcome>>> = Vec::new();
@@ -116,9 +122,9 @@ pub mod machines {
             }
 
             // Iterate on all states (and their id) to properly fill in delta
-            for (i, state) in v.iter().enumerate() {
-                let state_id: State = i as State;
+            for state in v.iter() {
                 let state_name: String = state.name.clone();
+                let state_id: State = *state_of_string.get(&state_name).unwrap();
 
                 // Build a set of unvisited read characters to easily iterate
                 // When we encounter a 'b' representing any value
@@ -202,7 +208,57 @@ pub mod machines {
                             }
                         }
                         parser::WriteEnv::Fun(write_funs) => {
-                            todo!()
+                            // Functions list that will be stored by the Outcome
+                            let mut funs: Vec<Fun> = vec![];
+
+                            // Iterate on the parser's function list
+                            for f in write_funs.iter() {
+                                let fun_name: &str = f.name.as_str();
+                                // Check the fun env
+                                if !valid_funs_set.contains(&f.name) {
+                                    return Err(format!(
+                                        "{fun_name} is not available (used at line {j})."
+                                    ));
+                                }
+
+                                // Construct the correct object
+                                let parsed_fun = match fun_name {
+                                    "MOVE" => {
+                                        // Should have arity 1
+                                        Fun::MvMain(f.arg.parse::<i32>().unwrap())
+                                    }
+                                    "MOVE_M" => {
+                                        // Should have arity 1
+                                        Fun::MvMain(f.arg.parse::<i32>().unwrap())
+                                    }
+                                    "MOVE_W" => {
+                                        // Should have arity 1
+                                        Fun::MvWork(f.arg.parse::<i32>().unwrap())
+                                    }
+                                    "MOVE_BYTE_M" => {
+                                        todo!()
+                                    }
+                                    "ADD1_M" => {
+                                        todo!()
+                                    }
+                                    "WRITE_M" => {
+                                        todo!()
+                                    }
+                                    _ => {
+                                        return Err(format!(
+                                            "{fun_name} is not implemented in the simulation."
+                                        ))
+                                    }
+                                };
+
+                                funs.push(parsed_fun);
+                            }
+
+                            // Output the constructed outcome from functions list
+                            Outcome {
+                                action: Action::Funs(funs),
+                                target: *state_of_string.get(&target_name).unwrap(),
+                            }
                         }
                     }; // END outcome match
 
@@ -294,10 +350,21 @@ pub mod machines {
                                 }
                                 delta[state_id as usize][*read_main as usize]
                                     [read_working as usize] = outcome.clone();
+
+                                // Remove the entry from the HashMap if the working set
+                                // is empty
+                                // TODO: check if necessary
                             }
                         }
                         (false, false) => {
                             // CASE 4: both read and working are variables
+
+                            if not_seen_read.is_empty() {
+                                // TODO: change this to a warning
+                                return Err(format!(
+                                    "Everything has already been matched by a transition previously for state {state_name} (line {j})"
+                                ));
+                            }
 
                             for (read_main, working_set_read) in not_seen_read.iter() {
                                 for read_working in working_set_read.iter() {
@@ -305,6 +372,8 @@ pub mod machines {
                                         [*read_working as usize] = outcome.clone();
                                 }
                             }
+
+                            not_seen_read.clear();
                         }
                     }
                 }
@@ -335,9 +404,10 @@ pub mod machines {
             grammar_version: i8,
             main_tape: Vec<Gamma>,
             working_tape: Vec<Gamma>,
+            fun_env: Vec<String>,
         ) -> Result<Simu, String> {
             let states = parser::get_parsed_file(input_string, grammar_version)?;
-            let tm: TM = TM::from_state_vector(states)?;
+            let tm: TM = TM::from_state_vector(states, fun_env)?;
             let start_state: State = tm.state_of_string("START".to_string());
 
             Ok(Simu {
