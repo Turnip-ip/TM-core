@@ -28,8 +28,8 @@ pub mod dot {
                 let read_letter_main: String = t.read.main;
                 let read_letter: String =
                     match grammar_version {
-                        0 => format!("{read_letter_main}, {read_letter_working}"),
-                        1 => read_letter_main,
+                        0 => read_letter_main,
+                        1 => format!("{read_letter_main}, {read_letter_working}"),
                         _ => panic!("Unknown grammar version match 1 dot generation")
                     };
                 let written_instructions: String = match t.write {
