@@ -3,7 +3,6 @@
 
 pub mod machines {
     use crate::turnip_parsing::parser;
-    use core::num;
     use std::{
         collections::{HashMap, HashSet},
         hash::RandomState,
@@ -431,12 +430,13 @@ pub mod machines {
         }
     }
 
+    #[wasm_bindgen]
     impl Simu {
-        pub fn is_end(&mut self) -> bool {
+        pub fn is_end(&self) -> bool {
             self._cur_state == *self._tm._state_of_string.get("END").unwrap()
         }
 
-        pub fn is_error(&mut self) -> bool {
+        pub fn is_error(&self) -> bool {
             self._cur_state == *self._tm._state_of_string.get("ERROR").unwrap()
         }
 
@@ -514,8 +514,8 @@ pub mod machines {
         /// in arguments.
         ///
         /// Returns true if on END state and the expected output matches the main tape.
-        pub fn verify_output(self, expected: &[Gamma]) -> bool {
-            if self._tm.string_of_state(self._cur_state) != "END" {
+        pub fn verify_output(&self, expected: &[Gamma]) -> bool {
+            if !self.is_end() && self.head_pos_main() == 0 && self.head_pos_work() == 0 {
                 false
             } else {
                 for (i, letter) in expected.iter().enumerate() {

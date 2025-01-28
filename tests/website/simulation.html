@@ -85,20 +85,31 @@ qp0
       </tr>
     </tbody>
   </table>
+  <br />
+  <button id="compile-button">Compile</button>
   <hr />
   <pre>
-      <code id="test-compil-output">
-        Waiting for compilation...
-      </code>
+    <button id="next-step-button" disabled>NEXT STEP</button>
+    <button id="all-steps-button" disabled>ALL STEPS</button>
+    <code id="test-compil-output">
+      Waiting for compilation...
+    </code>
     </pre>
   <script type="module">
     import init, { Simu } from "./tm_parser/tm_parser.js?init";
 
     init().then(() => {
+      /// Get the HTML elements
       const code_editor = document.getElementById("test-tm-code");
+      const compile_button = document.getElementById("compile-button");
+      const next_step_button = document.getElementById("next-step-button");
+      const all_steps_button = document.getElementById("all-steps-button");
       const compil_output = document.getElementById("test-compil-output");
       const grammar_version = document.getElementById("test-version-select");
 
+      let simu = undefined;
+
+      /// Create Simulation Function
       function createSimu(main_tape, work_tape) {
         /*
         pub fn new(
@@ -113,7 +124,7 @@ qp0
         const gv = parseInt(grammar_version.value);
 
         try {
-          let simu = Simu.new(
+          simu = Simu.new(
             turnip_input,
             gv,
             main_tape,
@@ -125,13 +136,22 @@ qp0
           compil_output.innerHTML = `<ul>
               <li>Current State: `+ simu.cur_state().toString() + `</li>
             </ul>`;
+
+          // Update interactions
+          next_step_button.removeAttribute("disabled");
+          all_steps_button.removeAttribute("disabled");
         } catch (error) {
+          // Update interactions
+          next_step_button.setAttribute("disabled", "true");
+          all_steps_button.setAttribute("disabled", "true");
+          // Print errors
           console.error("Turnip Compilation error...")
           console.log(error);
           compil_output.innerHTML = error.toString();
         }
       }
 
+      /// Setup tapes
       let main_tape = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
       let work_tape = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
       const main_tape_table_row = document.getElementById("main_tape_row");
@@ -146,9 +166,9 @@ qp0
         tape_cell_input.classList.add("tape_input");
         tape_cell_input.value = main_tape[i];
 
-        tape_cell_input.oninput = (e => {
-          createSimu(main_tape, work_tape);
-        });
+        // tape_cell_input.oninput = (e => {
+        //   createSimu(main_tape, work_tape);
+        // });
 
         tape_cell.appendChild(tape_cell_input);
 
@@ -164,19 +184,36 @@ qp0
         tape_cell_input.classList.add("tape_input");
         tape_cell_input.value = work_tape[i];
 
-        tape_cell_input.oninput = (e => {
-          createSimu(main_tape, work_tape);
-        });
+        // tape_cell_input.oninput = (e => {
+        //   createSimu(main_tape, work_tape);
+        // });
 
         tape_cell.appendChild(tape_cell_input);
 
         work_tape_table_row.appendChild(tape_cell);
       }
 
-      createSimu(main_tape, work_tape);
-
-      code_editor.addEventListener("input", (e) => {
+      /// Setup events
+      code_editor.addEventListener("focusout", (e) => {
+        e.stopPropagation();// Just in case, I don't remember what it does :)
         createSimu(main_tape, work_tape);
+      });
+
+      compile_button.addEventListener("click", (e) => {
+        e.preventDefault();
+        createSimu(main_tape, work_tape);
+      });
+
+      next_step_button.addEventListener("click", (e) => {
+        e.preventDefault();
+        if (simu !== undefined)
+          simu.next_step();
+      });
+
+      all_steps_button.addEventListener("click", (e) => {
+        e.preventDefault();
+        if (simu !== undefined)
+          simu.all_steps();
       });
     });
   </script>
