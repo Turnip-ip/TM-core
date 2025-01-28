@@ -3,6 +3,7 @@
 
 pub mod machines {
     use crate::turnip_parsing::parser;
+    use core::num;
     use std::{
         collections::{HashMap, HashSet},
         hash::RandomState,
@@ -239,19 +240,19 @@ pub mod machines {
                                         // TODO
                                         return Err(format!(
                                             "{fun_name} is not implemented in the simulation."
-                                        ))
+                                        ));
                                     }
                                     "ADD1_M" => {
                                         // TODO
                                         return Err(format!(
                                             "{fun_name} is not implemented in the simulation."
-                                        ))
+                                        ));
                                     }
                                     "WRITE_M" => {
                                         // TODO
                                         return Err(format!(
                                             "{fun_name} is not implemented in the simulation."
-                                        ))
+                                        ));
                                     }
                                     _ => {
                                         return Err(format!(
@@ -431,6 +432,14 @@ pub mod machines {
     }
 
     impl Simu {
+        pub fn is_end(&mut self) -> bool {
+            self._cur_state == *self._tm._state_of_string.get("END").unwrap()
+        }
+
+        pub fn is_error(&mut self) -> bool {
+            self._cur_state == *self._tm._state_of_string.get("ERROR").unwrap()
+        }
+
         /// TODO: documentation
         pub fn next_step(&mut self) {
             let cur_state_usize = self._cur_state as usize;
@@ -478,7 +487,11 @@ pub mod machines {
 
         /// TODO: documentation
         pub fn all_steps(&mut self) {
-            todo!()
+            let mut num_iter = 1000;
+            while !self.is_end() && !self.is_error() && num_iter > 0 {
+                self.next_step();
+                num_iter -= 1;
+            }
         }
     }
 
