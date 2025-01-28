@@ -236,13 +236,22 @@ pub mod machines {
                                         Fun::MvWork(f.arg.parse::<i32>().unwrap())
                                     }
                                     "MOVE_BYTE_M" => {
-                                        todo!()
+                                        // TODO
+                                        return Err(format!(
+                                            "{fun_name} is not implemented in the simulation."
+                                        ))
                                     }
                                     "ADD1_M" => {
-                                        todo!()
+                                        // TODO
+                                        return Err(format!(
+                                            "{fun_name} is not implemented in the simulation."
+                                        ))
                                     }
                                     "WRITE_M" => {
-                                        todo!()
+                                        // TODO
+                                        return Err(format!(
+                                            "{fun_name} is not implemented in the simulation."
+                                        ))
                                     }
                                     _ => {
                                         return Err(format!(

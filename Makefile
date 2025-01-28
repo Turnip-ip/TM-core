@@ -1,7 +1,7 @@
 PKG_NAME:=$(shell cargo metadata --no-deps --format-version 1 | head -c 31 | tail -c 9)
 
 .PHONY: all
-all: doc release
+all: release
 
 .PHONY: test
 test:
@@ -13,8 +13,8 @@ lint:
 	cargo fmt
 
 .PHONY: doc
-doc: lint
-	cargo doc --document-private-items
+doc:
+	RUSTDOCFLAGS="--enable-index-page -Zunstable-options" cargo +nightly doc --document-private-items
 
 .PHONY: release
 release: lint test

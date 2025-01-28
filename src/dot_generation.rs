@@ -13,9 +13,6 @@ pub mod dot {
 
     /// TODO: doc
     fn state_to_dot(state: parser::State, grammar_version: i8) -> String {
-        use fstrings::f;
-        use fstrings::format_args_f;
-
         // Append all transitions into .dot edges format
         state
             .transitions
@@ -41,8 +38,8 @@ pub mod dot {
 
                         // Check if we only use one tape (the main one)
                         match grammar_version {
-                            0 => f!("{main_written_symbol}, {main_head_move}"),
-                            1 => f!("({main_written_symbol}, {main_head_move}), ({working_written_symbol}, {working_head_move})"),
+                            0 => format!("{main_written_symbol}, {main_head_move}"),
+                            1 => format!("({main_written_symbol}, {main_head_move}), ({working_written_symbol}, {working_head_move})"),
                             _ => panic!("Unknown grammar version match 2 dot generation")
                         }
                     }
@@ -50,7 +47,9 @@ pub mod dot {
                         if v.len() == 1 {
                             // Only one function in the vector
                             let fun = v.first().unwrap();
-                            f!("{fun.name}({fun.arg})")
+                            let f_name = fun.name.clone();
+                            let f_arg = fun.arg.clone();
+                            format!("{f_name}({f_arg})")
                         }
                         else {
                             // List of functions
@@ -58,7 +57,9 @@ pub mod dot {
                             v.into_iter()
                                 .fold("[".to_string(), |s: String, fun: parser::WriteFun| {
                                     let s: &str = s.as_str();
-                                    f!("{s}{fun.name}({fun.arg}), ")
+                                    let f_name = fun.name;
+                                    let f_arg = fun.arg;
+                                    format!("{s}{f_name}({f_arg}), ")
                                 });
                         // Remove the last ", " characters
                         out.pop();
@@ -69,7 +70,7 @@ pub mod dot {
                     }
                 };
                 s.push_str(
-                    f!("{name} -> {target} [label=\"{read_letter} → {written_instructions}\"];\n")
+                    format!("{name} -> {target} [label=\"{read_letter} → {written_instructions}\"];\n")
                         .as_str(),
                 );
                 s
