@@ -19,6 +19,29 @@ pub mod machines {
     pub type TapePos = u32;
     pub type Gamma = u8;
 
+    #[wasm_bindgen]
+    #[derive(Debug, Clone)]
+    pub enum TapeType {
+        Work,
+        Main,
+    }
+
+    #[wasm_bindgen]
+    #[derive(Debug, Clone)]
+    pub struct TapeEdit {
+        tape_type: TapeType,
+        index_of_edit: TapePos,
+        new_letter: Gamma,
+        new_index: TapePos,
+    }
+
+    #[wasm_bindgen]
+    #[derive(Debug, Clone)]
+    pub struct TmEdit {
+        tapes_edits: Vec<TapeEdit>,
+        new_state: State,
+    }
+
     #[derive(Debug, Clone, Copy)]
     pub struct BaseAction {
         letter_main: Gamma,
@@ -40,11 +63,27 @@ pub mod machines {
             _tape_main: &mut [Gamma],
             pos_work: &mut TapePos,
             _tape_work: &mut [Gamma],
-        ) {
+        ) -> Vec<TapeEdit> {
             match &self {
                 // TODO check bounds
-                Fun::MvMain(i) => *pos_main = (*pos_main).wrapping_add(*i as u32),
-                Fun::MvWork(i) => *pos_work = (*pos_work).wrapping_add(*i as u32),
+                Fun::MvMain(i) => {
+                    *pos_main = (*pos_main).wrapping_add(*i as u32);
+                    vec![TapeEdit {
+                        tape_type: TapeType::Main,
+                        index_of_edit: 0,
+                        new_letter: _tape_main[0],
+                        new_index: *pos_main,
+                    }]
+                }
+                Fun::MvWork(i) => {
+                    *pos_work = (*pos_work).wrapping_add(*i as u32);
+                    vec![TapeEdit {
+                        tape_type: TapeType::Main,
+                        index_of_edit: 0,
+                        new_letter: _tape_main[0],
+                        new_index: *pos_main,
+                    }]
+                }
             }
         }
     }
@@ -77,7 +116,19 @@ pub mod machines {
         _tape_main: Vec<Gamma>,
         _head_pos_work: TapePos,
         _tape_work: Vec<Gamma>,
+        _past_edits: Vec<TmEdit>,
+        _future_edits: Vec<TmEdit>,
     }
+
+    // #[wasm_bindgen]
+    // #[derive(Debug, Clone)]
+    // pub struct SimuInfo {
+    //     pub cur_state: State,
+    //     pub head_pos_main: TapePos,
+    //     pub tape_main: String,
+    //     pub head_pos_work: TapePos,
+    //     pub tape_work: Vec<Gamma>,
+    // }
 
     impl TM {
         /// Function that creates a TM object from a Vector of States
@@ -426,12 +477,45 @@ pub mod machines {
                 _tape_main: main_tape,
                 _head_pos_work: 0,
                 _tape_work: working_tape,
+                _past_edits: Vec::new(),
+                _future_edits: Vec::new(),
             })
+        }
+    }
+
+    impl Simu {
+        fn apply_tm_edit(&mut self, edit: &mut TmEdit) {
+            std::mem::swap(&mut self._cur_state, &mut edit.new_state);
+            for e in edit.tapes_edits.iter_mut() {
+                match e.tape_type {
+                    TapeType::Work => {
+                        std::mem::swap(
+                            &mut self._tape_work[e.index_of_edit as usize],
+                            &mut e.new_letter,
+                        );
+
+                        std::mem::swap(&mut self._head_pos_work, &mut e.new_index);
+                    }
+                    TapeType::Main => {
+                        std::mem::swap(
+                            &mut self._tape_main[e.index_of_edit as usize],
+                            &mut e.new_letter,
+                        );
+
+                        std::mem::swap(&mut self._head_pos_main, &mut e.new_index);
+                    }
+                }
+            }
+            edit.tapes_edits.reverse();
         }
     }
 
     #[wasm_bindgen]
     impl Simu {
+        pub fn is_start(&self) -> bool {
+            self._past_edits.is_empty()
+        }
+
         pub fn is_end(&self) -> bool {
             self._cur_state == *self._tm._state_of_string.get("END").unwrap()
         }
@@ -440,8 +524,26 @@ pub mod machines {
             self._cur_state == *self._tm._state_of_string.get("ERROR").unwrap()
         }
 
+        //     pub fn get_info(&self) {
+        //         (
+        //             self._cur_state,
+        //             self._head_pos_main,
+        //             self._tape_main.clone(),
+        //             self._head_pos_work,
+        //             self._tape_work.clone(),
+        //         )
+        //     }
+    }
+
+    impl Simu {
         /// TODO: documentation
-        pub fn next_step(&mut self) {
+        pub fn _next_step(&mut self) {
+            if !self._future_edits.is_empty() {
+                let mut edits = self._future_edits.pop().unwrap();
+                self.apply_tm_edit(&mut edits);
+                self._past_edits.push(edits);
+                return;
+            }
             let cur_state_usize = self._cur_state as usize;
             let head_pos_main_usize = self._head_pos_main as usize;
             let head_pos_work_usize = self._head_pos_work as usize;
@@ -449,8 +551,26 @@ pub mod machines {
             let tape_letter_work = self._tape_work[head_pos_work_usize] as usize;
             let tm = &self._tm;
             let oc = &tm.delta[cur_state_usize][tape_letter_main][tape_letter_work];
+            let mut reverse_tm_edit = TmEdit {
+                tapes_edits: Vec::new(),
+                new_state: self._cur_state,
+            };
             match &(oc.action) {
                 Action::BaseAction(act) => {
+                    let tape_edit_main = TapeEdit {
+                        tape_type: TapeType::Main,
+                        index_of_edit: self.head_pos_main(),
+                        new_letter: self._tape_main[head_pos_main_usize],
+                        new_index: self.head_pos_main(),
+                    };
+                    let tape_edit_work = TapeEdit {
+                        tape_type: TapeType::Work,
+                        index_of_edit: self.head_pos_work(),
+                        new_letter: self._tape_work[head_pos_work_usize],
+                        new_index: self.head_pos_work(),
+                    };
+                    reverse_tm_edit.tapes_edits.push(tape_edit_main);
+                    reverse_tm_edit.tapes_edits.push(tape_edit_work);
                     self._tape_main[head_pos_main_usize] = act.letter_main;
                     self._tape_work[head_pos_work_usize] = act.letter_work;
                     self._head_pos_main = match act.mov_main {
@@ -467,29 +587,38 @@ pub mod machines {
                     };
                 }
                 Action::Funs(fs) => {
+                    let mut all_edits = Vec::new();
                     for f in fs.iter() {
-                        f.eval(
+                        let rev_tape_edits = f.eval(
                             &mut self._head_pos_main,
                             &mut self._tape_main,
                             &mut self._head_pos_work,
                             &mut self._tape_work,
                         );
+                        all_edits.push(rev_tape_edits);
                     }
+                    all_edits.reverse();
+                    reverse_tm_edit.tapes_edits = all_edits.into_iter().flatten().collect();
                 }
             }
             self._cur_state = oc.target;
+            self._past_edits.push(reverse_tm_edit);
         }
 
         /// TODO: documentation
-        pub fn prev_step(&mut self) {
-            todo!()
+        pub fn _prev_step(&mut self) {
+            if !self._past_edits.is_empty() {
+                let mut edits = self._past_edits.pop().unwrap();
+                self.apply_tm_edit(&mut edits);
+                self._future_edits.push(edits);
+            }
         }
 
         /// TODO: documentation
-        pub fn all_steps(&mut self) {
+        pub fn _all_steps(&mut self) {
             let mut num_iter = 1000;
             while !self.is_end() && !self.is_error() && num_iter > 0 {
-                self.next_step();
+                self._next_step();
                 num_iter -= 1;
             }
         }
