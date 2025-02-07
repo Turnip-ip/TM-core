@@ -81,11 +81,89 @@ pub enum Fun {
     MvWork(i32),
     /// Writes the given letter from Gamma to the main tape at the current
     /// head position.
-    WriteMain(u8),
+    WriteMain(Gamma),
     /// Writes the given letter from Gamma to the work tape at the current
     /// head position.
-    WriteWork(u8),
+    WriteWork(Gamma),
+    /// Adds one to the letter currently under the main tape head
     IncrBitsMain(),
+    /// Adds one to the letter currently under the work tape head
+    IncrBitsWork(),
+    /// Subtracts one to the letter currently under the main tape head
+    DecrBitsMain(),
+    /// Subtracts one to the letter currently under the work tape head
+    DecrBitsWork(),
+    /// Performs a bitwise not on the letter currently under the main tape head
+    BitwiseNotMain(),
+    /// Performs a bitwise not on the letter currently under the work tape head
+    BitwiseNotWork(),
+    /// Reads the next two letters A and B on the main tape, puts A + B in the third
+    /// position, and goes back to the head position in which it was before this function
+    Add(),
+    /// Reads the next two letters A and B on the main tape, puts A - B in the third
+    /// position, and goes back to the head position in which it was before this function
+    Sub(),
+    /// Reads the next two letters A and B on the main tape, puts A * B in the third
+    /// position, and goes back to the head position in which it was before this function
+    Mul(),
+    /// Reads the next two letters A and B on the main tape, puts A % B in the third
+    /// position, and goes back to the head position in which it was before this function
+    Mod(),
+    /// Reads the next two letters A and B on the main tape, puts A / B in the third
+    /// position, and goes back to the head position in which it was before this function
+    Div(),
+    /// Performs a bitwise or on the next two letters on the main tape, puts the result in the third
+    /// position, and goes back to the head position in which it was before this function
+    BitwiseOr(),
+    /// Performs a bitwise and on the next two letters on the main tape, puts the result in the third
+    /// position, and goes back to the head position in which it was before this function
+    BitwiseAnd(),
+    /// Performs a bitwise xor on the next two letters on the main tape, puts the result in the third
+    /// position, and goes back to the head position in which it was before this function
+    BitwiseXor(),
+    /// Performs a bitwise nand on the next two letters on the main tape, puts the result in the third
+    /// position, and goes back to the head position in which it was before this function
+    BitwiseNand(),
+    /// Compares the next two letters A and B on the main tape, if A >= B, puts 1 in the third
+    /// position, otherwise puts 0. Finally, goes back to the head position in which it was before
+    /// this function
+    Geq(),
+    /// Compares the next two letters A and B on the main tape, if A <= B, puts 1 in the third
+    /// position, otherwise puts 0. Finally, goes back to the head position in which it was before
+    /// this function
+    Leq(),
+    /// Compares the next two letters A and B on the main tape, if A > B, puts 1 in the third
+    /// position, otherwise puts 0. Finally, goes back to the head position in which it was before
+    /// this function
+    Gt(),
+    /// Compares the next two letters A and B on the main tape, if A < B, puts 1 in the third
+    /// position, otherwise puts 0. Finally, goes back to the head position in which it was before
+    /// this function
+    Lt(),
+    /// Compares the next two letters A and B on the main tape, if A = B, puts 1 in the third
+    /// position, otherwise puts 0. Finally, goes back to the head position in which it was before
+    /// this function
+    Eq(),
+    /// Compares the next two letters A and B on the main tape, if A != B, puts 1 in the third
+    /// position, otherwise puts 0. Finally, goes back to the head position in which it was before
+    /// this function
+    Neq(),
+}
+
+impl TapeType {
+    fn basic_tape_edit(
+        &self,
+        pos_edit: &TapePos,
+        pos_head: &TapePos,
+        _tape: &[Gamma],
+    ) -> Vec<TapeEdit> {
+        vec![TapeEdit {
+            tape_type: self.clone(),
+            index_of_edit: *pos_edit,
+            new_letter: _tape[*pos_edit as usize],
+            new_index: *pos_head,
+        }]
+    }
 }
 
 impl Fun {
@@ -99,46 +177,167 @@ impl Fun {
         match &self {
             // TODO check bounds XXX
             Fun::MvMain(i) => {
-                // TODO: check if correct
+                let v = TapeType::Main.basic_tape_edit(pos_main, &pos_main, _tape_main);
                 *pos_main = (*pos_main).wrapping_add(*i as u32);
-                vec![TapeEdit {
-                    tape_type: TapeType::Main,
-                    index_of_edit: 0,
-                    new_letter: _tape_main[0],
-                    new_index: *pos_main,
-                }]
+                v
             }
             Fun::MvWork(i) => {
+                let v = TapeType::Work.basic_tape_edit(pos_work, &pos_work, _tape_work);
                 *pos_work = (*pos_work).wrapping_add(*i as u32);
-                // TODO: check if correct
-                vec![TapeEdit {
-                    tape_type: TapeType::Work,
-                    index_of_edit: 0,
-                    new_letter: _tape_work[0],
-                    new_index: *pos_work,
-                }]
+                v
             }
             Fun::WriteMain(u) => {
+                let v = TapeType::Main.basic_tape_edit(pos_main, &pos_main, _tape_main);
                 _tape_main[*pos_main as usize] = *u;
-                // TODO: check if correct
-                vec![TapeEdit {
-                    tape_type: TapeType::Main,
-                    index_of_edit: *pos_main,
-                    new_letter: *u,
-                    new_index: *pos_main,
-                }]
+                v
             }
             Fun::WriteWork(u) => {
+                let v = TapeType::Work.basic_tape_edit(pos_work, &pos_work, _tape_work);
                 _tape_work[*pos_work as usize] = *u;
-                // TODO: check if correct
-                vec![TapeEdit {
-                    tape_type: TapeType::Work,
-                    index_of_edit: *pos_work,
-                    new_letter: *u,
-                    new_index: *pos_work,
-                }]
+                v
             }
-            Fun::IncrBitsMain() => todo!(),
+            Fun::IncrBitsMain() => {
+                let v = TapeType::Main.basic_tape_edit(pos_main, &pos_main, _tape_main);
+                _tape_main[*pos_main as usize] =
+                    _tape_main[*pos_main as usize].wrapping_add(1 as u8);
+                v
+            }
+            Fun::IncrBitsWork() => {
+                let v = TapeType::Work.basic_tape_edit(pos_work, &pos_work, _tape_work);
+                _tape_work[*pos_work as usize] =
+                    _tape_work[*pos_work as usize].wrapping_add(1 as u8);
+                v
+            }
+            Fun::DecrBitsMain() => {
+                let v = TapeType::Main.basic_tape_edit(pos_main, &pos_main, _tape_main);
+                _tape_main[*pos_main as usize] =
+                    _tape_main[*pos_main as usize].wrapping_sub(1 as Gamma);
+                v
+            }
+            Fun::DecrBitsWork() => {
+                let v = TapeType::Work.basic_tape_edit(pos_work, &pos_work, _tape_work);
+                _tape_work[*pos_work as usize] =
+                    _tape_work[*pos_work as usize].wrapping_sub(1 as Gamma);
+                v
+            }
+            Fun::BitwiseNotMain() => {
+                let v = TapeType::Main.basic_tape_edit(pos_main, &pos_main, _tape_main);
+                _tape_main[*pos_main as usize] = !_tape_main[*pos_main as usize];
+                v
+            }
+            Fun::BitwiseNotWork() => {
+                let v = TapeType::Work.basic_tape_edit(pos_work, &pos_work, _tape_work);
+                _tape_work[*pos_work as usize] = !_tape_work[*pos_work as usize];
+                v
+            }
+            Fun::Add() => {
+                let v = TapeType::Main.basic_tape_edit(pos_main, &pos_main, _tape_main);
+                let pmu = *pos_main as usize;
+                _tape_main[pmu + 2] = _tape_main[pmu] + _tape_main[pmu + 1];
+                v
+            }
+            Fun::Sub() => {
+                let v = TapeType::Main.basic_tape_edit(pos_main, &pos_main, _tape_main);
+                let pmu = *pos_main as usize;
+                _tape_main[pmu + 2] = _tape_main[pmu] - _tape_main[pmu + 1];
+                v
+            }
+            Fun::Mul() => {
+                let v = TapeType::Main.basic_tape_edit(pos_main, &pos_main, _tape_main);
+                let pmu = *pos_main as usize;
+                _tape_main[pmu + 2] = _tape_main[pmu] * _tape_main[pmu + 1];
+                v
+            }
+            Fun::Mod() => {
+                let v = TapeType::Main.basic_tape_edit(pos_main, &pos_main, _tape_main);
+                let pmu = *pos_main as usize;
+                _tape_main[pmu + 2] = _tape_main[pmu] % _tape_main[pmu + 1];
+                v
+            }
+            Fun::Div() => {
+                let v = TapeType::Main.basic_tape_edit(pos_main, &pos_main, _tape_main);
+                let pmu = *pos_main as usize;
+                _tape_main[pmu + 2] = _tape_main[pmu] / _tape_main[pmu + 1];
+                v
+            }
+            Fun::BitwiseOr() => {
+                let v = TapeType::Main.basic_tape_edit(pos_main, &pos_main, _tape_main);
+                let pmu = *pos_main as usize;
+                _tape_main[pmu + 2] = _tape_main[pmu] | _tape_main[pmu + 1];
+                v
+            }
+            Fun::BitwiseAnd() => {
+                let v = TapeType::Main.basic_tape_edit(pos_main, &pos_main, _tape_main);
+                let pmu = *pos_main as usize;
+                _tape_main[pmu + 2] = _tape_main[pmu] & _tape_main[pmu + 1];
+                v
+            }
+            Fun::BitwiseXor() => {
+                let v = TapeType::Main.basic_tape_edit(pos_main, &pos_main, _tape_main);
+                let pmu = *pos_main as usize;
+                _tape_main[pmu + 2] = _tape_main[pmu] ^ _tape_main[pmu + 1];
+                v
+            }
+            Fun::BitwiseNand() => {
+                let v = TapeType::Main.basic_tape_edit(pos_main, &pos_main, _tape_main);
+                let pmu = *pos_main as usize;
+                _tape_main[pmu + 2] = !(_tape_main[pmu] & _tape_main[pmu + 1]);
+                v
+            }
+            Fun::Geq() => {
+                let v = TapeType::Main.basic_tape_edit(pos_main, &pos_main, _tape_main);
+                let pmu = *pos_main as usize;
+                _tape_main[pmu + 2] = 0;
+                if _tape_main[pmu] >= _tape_main[pmu + 1] {
+                    _tape_main[pmu + 2] = 1;
+                }
+                v
+            }
+            Fun::Leq() => {
+                let v = TapeType::Main.basic_tape_edit(pos_main, &pos_main, _tape_main);
+                let pmu = *pos_main as usize;
+                _tape_main[pmu + 2] = 0;
+                if _tape_main[pmu] <= _tape_main[pmu + 1] {
+                    _tape_main[pmu + 2] = 1;
+                }
+                v
+            }
+            Fun::Gt() => {
+                let v = TapeType::Main.basic_tape_edit(pos_main, &pos_main, _tape_main);
+                let pmu = *pos_main as usize;
+                _tape_main[pmu + 2] = 0;
+                if _tape_main[pmu] > _tape_main[pmu + 1] {
+                    _tape_main[pmu + 2] = 1;
+                }
+                v
+            }
+            Fun::Lt() => {
+                let v = TapeType::Main.basic_tape_edit(pos_main, &pos_main, _tape_main);
+                let pmu = *pos_main as usize;
+                _tape_main[pmu + 2] = 0;
+                if _tape_main[pmu] < _tape_main[pmu + 1] {
+                    _tape_main[pmu + 2] = 1;
+                }
+                v
+            }
+            Fun::Eq() => {
+                let v = TapeType::Main.basic_tape_edit(pos_main, &pos_main, _tape_main);
+                let pmu = *pos_main as usize;
+                _tape_main[pmu + 2] = 0;
+                if _tape_main[pmu] == _tape_main[pmu + 1] {
+                    _tape_main[pmu + 2] = 1;
+                }
+                v
+            }
+            Fun::Neq() => {
+                let v = TapeType::Main.basic_tape_edit(pos_main, &pos_main, _tape_main);
+                let pmu = *pos_main as usize;
+                _tape_main[pmu + 2] = 0;
+                if _tape_main[pmu] != _tape_main[pmu + 1] {
+                    _tape_main[pmu + 2] = 1;
+                }
+                v
+            }
         }
     }
 }
