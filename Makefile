@@ -5,7 +5,8 @@ all: release
 
 .PHONY: test
 test:
-	cargo test
+	# cargo test
+	cargo llvm-cov
 
 .PHONY: lint
 lint:

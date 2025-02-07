@@ -1,11 +1,9 @@
-//! Grammar file the the V1 of the Turing Machine language
-//! This changes the `tape_action` rule and `state_rule` to enable
-//! acting on 2 tapes (main and working tapes)
+//! Grammar file the the V0 of the Turing Machine language
 //!
 //! This file is used by the pest parser generator to create a struct that
 //! we can then manipulate in the main Rust functions of the library.
 
-// Implicit rules that will apply everywhere
+// Implicit rules that will apply everywhere - comments
 WHITESPACE = _{ "//" ~ (!NEWLINE ~ ANY)* ~ NEWLINE|" "|NEWLINE|"\t" }
 
 // State name
@@ -18,27 +16,23 @@ var_name = @{ LETTER ~ (LETTER | NUMBER)* }
 int = @{ ("+"|"-")? ~ ASCII_DIGIT+ } //can be 0 if we want
 
 // What can be matched by a rule
-tape_symbol = @{ '0'..'1'|"_"|var_name }
+tape_symbol = @{ '0'..'1' | "_" | var_name }
 
 // Head movement
 head_move = @{ "L"|"R"|"S" }
-// head_move = @{ ("+"|"-")? ~ ASCII_NONZERO_DIGIT	~ ASCII_DIGIT* }
 
 // Function
 fun_name = @{ UPPERCASE_LETTER~("_"|UPPERCASE_LETTER|ASCII_DIGIT)* }
-function = { fun_name ~ "(" ~ (int|var_name) ~ ")" }
+function = { fun_name ~ "(" ~ (int|var_name)? ~ ")" }
 
 // Function sequence
 fun_sequence = { function | "[]" | "[" ~ function ~ ("," ~ function)* ~ "]" }
 
 // Transition condition
-tape_action = {
-    "(" ~ tape_symbol ~ "," ~ head_move ~ ")"
-    ~ "," ~ "(" ~ tape_symbol ~ "," ~ head_move ~ ")" | fun_sequence
-}
+tape_action = { ("(" ~ tape_symbol ~ "," ~ head_move ~ ")") | fun_sequence }
 
 // Match rule of a state
-state_rule = { "|" ~ tape_symbol ~ "," ~ tape_symbol ~ "->" ~ tape_action ~ "," ~ state_name }
+state_rule = { "|" ~ tape_symbol ~ "->" ~ tape_action ~ "," ~ state_name }
 
 // A state with its match rules
 state = { state_name ~ state_rule+ }
