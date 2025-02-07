@@ -30,6 +30,38 @@ pub type TapePos = u32;
 /// Datatype representing all possible values for a TM tape cell.
 pub type Gamma = u8;
 
+/// Enum to easily differentiate tape type.
+#[wasm_bindgen]
+#[derive(Debug, Clone)]
+pub enum TapeType {
+    /// Work tape
+    Work,
+    /// Main tape
+    Main,
+}
+
+/// Struct containing an edition of a tape cell.
+#[wasm_bindgen]
+#[derive(Debug, Clone)]
+pub struct TapeEdit {
+    /// On which tape the edit has been done
+    tape_type: TapeType,
+    /// On which cell of that tape
+    index_of_edit: TapePos,
+    /// New letter replacing the previous cell content
+    new_letter: Gamma,
+    /// Cell index where the tape's head has moved to
+    new_index: TapePos,
+}
+
+/// Struct used to store Tape edits
+#[wasm_bindgen]
+#[derive(Debug, Clone)]
+pub struct TmEdit {
+    tapes_edits: Vec<TapeEdit>,
+    new_state: State,
+}
+
 /// Base action that a TM can do after reading values at its heads.
 #[derive(Debug, Clone, Copy)]
 pub struct BaseAction {
@@ -63,13 +95,49 @@ impl Fun {
         _tape_main: &mut [Gamma],
         pos_work: &mut TapePos,
         _tape_work: &mut [Gamma],
-    ) {
+    ) -> Vec<TapeEdit> {
         match &self {
-            // TODO check bounds
-            Fun::MvMain(i) => *pos_main = (*pos_main).wrapping_add(*i as u32),
-            Fun::MvWork(i) => *pos_work = (*pos_work).wrapping_add(*i as u32),
-            Fun::WriteMain(u) => _tape_main[*pos_main as usize] = *u,
-            Fun::WriteWork(u) => _tape_work[*pos_work as usize] = *u,
+            // TODO check bounds XXX
+            Fun::MvMain(i) => {
+                // TODO: check if correct
+                *pos_main = (*pos_main).wrapping_add(*i as u32);
+                vec![TapeEdit {
+                    tape_type: TapeType::Main,
+                    index_of_edit: 0,
+                    new_letter: _tape_main[0],
+                    new_index: *pos_main,
+                }]
+            }
+            Fun::MvWork(i) => {
+                *pos_work = (*pos_work).wrapping_add(*i as u32);
+                // TODO: check if correct
+                vec![TapeEdit {
+                    tape_type: TapeType::Work,
+                    index_of_edit: 0,
+                    new_letter: _tape_work[0],
+                    new_index: *pos_work,
+                }]
+            }
+            Fun::WriteMain(u) => {
+                _tape_main[*pos_main as usize] = *u;
+                // TODO: check if correct
+                vec![TapeEdit {
+                    tape_type: TapeType::Main,
+                    index_of_edit: *pos_main,
+                    new_letter: *u,
+                    new_index: *pos_main,
+                }]
+            }
+            Fun::WriteWork(u) => {
+                _tape_work[*pos_work as usize] = *u;
+                // TODO: check if correct
+                vec![TapeEdit {
+                    tape_type: TapeType::Work,
+                    index_of_edit: *pos_work,
+                    new_letter: *u,
+                    new_index: *pos_work,
+                }]
+            }
             Fun::IncrBitsMain() => todo!(),
         }
     }
@@ -99,24 +167,9 @@ pub struct TM {
     delta: Vec<Vec<Vec<Outcome>>>, // delta[state][letter_main][letter_work]
 }
 
-/// Turing Machine simulation object. This object is made to be usable
-/// from JavaScript in the web via WebAssembly.
-#[wasm_bindgen]
-#[derive(Debug)]
-pub struct Simu {
-    _tm: TM,
-    _cur_state: State,
-    _head_pos_main: TapePos,
-    _tape_main: Vec<Gamma>,
-    _head_pos_work: TapePos,
-    _tape_work: Vec<Gamma>,
-}
-
 impl TM {
     /// Function that creates a TM object from a Vector of States
     /// from the parser.
-    ///
-    /// TODO: maybe add an option for bit mode (v0 grammar)
     pub fn from_state_vector(v: Vec<parser::State>, valid_funs: Vec<String>) -> Result<TM, String> {
         // Create TM arguments that we will use in the constructor
         let mut state_of_string: HashMap<String, State> = HashMap::new();
@@ -661,6 +714,31 @@ impl TM {
     }
 }
 
+/// Turing Machine simulation object. This object is made to be usable
+/// from JavaScript in the web via WebAssembly.
+#[wasm_bindgen]
+#[derive(Debug)]
+pub struct Simu {
+    _tm: TM,
+    _cur_state: State,
+    _head_pos_main: TapePos,
+    _tape_main: Vec<Gamma>,
+    _head_pos_work: TapePos,
+    _tape_work: Vec<Gamma>,
+    _past_edits: Vec<TmEdit>,
+    _future_edits: Vec<TmEdit>,
+}
+
+// #[wasm_bindgen]
+// #[derive(Debug, Clone)]
+// pub struct SimuInfo {
+//     pub cur_state: State,
+//     pub head_pos_main: TapePos,
+//     pub tape_main: String,
+//     pub head_pos_work: TapePos,
+//     pub tape_work: Vec<Gamma>,
+// }
+
 #[wasm_bindgen]
 impl Simu {
     /// Simulation object constructor.
@@ -685,12 +763,47 @@ impl Simu {
             _tape_main: main_tape,
             _head_pos_work: 0,
             _tape_work: work_tape,
+            _past_edits: Vec::new(),
+            _future_edits: Vec::new(),
         })
+    }
+}
+
+impl Simu {
+    fn apply_tm_edit(&mut self, edit: &mut TmEdit) {
+        std::mem::swap(&mut self._cur_state, &mut edit.new_state);
+        for e in edit.tapes_edits.iter_mut() {
+            match e.tape_type {
+                TapeType::Work => {
+                    std::mem::swap(
+                        &mut self._tape_work[e.index_of_edit as usize],
+                        &mut e.new_letter,
+                    );
+
+                    std::mem::swap(&mut self._head_pos_work, &mut e.new_index);
+                }
+                TapeType::Main => {
+                    std::mem::swap(
+                        &mut self._tape_main[e.index_of_edit as usize],
+                        &mut e.new_letter,
+                    );
+
+                    std::mem::swap(&mut self._head_pos_main, &mut e.new_index);
+                }
+            }
+        }
+        edit.tapes_edits.reverse();
     }
 }
 
 #[wasm_bindgen]
 impl Simu {
+    /// Checks if the Simulation's TM has not started yet.
+    /// NB: this is NOT a check for the START state.
+    pub fn is_start(&self) -> bool {
+        self._past_edits.is_empty()
+    }
+
     /// Checks if the Simulation's TM has reached the END state.
     pub fn is_end(&self) -> bool {
         self._cur_state == *self._tm._state_of_string.get("END").unwrap()
@@ -701,10 +814,29 @@ impl Simu {
         self._cur_state == *self._tm._state_of_string.get("ERROR").unwrap()
     }
 
+    //  pub fn get_info(&self) {
+    //      (
+    //          self._cur_state,
+    //          self._head_pos_main,
+    //          self._tape_main.clone(),
+    //          self._head_pos_work,
+    //          self._tape_work.clone(),
+    //      )
+    //  }
+}
+
+impl Simu {
     /// Runs a single step (i.e. takes a single transition) of the
     /// simulated Turing Machine.
-    pub fn next_step(&mut self) {
+    pub fn _next_step(&mut self) {
         println!("State : {:?}", self._tm.string_of_state(self._cur_state)); // DEBUG
+
+        if !self._future_edits.is_empty() {
+            let mut edits = self._future_edits.pop().unwrap();
+            self.apply_tm_edit(&mut edits);
+            self._past_edits.push(edits);
+            return;
+        }
 
         let cur_state_usize = self._cur_state as usize;
         let head_pos_main_usize = self._head_pos_main as usize;
@@ -712,16 +844,36 @@ impl Simu {
         let tape_letter_main = self._tape_main[head_pos_main_usize] as usize;
         let tape_letter_work = self._tape_work[head_pos_work_usize] as usize;
         let tm = &self._tm;
+        let mut reverse_tm_edit = TmEdit {
+            tapes_edits: Vec::new(),
+            new_state: self._cur_state,
+        };
+
         let oc = &tm.delta[cur_state_usize][tape_letter_main][tape_letter_work];
         dbg!(&oc);
         match &(oc.action) {
             Action::BaseAction(act) => {
+                let tape_edit_main = TapeEdit {
+                    tape_type: TapeType::Main,
+                    index_of_edit: self.head_pos_main(),
+                    new_letter: self._tape_main[head_pos_main_usize],
+                    new_index: self.head_pos_main(),
+                };
+                let tape_edit_work = TapeEdit {
+                    tape_type: TapeType::Work,
+                    index_of_edit: self.head_pos_work(),
+                    new_letter: self._tape_work[head_pos_work_usize],
+                    new_index: self.head_pos_work(),
+                };
+                reverse_tm_edit.tapes_edits.push(tape_edit_main);
+                reverse_tm_edit.tapes_edits.push(tape_edit_work);
+
                 self._tape_main[head_pos_main_usize] = act.letter_main;
-                self._tape_work[head_pos_work_usize] = act.letter_work;
                 println!(
                     "Act Main = Read: {:?}, Written: {:?}, Head Move: {:?}",
                     tape_letter_main, act.letter_main, act.mov_main
                 );
+                self._tape_work[head_pos_work_usize] = act.letter_work;
                 println!(
                     "Act Work = Read: {:?}, Written: {:?}, Head Move: {:?}",
                     tape_letter_work, act.letter_work, act.mov_work
@@ -740,35 +892,45 @@ impl Simu {
                 };
             }
             Action::Funs(fs) => {
+                let mut all_edits = Vec::new();
+
                 for f in fs.iter() {
-                    f.eval(
+                    let rev_tape_edits = f.eval(
                         &mut self._head_pos_main,
                         &mut self._tape_main,
                         &mut self._head_pos_work,
                         &mut self._tape_work,
                     );
+                    all_edits.push(rev_tape_edits);
                 }
+                all_edits.reverse();
+                reverse_tm_edit.tapes_edits = all_edits.into_iter().flatten().collect();
             }
         }
         self._cur_state = oc.target;
+        self._past_edits.push(reverse_tm_edit);
 
         println!("{:?}", self._tape_main); // DEBUG
         println!("{:?}", self._tape_work); // DEBUG
     }
 
     /// Rewinds the Turing Machine one step back.
-    pub fn prev_step(&mut self) {
-        todo!()
+    pub fn _prev_step(&mut self) {
+        if !self._past_edits.is_empty() {
+            let mut edits = self._past_edits.pop().unwrap();
+            self.apply_tm_edit(&mut edits);
+            self._future_edits.push(edits);
+        }
     }
 
     /// Runs the whole Turing Machine for a maxiumum number of iterations.
     ///
-    /// We simply call `next_step` in a while not finished loop.
-    pub fn all_steps(&mut self) {
+    /// We simply call `_next_step` in a while not finished loop.
+    pub fn _all_steps(&mut self) {
         let mut num_iter = 1000; // DEBUG value
         while !self.is_end() && !self.is_error() && num_iter > 0 {
             println!("STEP {:?}\n", num_iter);
-            self.next_step();
+            self._next_step();
             num_iter -= 1;
         }
     }

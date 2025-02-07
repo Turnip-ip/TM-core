@@ -19,7 +19,7 @@ fn dot_from_state(state: parser::State, grammar_version: i8) -> Result<String, S
     state
             .transitions
             .into_iter()
-            .fold(Ok(String::new()), |s: Result<String,String>, t: parser::Transition| {
+            .try_fold(String::new(), |mut s: String, t: parser::Transition| {
                 let name: &str = state.name.as_str();
                 let target: &str = t.target.as_str();
                 // Check if read has empty main
@@ -73,7 +73,6 @@ fn dot_from_state(state: parser::State, grammar_version: i8) -> Result<String, S
                         }
                     }
                 };
-                let mut s = s?;
                 s.push_str(
                     format!("{name} -> {target} [label=\"{read_letter} → {written_instructions}\"];\n")
                         .as_str(),
@@ -129,14 +128,13 @@ pub fn tm_string_to_dot(
     let states: Vec<parser::State> = parser::get_parsed_file(input_string, grammar_version)?;
 
     // Parse the AST from states
-    let states_dot = states.into_iter().fold(
-        Ok(String::new()),
-        |s: Result<String, String>, state: parser::State| {
-            let mut s = s?;
-            s.push_str(dot_from_state(state, grammar_version)?.as_str());
-            Ok(s)
-        },
-    );
+    let states_dot: String =
+        (states
+            .into_iter()
+            .try_fold(String::new(), |mut s: String, state: parser::State| {
+                s.push_str(dot_from_state(state, grammar_version)?.as_str());
+                Ok(s)
+            }) as Result<String, String>)?;
 
     Ok(format!(
         "digraph {name} {{
@@ -151,6 +149,6 @@ ERROR [shape=hexagon,fillcolor=\"#f37db6\"];
 }}
 ",
         name = tm_name,
-        states_dot = states_dot.unwrap()
+        states_dot = states_dot
     ))
 }
