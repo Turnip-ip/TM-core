@@ -198,14 +198,12 @@ impl Fun {
             }
             Fun::IncrBitsMain() => {
                 let v = TapeType::Main.basic_tape_edit(*pos_main, *pos_main, _tape_main);
-                _tape_main[*pos_main as usize] =
-                    _tape_main[*pos_main as usize].wrapping_add(1 as u8);
+                _tape_main[*pos_main as usize] = _tape_main[*pos_main as usize].wrapping_add(1_u8);
                 v
             }
             Fun::IncrBitsWork() => {
                 let v = TapeType::Work.basic_tape_edit(*pos_work, *pos_work, _tape_work);
-                _tape_work[*pos_work as usize] =
-                    _tape_work[*pos_work as usize].wrapping_add(1 as u8);
+                _tape_work[*pos_work as usize] = _tape_work[*pos_work as usize].wrapping_add(1_u8);
                 v
             }
             Fun::DecrBitsMain() => {
@@ -369,7 +367,11 @@ pub struct TM {
 impl TM {
     /// Function that creates a TM object from a Vector of States
     /// from the parser.
-    pub fn from_state_vector(v: Vec<parser::State>, valid_funs: Vec<String>) -> Result<TM, String> {
+    pub fn from_state_vector(
+        v: Vec<parser::State>,
+        valid_funs: Vec<String>,
+        grammar_version: i8,
+    ) -> Result<TM, String> {
         // Create TM arguments that we will use in the constructor
         let mut state_of_string: HashMap<String, State> = HashMap::new();
         let mut string_of_state: HashMap<State, String> = HashMap::new();
@@ -527,61 +529,113 @@ impl TM {
                             //     WRITE_W(.), MOVE_R_W(.), MOVE_L_W(.), ADD1_W(.), SUB1_W(.), NEG_W()
                             // Functions that read arguments from main tape
                             // ADD,SUB,GEQ,LEQ,MUL,MOD,DIV,EXP,IS_PRIME,LEN_SYRACUSE
-                            let parsed_fun = match fun_name {
+                            // v0
+                            let parsed_funs: &[Fun] = if grammar_version == 0 {
+                                match fun_name {
                                     // In place functions:
-                                    // v0
                                     "WRITE" => {
-                                        let i = arg_to_int(&f.arg)?;
-                                        if i != 0 && i != 1 {
+                                        if f.args.len() != 1 {
                                             return Err(format!(
-                                                "WRITE argument must be a bit but we got {i}."
+                                                "{fun_name} must receive 1 argument."
                                             ))
                                         }
-                                        Fun::WriteMain(i as u8)
+                                        let i = arg_to_int(&f.args[0])?;
+                                        if i != 0 && i != 1 {
+                                            return Err(format!(
+                                                "{fun_name} argument must be a bit but we got {i}."
+                                            ))
+                                        }
+                                        &[Fun::WriteMain(i as u8)]
                                     }
                                     "MOVE" => {
-                                        Fun::MvMain(arg_to_int(&f.arg)?)
+                                        if f.args.len() != 1 {
+                                            return Err(format!(
+                                                "{fun_name} must receive 1 argument."
+                                            ))
+                                        }
+                                        &[Fun::MvMain(arg_to_int(&f.args[0])?)]
                                     }
                                     "MOVE_R" => {
-                                        let i = arg_to_int(&f.arg)?;
+                                        if f.args.len() != 1 {
+                                            return Err(format!(
+                                                "{fun_name} must receive 1 argument."
+                                            ))
+                                        }
+                                        let i = arg_to_int(&f.args[0])?;
                                         if i<0 {
                                             return Err(format!(
                                                 "Unsupported negative argument {i} to MOVE_R."
                                             ))
                                         }
-                                        Fun::MvMain(i)
+                                        &[Fun::MvMain(i)]
                                     }
                                     "MOVE_L" => {
-                                        let i = arg_to_int(&f.arg)?;
+                                        if f.args.len() != 1 {
+                                            return Err(format!(
+                                                "{fun_name} must receive 1 argument."
+                                            ))
+                                        }
+                                        let i = arg_to_int(&f.args[0])?;
                                         if i<0 {
                                             return Err(format!(
                                                 "Unsupported negative argument {i} to MOVE_L."
                                             ))
                                         }
-                                        Fun::MvMain(-i)
+                                        &[Fun::MvMain(-i)]
                                     }
                                     "ADD1" => {
-                                        // TODO: no arguments
-                                        Fun::IncrBitsMain()
-                                    }
-                                    "SUB1" => {
-                                        // TODO: no arguments
-                                        todo!()
-                                    }
-                                    "NEG" => {
-                                        // TODO: no arguments
-                                        todo!()
-                                    }
-
-                                    // v1 - Main tape
-                                    "WRITE_M" => {
-                                        let i = arg_to_int(&f.arg)?;
-                                        if !(0..=255).contains(&i) {
+                                        if !f.args.is_empty() {
                                             return Err(format!(
-                                                "WRITE argument must be a byte but we got {i}."
+                                                "{fun_name} must receive 0 argument."
                                             ))
                                         }
-                                        Fun::WriteMain(i as u8)
+                                        &[Fun::IncrBitsMain()]
+                                    }
+                                    "SUB1" => {
+                                        if !f.args.is_empty() {
+                                            return Err(format!(
+                                                "{fun_name} must receive 0 argument."
+                                            ))
+                                        }
+                                        &[Fun::DecrBitsMain()]
+                                    }
+                                    "NEG" => {
+                                        if !f.args.is_empty() {
+                                            return Err(format!(
+                                                "{fun_name} must receive 0 argument."
+                                            ))
+                                        }
+                                        &[Fun::BitwiseNotMain(), Fun::IncrBitsMain()]
+                                    }
+                                    _ => {
+                                        return Err(format!(
+                                            "{fun_name} is not known by the simulator and shouldn't have been given in the functions environment."
+                                        ))
+                                    }
+                                }
+                            } else {
+                                // Multiple tapes
+                                match fun_name {
+                                    // Main tape
+                                    "WRITE_M" => {
+                                        if f.args.len() != 1 {
+                                            return Err(format!(
+                                                "{fun_name} must receive 1 argument."
+                                            ))
+                                        }
+                                        let i = arg_to_int(&f.args[0])?;
+                                        if grammar_version == 1 {
+                                            if i != 0 && i != 1 {
+                                                return Err(format!(
+                                                    "WRITE argument must be a bit but we got {i}."
+                                                ))
+                                            }
+                                        } else if grammar_version == 2 && !(0..=255).contains(&i) {
+                                                return Err(format!(
+                                                    "WRITE argument must be a byte but we got {i}."
+                                                ))
+                                        }
+                                        &[Fun::WriteMain(i as u8)]
                                     }
                                     "COPY_TO_MAIN" => {
                                         // TODO
@@ -590,46 +644,80 @@ impl TM {
                                         ));
                                     }
                                     "MOVE_M" => {
-                                        Fun::MvMain(arg_to_int(&f.arg)?)
+                                        if f.args.len() != 1 {
+                                            return Err(format!(
+                                                "{fun_name} must receive 1 argument."
+                                            ))
+                                        }
+                                        &[Fun::MvMain(arg_to_int(&f.args[0])?)]
                                     }
                                     "MOVE_R_M" => {
-                                        let i = arg_to_int(&f.arg)?;
+                                        if f.args.len() != 1 {
+                                            return Err(format!(
+                                                "{fun_name} must receive 1 argument."
+                                            ))
+                                        }
+                                        let i = arg_to_int(&f.args[0])?;
                                         if i<0 {
                                             return Err(format!(
                                                 "Unsupported negative argument {i} to MOVE_R_M."
                                             ))
                                         }
-                                        Fun::MvMain(i)
+                                        &[Fun::MvMain(i)]
                                     }
                                     "MOVE_L_M" => {
-                                        let i = arg_to_int(&f.arg)?;
+                                        if f.args.len() != 1 {
+                                            return Err(format!(
+                                                "{fun_name} must receive 1 argument."
+                                            ))
+                                        }
+                                        let i = arg_to_int(&f.args[0])?;
                                         if i<0 {
                                             return Err(format!(
                                                 "Unsupported negative argument {i} to MOVE_L_M."
                                             ))
                                         }
-                                        Fun::MvMain(-i)
+                                        &[Fun::MvMain(-i)]
                                     }
-                                    // TODO: add1, sub1, neg
                                     "ADD1_M" => {
-                                        todo!()
+                                        if !f.args.is_empty() {
+                                            return Err(format!(
+                                                "{fun_name} must receive 0 argument."
+                                            ))
+                                        }
+                                        &[Fun::IncrBitsMain()]
                                     }
                                     "SUB1_M" => {
-                                        todo!()
+                                        if !f.args.is_empty() {
+                                            return Err(format!(
+                                                "{fun_name} must receive 0 argument."
+                                            ))
+                                        }
+                                        &[Fun::DecrBitsMain()]
                                     }
                                     "NEG_M" => {
-                                        todo!()
+                                        if !f.args.is_empty() {
+                                            return Err(format!(
+                                                "{fun_name} must receive 0 argument."
+                                            ))
+                                        }
+                                        &[Fun::BitwiseNotMain(),Fun::IncrBitsMain()]
                                     }
 
                                     // v1 - Work tape
                                     "WRITE_W" => {
-                                        let i = arg_to_int(&f.arg)?;
+                                        if f.args.len() != 1 {
+                                            return Err(format!(
+                                                "{fun_name} must receive 1 argument."
+                                            ))
+                                        }
+                                        let i = arg_to_int(&f.args[0])?;
                                         if !(0..=255).contains(&i) {
                                             return Err(format!(
                                                 "WRITE argument must be a byte but we got {i}."
                                             ))
                                         }
-                                        Fun::WriteWork(i as u8)
+                                        &[Fun::WriteWork(i as u8)]
                                     }
                                     "COPY_TO_WORK" => {
                                         // TODO
@@ -638,58 +726,122 @@ impl TM {
                                         ));
                                     }
                                     "MOVE_W" => {
-                                        Fun::MvWork(arg_to_int(&f.arg)?)
+                                        if f.args.len() != 1 {
+                                            return Err(format!(
+                                                "{fun_name} must receive 1 argument."
+                                            ))
+                                        }
+                                        &[Fun::MvWork(arg_to_int(&f.args[0])?)]
                                     }
                                     "MOVE_R_W" => {
-                                        let i = arg_to_int(&f.arg)?;
+                                        if f.args.len() != 1 {
+                                            return Err(format!(
+                                                "{fun_name} must receive 1 argument."
+                                            ))
+                                        }
+                                        let i = arg_to_int(&f.args[0])?;
                                         if i<0 {
                                             return Err(format!(
                                                 "Unsupported negative argument {i} to MOVE_R_M."
                                             ))
                                         }
-                                        Fun::MvWork(i)
+                                        &[Fun::MvWork(i)]
                                     }
                                     "MOVE_L_W" => {
-                                        let i = arg_to_int(&f.arg)?;
+                                        if f.args.len() != 1 {
+                                            return Err(format!(
+                                                "{fun_name} must receive 1 argument."
+                                            ))
+                                        }
+                                        let i = arg_to_int(&f.args[0])?;
                                         if i<0 {
                                             return Err(format!(
                                                 "Unsupported negative argument {i} to MOVE_L_M."
                                             ))
                                         }
-                                        Fun::MvWork(-i)
+                                        &[Fun::MvWork(-i)]
                                     }
-                                    // TODO: add1, sub1, neg
                                     "ADD1_W" => {
-                                        todo!()
+                                        if !f.args.is_empty() {
+                                            return Err(format!(
+                                                "{fun_name} must receive 0 argument."
+                                            ))
+                                        }
+                                        &[Fun::IncrBitsWork()]
                                     }
                                     "SUB1_W" => {
-                                        todo!()
+                                        if !f.args.is_empty() {
+                                            return Err(format!(
+                                                "{fun_name} must receive 0 argument."
+                                            ))
+                                        }
+                                        &[Fun::DecrBitsWork()]
                                     }
                                     "NEG_W" => {
-                                        todo!()
+                                        if !f.args.is_empty() {
+                                            return Err(format!(
+                                                "{fun_name} must receive 0 argument."
+                                            ))
+                                        }
+                                        &[Fun::BitwiseNotWork(),Fun::IncrBitsWork()]
                                     }
                                     // Functions that read arguments from the tape
-                                    // TODO: ADD,SUB,GEQ,LEQ,MUL,MOD,DIV,EXP,IS_PRIME,LEN_SYRACUSE
+                                    // TODO: EXP,IS_PRIME,LEN_SYRACUSE
                                     "ADD" => {
-                                        todo!()
+                                        if !f.args.is_empty() {
+                                            return Err(format!(
+                                                "{fun_name} must receive 0 argument."
+                                            ))
+                                        }
+                                        &[Fun::Add()]
                                     }
                                     "SUB" => {
-                                        todo!()
+                                        if !f.args.is_empty() {
+                                            return Err(format!(
+                                                "{fun_name} must receive 0 argument."
+                                            ))
+                                        }
+                                        &[Fun::Sub()]
                                     }
                                     "GEQ" => {
-                                        todo!()
+                                        if !f.args.is_empty() {
+                                            return Err(format!(
+                                                "{fun_name} must receive 0 argument."
+                                            ))
+                                        }
+                                        &[Fun::Geq()]
                                     }
                                     "LEQ" => {
-                                        todo!()
+                                        if !f.args.is_empty() {
+                                            return Err(format!(
+                                                "{fun_name} must receive 0 argument."
+                                            ))
+                                        }
+                                        &[Fun::Leq()]
                                     }
                                     "MUL" => {
-                                        todo!()
+                                        if !f.args.is_empty() {
+                                            return Err(format!(
+                                                "{fun_name} must receive 0 argument."
+                                            ))
+                                        }
+                                        &[Fun::Mul()]
                                     }
                                     "MOD" => {
-                                        todo!()
+                                        if !f.args.is_empty() {
+                                            return Err(format!(
+                                                "{fun_name} must receive 0 argument."
+                                            ))
+                                        }
+                                        &[Fun::Mod()]
                                     }
                                     "DIV" => {
-                                        todo!()
+                                        if !f.args.is_empty() {
+                                            return Err(format!(
+                                                "{fun_name} must receive 0 argument."
+                                            ))
+                                        }
+                                        &[Fun::Div()]
                                     }
                                     "EXP" => {
                                         todo!()
@@ -705,9 +857,12 @@ impl TM {
                                             "{fun_name} is not known by the simulator and shouldn't have been given in the functions environment."
                                         ))
                                     }
-                                };
+                                }
+                            };
 
-                            funs.push(parsed_fun);
+                            for f in parsed_funs {
+                                funs.push(*f);
+                            }
                         }
 
                         // Output the constructed outcome from functions list
@@ -952,7 +1107,7 @@ impl Simu {
         fun_env: Vec<String>,
     ) -> Result<Simu, String> {
         let states = parser::get_parsed_file(input_string, grammar_version)?;
-        let tm: TM = TM::from_state_vector(states, fun_env)?;
+        let tm: TM = TM::from_state_vector(states, fun_env, grammar_version)?;
         let start_state: State = tm.state_of_string("START".to_string());
 
         Ok(Simu {

@@ -52,7 +52,14 @@ fn dot_from_state(state: parser::State, grammar_version: i8) -> Result<String, S
                             // Only one function in the vector
                             let fun = v.first().unwrap();
                             let f_name = fun.name.clone();
-                            let f_arg = fun.arg.clone();
+                            let mut f_arg = String::new();
+                            for arg in fun.args.iter() {
+                                f_arg += arg;
+                                f_arg.push(',');
+                            }
+                            if !f_arg.is_empty() {
+                                f_arg.pop();
+                            }
                             format!("{f_name}({f_arg})")
                         }
                         else {
@@ -62,7 +69,14 @@ fn dot_from_state(state: parser::State, grammar_version: i8) -> Result<String, S
                                 .fold("[".to_string(), |s: String, fun: parser::WriteFun| {
                                     let s: &str = s.as_str();
                                     let f_name = fun.name;
-                                    let f_arg = fun.arg;
+                                    let mut f_arg = String::new();
+                                    for arg in fun.args.iter() {
+                                        f_arg += arg;
+                                        f_arg.push(',');
+                                    }
+                                    if !f_arg.is_empty() {
+                                        f_arg.pop();
+                                    }
                                     format!("{s}{f_name}({f_arg}), ")
                                 });
                         // Remove the last ", " characters
@@ -128,27 +142,35 @@ pub fn tm_string_to_dot(
     let states: Vec<parser::State> = parser::get_parsed_file(input_string, grammar_version)?;
 
     // Parse the AST from states
-    let states_dot: String =
+    let mut states_dot: String =
+            String::from(
+                "START [id=\"START\",shape=cds,fillcolor=\"#38ef59\"];\nEND [id=\"END\",shape=doublecircle,fillcolor=\"#efa038\"];\nERROR [id=\"ERROR\",shape=hexagon,fillcolor=\"#f37db6\"];\n");
+    let edges_dot: String =
         (states
             .into_iter()
             .try_fold(String::new(), |mut s: String, state: parser::State| {
+                // Handle state name
+                if state.name != "START" && state.name != "END" && state.name != "ERROR" {
+                    let name = state.name.clone();
+                    states_dot.push_str(format!("{name} [id=\"{name}\"];\n").as_str());
+                }
+                // Handle transitions
                 s.push_str(dot_from_state(state, grammar_version)?.as_str());
                 Ok(s)
             }) as Result<String, String>)?;
 
+    // Remove last \n from states_dot
+    states_dot.pop();
+
     Ok(format!(
-        "digraph {name} {{
-label=\"{name}\";
+        "digraph {tm_name} {{
+label=\"{tm_name}\";
 rankdir=LR;
 node [style=filled];
 
+{edges_dot}
 {states_dot}
-START [shape=cds,fillcolor=\"#38ef59\"];
-END [shape=doublecircle,fillcolor=\"#efa038\"];
-ERROR [shape=hexagon,fillcolor=\"#f37db6\"];
 }}
-",
-        name = tm_name,
-        states_dot = states_dot
+"
     ))
 }

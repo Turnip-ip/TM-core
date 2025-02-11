@@ -67,7 +67,7 @@ pub struct WriteFun {
     /// Function name.
     pub name: String,
     /// Arguments of the function.
-    pub arg: String,
+    pub args: Vec<String>,
 }
 
 /// Get the parsed file
@@ -142,6 +142,46 @@ pub fn get_parsed_file(input_string: &str, grammar_version: i8) -> Result<Vec<St
                                 // Then, all the state rules as Transitions structs
                                 let state_transitions: Vec<Transition> = state_iter.fold(vec![], |mut transitions: Vec<Transition>, state_rule_pair: Pair<turnip_v1::Rule>| {
                                     transitions.push(turnip_v1::state_rule_to_transition(state_rule_pair));
+                                    transitions
+                                });
+
+                                // Append the new state to the vector
+                                states.push(State {
+                                    name: state_name.to_string(),
+                                    transitions: state_transitions,
+                                })
+                            }
+
+                            // Add the missing ending states
+                            states.push(State { name: "END".to_string(), transitions: vec![]});
+                            states.push(State { name: "ERROR".to_string(), transitions: vec![]});
+                            states
+                        }))
+                    },
+                )
+        }
+        2 => {
+            // Call the parser for version 1
+            turnip_v2::TMParser::parse(turnip_v2::Rule::file, input_string).map_or_else(
+                    |e: Error<turnip_v2::Rule>| Err(format!("error {reason}", reason = e)),
+                    |mut grammar_it: Pairs<turnip_v2::Rule>| {
+                        let file_pair: Pair<turnip_v2::Rule> = grammar_it.next().unwrap();// skip SOI
+
+                        // Build the vector containing all the states of the given
+                        // parsed file using a fold onto the states
+                        let base_states: Vec<State> = vec![
+                            State { name: "END".to_string(), transitions: vec![]},
+                            State { name: "ERROR".to_string(), transitions: vec![]}
+                        ];
+                        Ok(file_pair.into_inner().fold(base_states, |mut states: Vec<State>, state_pair: Pair<turnip_v2::Rule>| {
+                            if state_pair.as_rule() == turnip_v2::Rule::state {
+                                // Iterator on state elements
+                                let mut state_iter: Pairs<turnip_v2::Rule> = state_pair.clone().into_inner();
+                                // First the name of the state
+                                let state_name: &str = state_iter.next().unwrap().as_str();
+                                // Then, all the state rules as Transitions structs
+                                let state_transitions: Vec<Transition> = state_iter.fold(vec![], |mut transitions: Vec<Transition>, state_rule_pair: Pair<turnip_v2::Rule>| {
+                                    transitions.push(turnip_v2::state_rule_to_transition(state_rule_pair));
                                     transitions
                                 });
 

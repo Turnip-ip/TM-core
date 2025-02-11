@@ -12,7 +12,14 @@ q5 -> q6 [label="b, _ → (b, R), (b, R)"];
 q6 -> qend [label="b, _ → (b, R), (b, R)"];
 qend -> END [label="_, _ → [MOVE_M(-7), MOVE_W(-7)]"];
 
-START [shape=cds,fillcolor="#38ef59"];
-END [shape=doublecircle,fillcolor="#efa038"];
-ERROR [shape=hexagon,fillcolor="#f37db6"];
+START [id="START",shape=cds,fillcolor="#38ef59"];
+END [id="END",shape=doublecircle,fillcolor="#efa038"];
+ERROR [id="ERROR",shape=hexagon,fillcolor="#f37db6"];
+q1 [id="q1"];
+q2 [id="q2"];
+q3 [id="q3"];
+q4 [id="q4"];
+q5 [id="q5"];
+q6 [id="q6"];
+qend [id="qend"];
 }

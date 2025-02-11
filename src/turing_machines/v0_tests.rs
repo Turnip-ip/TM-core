@@ -4,7 +4,7 @@ use std::fs;
 #[test]
 fn fun_not_in_env() {
     let input_string: String =
-        fs::read_to_string("tests/funs/v0/WRITE.tm").expect("cannot read file..");
+        fs::read_to_string("tests/simulation/v0/WRITE.tm").expect("cannot read file..");
     let main_tape: Vec<super::Gamma> = vec![1, 0, 0, 0, 0, 0, 0, 0];
     let work_tape: Vec<super::Gamma> = vec![0, 0, 0, 0, 0, 0, 0, 0];
     let fun_env: Vec<String> = vec![];
@@ -20,7 +20,7 @@ fn fun_not_in_env() {
 #[allow(non_snake_case)]
 fn fun_v0_WRITE() {
     let input_string: String =
-        fs::read_to_string("tests/funs/v0/WRITE.tm").expect("cannot read file..");
+        fs::read_to_string("tests/simulation/v0/WRITE.tm").expect("cannot read file..");
     let main_tape: Vec<super::Gamma> = vec![1, 0, 0, 0, 0, 0, 0, 1];
     let work_tape: Vec<super::Gamma> = vec![0, 0, 0, 0, 0, 0, 0, 0];
     let fun_env: Vec<String> = vec![String::from("WRITE")];
@@ -34,7 +34,7 @@ fn fun_v0_WRITE() {
 #[allow(non_snake_case)]
 fn fun_v0_MOVE() {
     let input_string: String =
-        fs::read_to_string("tests/funs/v0/MOVE.tm").expect("cannot read file..");
+        fs::read_to_string("tests/simulation/v0/MOVE.tm").expect("cannot read file..");
     let main_tape: Vec<super::Gamma> = vec![0, 0, 0, 0, 0, 0, 0, 0];
     let work_tape: Vec<super::Gamma> = vec![0, 0, 0, 0, 0, 0, 0, 0];
     let fun_env: Vec<String> = vec![String::from("MOVE")];
@@ -52,7 +52,7 @@ fn fun_v0_MOVE() {
 #[allow(non_snake_case)]
 fn fun_v0_MOVE_LR() {
     let input_string: String =
-        fs::read_to_string("tests/funs/v0/MOVE_LR.tm").expect("cannot read file..");
+        fs::read_to_string("tests/simulation/v0/MOVE_LR.tm").expect("cannot read file..");
     let main_tape: Vec<super::Gamma> = vec![0, 0, 0, 0, 0, 0, 0, 0];
     let work_tape: Vec<super::Gamma> = vec![0, 0, 0, 0, 0, 0, 0, 0];
     let fun_env: Vec<String> = vec![String::from("MOVE_L"), String::from("MOVE_R")];
@@ -70,7 +70,7 @@ fn fun_v0_MOVE_LR() {
 #[allow(non_snake_case)]
 fn fun_v0_ADD1() {
     let input_string: String =
-        fs::read_to_string("tests/funs/v0/ADD1.tm").expect("cannot read file..");
+        fs::read_to_string("tests/simulation/v0/ADD1.tm").expect("cannot read file..");
     let main_tape: Vec<super::Gamma> = vec![1, 0, 1, 0, 0, 1, 1, 1]; // 167
     let work_tape: Vec<super::Gamma> = vec![0, 0, 0, 0, 0, 0, 0, 0]; // 0
     let fun_env: Vec<String> = vec![String::from("MOVE"), String::from("WRITE")];
@@ -84,7 +84,7 @@ fn fun_v0_ADD1() {
 #[allow(non_snake_case)]
 fn fun_v0_ADD1_OVERFLOW() {
     let input_string: String =
-        fs::read_to_string("tests/funs/v0/ADD1.tm").expect("cannot read file..");
+        fs::read_to_string("tests/simulation/v0/ADD1.tm").expect("cannot read file..");
     let main_tape: Vec<super::Gamma> = vec![1, 1, 1, 1, 1, 1, 1, 1]; // 255
     let work_tape: Vec<super::Gamma> = vec![0, 0, 0, 0, 0, 0, 0, 0]; // 0
     let fun_env: Vec<String> = vec![String::from("MOVE"), String::from("WRITE")];
@@ -98,7 +98,7 @@ fn fun_v0_ADD1_OVERFLOW() {
 #[allow(non_snake_case)]
 fn fun_v0_SUB1() {
     let input_string: String =
-        fs::read_to_string("tests/funs/v0/SUB1.tm").expect("cannot read file..");
+        fs::read_to_string("tests/simulation/v0/SUB1.tm").expect("cannot read file..");
     let main_tape: Vec<super::Gamma> = vec![1, 0, 1, 0, 1, 0, 0, 0]; // 168
     let work_tape: Vec<super::Gamma> = vec![0, 0, 0, 0, 0, 0, 0, 0]; // 0
     let fun_env: Vec<String> = vec![
@@ -117,7 +117,7 @@ fn fun_v0_SUB1() {
 #[allow(non_snake_case)]
 fn fun_v0_SUB1_OVERFLOW() {
     let input_string: String =
-        fs::read_to_string("tests/funs/v0/SUB1.tm").expect("cannot read file..");
+        fs::read_to_string("tests/simulation/v0/SUB1.tm").expect("cannot read file..");
     let main_tape: Vec<super::Gamma> = vec![0, 0, 0, 0, 0, 0, 0, 0]; // 0
     let work_tape: Vec<super::Gamma> = vec![0, 0, 0, 0, 0, 0, 0, 0]; // 0
     let fun_env: Vec<String> = vec![
@@ -136,7 +136,7 @@ fn fun_v0_SUB1_OVERFLOW() {
 #[allow(non_snake_case)]
 fn fun_v0_NEG() {
     let input_string: String =
-        fs::read_to_string("tests/funs/v0/NEG.tm").expect("cannot read file..");
+        fs::read_to_string("tests/simulation/v0/NEG.tm").expect("cannot read file..");
     let main_tape: Vec<super::Gamma> = vec![0, 0, 0, 1, 0, 1, 0, 0]; // 20
     let work_tape: Vec<super::Gamma> = vec![0, 0, 0, 0, 0, 0, 0, 0]; // 0
     let fun_env: Vec<String> = vec![

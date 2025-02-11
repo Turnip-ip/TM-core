@@ -28,7 +28,22 @@ qp2 -> END [label="_ → MOVE(-2)"];
 qp1 -> END [label="_ → MOVE(-1)"];
 qp0 -> END [label="_ → MOVE(0)"];
 
-START [shape=cds,fillcolor="#38ef59"];
-END [shape=doublecircle,fillcolor="#efa038"];
-ERROR [shape=hexagon,fillcolor="#f37db6"];
+START [id="START",shape=cds,fillcolor="#38ef59"];
+END [id="END",shape=doublecircle,fillcolor="#efa038"];
+ERROR [id="ERROR",shape=hexagon,fillcolor="#f37db6"];
+q7 [id="q7"];
+q6 [id="q6"];
+q5 [id="q5"];
+q4 [id="q4"];
+q3 [id="q3"];
+q2 [id="q2"];
+q1 [id="q1"];
+q0 [id="q0"];
+qp6 [id="qp6"];
+qp5 [id="qp5"];
+qp4 [id="qp4"];
+qp3 [id="qp3"];
+qp2 [id="qp2"];
+qp1 [id="qp1"];
+qp0 [id="qp0"];
 }

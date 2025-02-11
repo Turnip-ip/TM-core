@@ -40,10 +40,16 @@ pub fn state_rule_to_transition(state_rule_pair: Pair<Rule>) -> super::Transitio
                     |mut v: Vec<super::WriteFun>, f: Pair<Rule>| {
                         // Get an iterator on the items of a function
                         let mut f_iter: Pairs<Rule> = f.into_inner();
-                        v.push(super::WriteFun {
-                            name: f_iter.next().unwrap().as_str().to_string(),
-                            arg: f_iter.next().unwrap().as_str().to_string(),
-                        });
+                        let name = f_iter.next().unwrap().as_str().to_string();
+                        let some_arg = f_iter.next();
+                        if some_arg.is_some() {
+                            v.push(super::WriteFun {
+                                name,
+                                args: vec![String::from(some_arg.unwrap().as_str())],
+                            });
+                        } else {
+                            v.push(super::WriteFun { name, args: vec![] });
+                        }
                         v
                     },
                 ))

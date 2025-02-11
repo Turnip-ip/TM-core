@@ -16,14 +16,14 @@ mod main_tests {
     #[allow(non_snake_case)]
     fn v0_full_generation() {
         let input_string: String =
-            fs::read_to_string("tests/v0/INCR.tm").expect("cannot read file..");
+            fs::read_to_string("tests/dot/v0/INCR.tm").expect("cannot read file..");
         let states: Vec<parser::State> = parser::get_parsed_file(&input_string, 0).unwrap();
         // Transform into a Turing Machine
-        assert!(TM::from_state_vector(states, vec![]).is_err());
+        assert!(TM::from_state_vector(states, vec![], 0).is_err());
         // Transform into DOT code
         assert_eq!(
             dot_generation::tm_string_to_dot(&input_string, "INCREMENT", 0).unwrap(),
-            fs::read_to_string("tests/v0/INCR.tm.result").expect("cannot read file..")
+            fs::read_to_string("tests/dot/v0/INCR.tm.result").expect("cannot read file..")
         )
     }
 
