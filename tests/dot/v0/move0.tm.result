@@ -1,0 +1,14 @@
+digraph MOVE0 {
+label="MOVE0";
+rankdir=LR;
+bgcolor="transparent";
+node [style=filled];
+
+START -> q [label="b → b, R"];
+q -> END [label="b → b, L"];
+
+START [id="START",shape=cds,fillcolor="#38ef59"];
+END [id="END",shape=doublecircle,fillcolor="#efa038"];
+ERROR [id="ERROR",shape=hexagon,fillcolor="#f37db6"];
+q [id="q"];
+}

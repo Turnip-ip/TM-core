@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8" />
+    <title>hello-wasm example</title>
+  </head>
+  <body>
+    <textarea id="test-tm-code" name="test-tm-code" rows="20" cols="50">
+// **add 1 to a byte (_+1 mod 256)**
+
+// INPUT: a
+// OUTPUT: a+1 (mod 256)
+// no overflow allowed
+
+// from the end: flip until a 0 is seen
+START
+  | _ -> MOVE(7), q7
+
+q7
+  | 0 -> (1, L), qp6
+  | 1 -> (0, L), q6
+
+q6
+  | 0 -> (1, L), qp5
+  | 1 -> (0, L), q5
+q5
+  | 0 -> (1, L), qp4
+  | 1 -> (0, L), q4
+q4
+  | 0 -> (1, L), qp3
+  | 1 -> (0, L), q3
+q3
+  | 0 -> (1, L), qp2
+  | 1 -> (0, L), q2
+q2
+  | 0 -> (1, L), qp1
+  | 1 -> (0, L), q1
+q1
+  | 0 -> (1, L), qp0
+  | 1 -> (0, L), q0
+q0
+  | 0 -> (1, R), qp1
+  | 1 -> (0, R), qp1
+
+qp6
+  | _ -> MOVE(-6), END
+qp5
+  | _ -> MOVE(-5), END
+qp4
+  | _ -> MOVE(-4), END
+qp3
+  | _ -> MOVE(-3), END
+qp2
+  | _ -> MOVE(-2), END
+qp1
+  | _ -> MOVE(-1), END
+qp0
+  | _ -> MOVE(0), END
+    </textarea>
+    <br />
+    <label for="test-version-select">Grammar Version</label>
+    <select id="test-version-select" name="test-version-select">
+      <option value="0" selected>0</option>
+      <option value="1">1</option>
+    </select>
+    <hr />
+    <pre>
+      <code id="test-dot-output">
+        Waiting for compilation...
+      </code>
+    </pre>
+    <script type="module">
+      import init, { tm_string_to_dot } from "./tm_parser/tm_parser.js?init";
+
+      init().then(() => {
+        const code_editor = document.getElementById("test-tm-code");
+        const dot_output = document.getElementById("test-dot-output");
+        const grammar_version = document.getElementById("test-version-select");
+
+        const gv = parseInt(grammar_version.value);
+
+        dot_output.innerText = tm_string_to_dot(code_editor.value, "TEST", gv);
+
+        code_editor.addEventListener("input", (e) => {
+          dot_output.innerText = tm_string_to_dot(code_editor.value, "TEST", gv);
+
+          console.log(init_tm(code_editor.value, gv));
+        });
+      });
+    </script>
+  </body>
+</html>

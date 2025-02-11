@@ -1,0 +1,20 @@
+digraph LENGTH_SYRACUSE {
+label="LENGTH_SYRACUSE";
+rankdir=LR;
+bgcolor="transparent";
+node [style=filled];
+
+START -> qTestEnd [label="n, _ → [MOVE_BYTE_M(1), WRITE_M(n), WRITE_W(0)]"];
+qTestEnd -> END [label="1, cpt → [WRITE_M(cpt), MOVE_BYTE_M(-1)]"];
+qTestEnd -> qTestMod [label="u, cpt → [ADD1_W(1), MOVE_BYTE_W(1), MOVE_BYTE_M(1), WRITE_M(2), MOVE_BYTE_M(-1), MOD(1), MOVE_BYTE_M(2)]"];
+qTestMod -> q [label="0, _ → [MOVE_BYTE_M(-2), DIV(1), MOVE_BYTE_M(2)]"];
+qTestMod -> q [label="1, _ → [MOVE_BYTE_M(-1), WRITE_M(3), MOVE_BYTE_M(-1), MUL(1), MOVE_BYTE_M(2), ADD1_M(1)]"];
+q -> qTestEnd [label="u, _ → [MOVE_BYTE_M(-2), WRITE_M(u), MOVE_BYTE_W(-1)]"];
+
+START [id="START",shape=cds,fillcolor="#38ef59"];
+END [id="END",shape=doublecircle,fillcolor="#efa038"];
+ERROR [id="ERROR",shape=hexagon,fillcolor="#f37db6"];
+qTestEnd [id="qTestEnd"];
+qTestMod [id="qTestMod"];
+q [id="q"];
+}

@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en-US">
+
+<head>
+  <meta charset="utf-8" />
+  <title>hello-wasm example</title>
+  <style>
+    input.tape_input {
+      width: 15px;
+    }
+  </style>
+</head>
+
+<body>
+  <textarea id="test-tm-code" name="test-tm-code" rows="20" cols="50">
+// **add 1 to a byte (_+1 mod 256)**
+
+// INPUT: a
+// OUTPUT: a+1 (mod 256)
+// no overflow allowed
+
+// from the end: flip until a 0 is seen
+START
+  | _ -> MOVE(7), q7
+
+q7
+  | 0 -> (1, L), qp6
+  | 1 -> (0, L), q6
+
+q6
+  | 0 -> (1, L), qp5
+  | 1 -> (0, L), q5
+q5
+  | 0 -> (1, L), qp4
+  | 1 -> (0, L), q4
+q4
+  | 0 -> (1, L), qp3
+  | 1 -> (0, L), q3
+q3
+  | 0 -> (1, L), qp2
+  | 1 -> (0, L), q2
+q2
+  | 0 -> (1, L), qp1
+  | 1 -> (0, L), q1
+q1
+  | 0 -> (1, L), qp0
+  | 1 -> (0, L), q0
+q0
+  | 0 -> (1, R), qp1
+  | 1 -> (0, R), qp1
+
+qp6
+  | _ -> MOVE(-6), END
+qp5
+  | _ -> MOVE(-5), END
+qp4
+  | _ -> MOVE(-4), END
+qp3
+  | _ -> MOVE(-3), END
+qp2
+  | _ -> MOVE(-2), END
+qp1
+  | _ -> MOVE(-1), END
+qp0
+  | _ -> MOVE(0), END
+    </textarea>
+  <br />
+  <label for="test-version-select">Grammar Version</label>
+  <select id="test-version-select" name="test-version-select">
+    <option value="0" selected>0</option>
+    <option value="1">1</option>
+  </select>
+  <br />
+  <label for="main_tape">Main tape:</label>
+  <table id="main_tape">
+    <tbody>
+      <tr id="main_tape_row">
+      </tr>
+    </tbody>
+  </table>
+  <label for="work_tape">Working tape:</label>
+  <table id="work_tape">
+    <tbody>
+      <tr id="work_tape_row">
+      </tr>
+    </tbody>
+  </table>
+  <br />
+  <button id="compile-button">Compile</button>
+  <hr />
+  <pre>
+    <button id="next-step-button" disabled>NEXT STEP</button>
+    <button id="all-steps-button" disabled>ALL STEPS</button>
+    <code id="test-compil-output">
+      Waiting for compilation...
+    </code>
+    </pre>
+  <script type="module">
+    import init, { Simu } from "./tm_parser/tm_parser.js?init";
+
+    init().then(() => {
+      /// Get the HTML elements
+      const code_editor = document.getElementById("test-tm-code");
+      const compile_button = document.getElementById("compile-button");
+      const next_step_button = document.getElementById("next-step-button");
+      const all_steps_button = document.getElementById("all-steps-button");
+      const compil_output = document.getElementById("test-compil-output");
+      const grammar_version = document.getElementById("test-version-select");
+
+      let simu = undefined;
+
+      /// Create Simulation Function
+      function createSimu(main_tape, work_tape) {
+        /*
+        pub fn new(
+          input_string: &str,
+          grammar_version: i8,
+          main_tape: Vec<Gamma>,
+          working_tape: Vec<Gamma>,
+          fun_env: Vec<String>,
+        ) -> Result<Simu, String>
+        */
+        const turnip_input = code_editor.value;
+        const gv = parseInt(grammar_version.value);
+
+        try {
+          simu = Simu.new(
+            turnip_input,
+            gv,
+            main_tape,
+            work_tape,
+            ["MOVE"]
+          );
+
+          console.log(simu);
+          compil_output.innerHTML = `<ul>
+              <li>Current State: `+ simu.get_current_state().toString() + `</li>
+            </ul>`;
+
+          // Update interactions
+          next_step_button.removeAttribute("disabled");
+          all_steps_button.removeAttribute("disabled");
+        } catch (error) {
+          // Update interactions
+          next_step_button.setAttribute("disabled", "true");
+          all_steps_button.setAttribute("disabled", "true");
+          // Print errors
+          console.error("Turnip Compilation error...")
+          console.log(error);
+          compil_output.innerHTML = error.toString();
+        }
+      }
+
+      /// Setup tapes
+      let main_tape = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+      let work_tape = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+      const main_tape_table_row = document.getElementById("main_tape_row");
+      const work_tape_table_row = document.getElementById("work_tape_row");
+
+      for (let i = 0; i < main_tape.length; ++i) {
+        const tape_cell = document.createElement("td");
+        tape_cell.id = "main_tape_cell_" + i.toString();
+
+        const tape_cell_input = document.createElement("input");
+        tape_cell_input.id = "main_tape_input_" + i.toString();
+        tape_cell_input.classList.add("tape_input");
+        tape_cell_input.value = main_tape[i];
+
+        // tape_cell_input.oninput = (e => {
+        //   createSimu(main_tape, work_tape);
+        // });
+
+        tape_cell.appendChild(tape_cell_input);
+
+        main_tape_table_row.appendChild(tape_cell);
+      }
+
+      for (let i = 0; i < work_tape.length; ++i) {
+        const tape_cell = document.createElement("td");
+        tape_cell.id = "work_tape_cell_" + i.toString();
+
+        const tape_cell_input = document.createElement("input");
+        tape_cell_input.id = "work_tape_input_" + i.toString();
+        tape_cell_input.classList.add("tape_input");
+        tape_cell_input.value = work_tape[i];
+
+        // tape_cell_input.oninput = (e => {
+        //   createSimu(main_tape, work_tape);
+        // });
+
+        tape_cell.appendChild(tape_cell_input);
+
+        work_tape_table_row.appendChild(tape_cell);
+      }
+
+      /// Setup events
+      code_editor.addEventListener("focusout", (e) => {
+        e.stopPropagation();// Just in case, I don't remember what it does :)
+        createSimu(main_tape, work_tape);
+      });
+
+      compile_button.addEventListener("click", (e) => {
+        e.preventDefault();
+        createSimu(main_tape, work_tape);
+      });
+
+      next_step_button.addEventListener("click", (e) => {
+        e.preventDefault();
+        if (simu !== undefined)
+          simu.next_step();
+      });
+
+      all_steps_button.addEventListener("click", (e) => {
+        e.preventDefault();
+        if (simu !== undefined)
+          simu.all_steps();
+      });
+    });
+  </script>
+</body>
+
+</html>

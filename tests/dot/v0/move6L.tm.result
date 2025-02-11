@@ -1,0 +1,22 @@
+digraph MOVE6L {
+label="MOVE6L";
+rankdir=LR;
+bgcolor="transparent";
+node [style=filled];
+
+START -> q1 [label="b → b, L"];
+q1 -> q2 [label="b → b, L"];
+q2 -> q3 [label="b → b, L"];
+q3 -> q4 [label="b → b, L"];
+q4 -> q5 [label="b → b, L"];
+q5 -> END [label="b → b, L"];
+
+START [id="START",shape=cds,fillcolor="#38ef59"];
+END [id="END",shape=doublecircle,fillcolor="#efa038"];
+ERROR [id="ERROR",shape=hexagon,fillcolor="#f37db6"];
+q1 [id="q1"];
+q2 [id="q2"];
+q3 [id="q3"];
+q4 [id="q4"];
+q5 [id="q5"];
+}

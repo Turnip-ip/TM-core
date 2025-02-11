@@ -1,7 +1,7 @@
 [package]
 name = "tm_parser"
 description = "Core parser and Turing Machine manipulation for the Turnip project at ENS de Lyon."
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 repository = "https://github.com/Turnip-ip/TM-core"
 license-file = "LICENSE"
@@ -11,7 +11,9 @@ readme = "README.md"
 crate-type = ["cdylib"]
 
 [dependencies]
-fstrings = "0.2.3"
-pest = "2.7.13"
-pest_derive = "2.7.13"
-wasm-bindgen = "0.2.93"
+pest = "2.7.15"
+pest_derive = "2.7.15"
+wasm-bindgen = "0.2.100"
+
+[dev-dependencies]
+pretty_assertions = "1.4.1"
