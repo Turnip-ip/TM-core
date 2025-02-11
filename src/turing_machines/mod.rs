@@ -1083,16 +1083,6 @@ pub struct Simu {
     _future_edits: Vec<TmEdit>,
 }
 
-// #[wasm_bindgen]
-// #[derive(Debug, Clone)]
-// pub struct SimuInfo {
-//     pub cur_state: State,
-//     pub head_pos_main: TapePos,
-//     pub tape_main: String,
-//     pub head_pos_work: TapePos,
-//     pub tape_work: Vec<Gamma>,
-// }
-
 #[wasm_bindgen]
 impl Simu {
     /// Simulation object constructor.
@@ -1167,22 +1157,12 @@ impl Simu {
     pub fn is_error(&self) -> bool {
         self._cur_state == *self._tm._state_of_string.get("ERROR").unwrap()
     }
-
-    //  pub fn get_info(&self) {
-    //      (
-    //          self._cur_state,
-    //          self._head_pos_main,
-    //          self._tape_main.clone(),
-    //          self._head_pos_work,
-    //          self._tape_work.clone(),
-    //      )
-    //  }
 }
 
 impl Simu {
     /// Runs a single step (i.e. takes a single transition) of the
     /// simulated Turing Machine.
-    pub fn _next_step(&mut self) {
+    pub fn next_step(&mut self) {
         println!("State : {:?}", self._tm.string_of_state(self._cur_state)); // DEBUG
 
         if !self._future_edits.is_empty() {
@@ -1269,7 +1249,7 @@ impl Simu {
     }
 
     /// Rewinds the Turing Machine one step back.
-    pub fn _prev_step(&mut self) {
+    pub fn prev_step(&mut self) {
         if !self._past_edits.is_empty() {
             let mut edits = self._past_edits.pop().unwrap();
             self.apply_tm_edit(&mut edits);
@@ -1280,11 +1260,11 @@ impl Simu {
     /// Runs the whole Turing Machine for a maxiumum number of iterations.
     ///
     /// We simply call `_next_step` in a while not finished loop.
-    pub fn _all_steps(&mut self) {
+    pub fn all_steps(&mut self) {
         let mut num_iter = 1000; // DEBUG value
         while !self.is_end() && !self.is_error() && num_iter > 0 {
             println!("STEP {:?}\n", num_iter);
-            self._next_step();
+            self.next_step();
             num_iter -= 1;
         }
     }
@@ -1339,8 +1319,8 @@ impl Simu {
 #[wasm_bindgen]
 impl Simu {
     /// Returns the current state ID of the simulated Turing Machine.
-    pub fn cur_state(&self) -> State {
-        self._cur_state
+    pub fn get_current_state(&self) -> String {
+        self._tm.string_of_state(self._cur_state)
     }
 
     /// Returns the current position of the main tape's head of the simulated TM.
@@ -1351,5 +1331,15 @@ impl Simu {
     /// Returns the current position of the work tape's head of the simulated TM.
     pub fn head_pos_work(&self) -> TapePos {
         self._head_pos_work
+    }
+
+    /// Returns the main tape
+    pub fn get_main_tape(&self) -> Vec<Gamma> {
+        self._tape_main.clone()
+    }
+
+    /// Returns the work tape
+    pub fn get_work_tape(&self) -> Vec<Gamma> {
+        self._tape_work.clone()
     }
 }

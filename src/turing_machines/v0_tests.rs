@@ -27,7 +27,7 @@ fn fun_v0_WRITE() {
     // Create a simulation
     let mut simu = super::Simu::new(&input_string, 0, main_tape, work_tape, fun_env).unwrap();
     let expected_tape: Vec<super::Gamma> = vec![0, 1, 1, 0, 1, 1, 0, 1];
-    simu._all_steps();
+    simu.all_steps();
     assert_eq!(simu._tape_main, expected_tape);
 }
 #[test]
@@ -41,11 +41,11 @@ fn fun_v0_MOVE() {
     // Create a simulation
     let mut simu = super::Simu::new(&input_string, 0, main_tape, work_tape, fun_env).unwrap();
     // Check that the head moves correctly in both directions.
-    simu._next_step();
+    simu.next_step();
     assert_eq!(simu.head_pos_main(), 2);
-    simu._next_step();
+    simu.next_step();
     assert_eq!(simu.head_pos_main(), 1);
-    simu._all_steps();
+    simu.all_steps();
     assert_eq!(simu.head_pos_main(), 1);
 }
 #[test]
@@ -59,11 +59,11 @@ fn fun_v0_MOVE_LR() {
     // Create a simulation
     let mut simu = super::Simu::new(&input_string, 0, main_tape, work_tape, fun_env).unwrap();
     // Check that the head moves correctly in both directions.
-    simu._next_step();
+    simu.next_step();
     assert_eq!(simu.head_pos_main(), 3);
-    simu._next_step();
+    simu.next_step();
     assert_eq!(simu.head_pos_main(), 2);
-    simu._all_steps();
+    simu.all_steps();
     assert_eq!(simu.head_pos_main(), 2);
 }
 #[test]
@@ -77,7 +77,7 @@ fn fun_v0_ADD1() {
     // Create a simulation
     let mut simu = super::Simu::new(&input_string, 0, main_tape, work_tape, fun_env).unwrap();
     let expected_tape: Vec<super::Gamma> = vec![1, 0, 1, 0, 1, 0, 0, 0]; // 168
-    simu._all_steps();
+    simu.all_steps();
     assert_eq!(simu._tape_main, expected_tape);
 }
 #[test]
@@ -91,7 +91,7 @@ fn fun_v0_ADD1_OVERFLOW() {
     // Create a simulation
     let mut simu = super::Simu::new(&input_string, 0, main_tape, work_tape, fun_env).unwrap();
     let expected_tape: Vec<super::Gamma> = vec![0, 0, 0, 0, 0, 0, 0, 0]; // 0
-    simu._all_steps();
+    simu.all_steps();
     assert_eq!(simu._tape_main, expected_tape);
 }
 #[test]
@@ -110,7 +110,7 @@ fn fun_v0_SUB1() {
     // Create a simulation
     let mut simu = super::Simu::new(&input_string, 0, main_tape, work_tape, fun_env).unwrap();
     let expected_tape: Vec<super::Gamma> = vec![1, 0, 1, 0, 0, 1, 1, 1]; // 167
-    simu._all_steps();
+    simu.all_steps();
     assert_eq!(simu._tape_main, expected_tape);
 }
 #[test]
@@ -129,7 +129,7 @@ fn fun_v0_SUB1_OVERFLOW() {
     // Create a simulation
     let mut simu = super::Simu::new(&input_string, 0, main_tape, work_tape, fun_env).unwrap();
     let expected_tape: Vec<super::Gamma> = vec![1, 1, 1, 1, 1, 1, 1, 1]; // 255
-    simu._all_steps();
+    simu.all_steps();
     assert_eq!(simu._tape_main, expected_tape);
 }
 #[test]
@@ -149,6 +149,6 @@ fn fun_v0_NEG() {
     // Create a simulation
     let mut simu = super::Simu::new(&input_string, 0, main_tape, work_tape, fun_env).unwrap();
     let expected_tape: Vec<super::Gamma> = vec![1, 1, 1, 0, 1, 1, 0, 0]; // -20
-    simu._all_steps();
+    simu.all_steps();
     assert_eq!(simu._tape_main, expected_tape);
 }
