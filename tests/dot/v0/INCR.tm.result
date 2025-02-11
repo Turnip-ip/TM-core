@@ -1,6 +1,7 @@
 digraph INCREMENT {
 label="INCREMENT";
 rankdir=LR;
+bgcolor="transparent";
 node [style=filled];
 
 START -> START [label="b → b, R"];

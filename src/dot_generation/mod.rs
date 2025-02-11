@@ -79,9 +79,11 @@ fn dot_from_state(state: parser::State, grammar_version: i8) -> Result<String, S
                                     }
                                     format!("{s}{f_name}({f_arg}), ")
                                 });
-                        // Remove the last ", " characters
-                        out.pop();
-                        out.pop();
+                        // Remove the last ", " characters if v is not empty
+                        if out.len() != 1 {
+                            out.pop();
+                            out.pop();
+                        }
                         out.push(']');
                         out
                         }
@@ -166,6 +168,7 @@ pub fn tm_string_to_dot(
         "digraph {tm_name} {{
 label=\"{tm_name}\";
 rankdir=LR;
+bgcolor=\"transparent\";
 node [style=filled];
 
 {edges_dot}

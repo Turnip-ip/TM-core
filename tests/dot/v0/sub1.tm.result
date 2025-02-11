@@ -1,6 +1,7 @@
 digraph SUB1 {
 label="SUB1";
 rankdir=LR;
+bgcolor="transparent";
 node [style=filled];
 
 START -> END [label="_ → ADD(255)"];

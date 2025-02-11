@@ -73,3 +73,23 @@ fn v0_sub1_parsing() {
         fs::read_to_string("tests/dot/v0/sub1.tm.result").expect("cannot read file..")
     );
 }
+#[test]
+#[allow(non_snake_case)]
+fn v0_sub1_efficient_parsing() {
+    let input_string: String =
+        fs::read_to_string("tests/dot/v0/sub1_efficient.tm").expect("cannot read file..");
+    assert_eq!(
+        dbg!(tm_string_to_dot(&input_string, "SUB1", 0)).unwrap(),
+        fs::read_to_string("tests/dot/v0/sub1_efficient.tm.result").expect("cannot read file..")
+    );
+}
+#[test]
+#[allow(non_snake_case)]
+fn v0_unitary_minus_parsing() {
+    let input_string: String =
+        fs::read_to_string("tests/dot/v0/unitary_minus.tm").expect("cannot read file..");
+    assert_eq!(
+        dbg!(tm_string_to_dot(&input_string, "UNITARY_MINUS", 0)).unwrap(),
+        fs::read_to_string("tests/dot/v0/unitary_minus.tm.result").expect("cannot read file..")
+    );
+}

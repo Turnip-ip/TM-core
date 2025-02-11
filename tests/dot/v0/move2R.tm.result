@@ -1,6 +1,7 @@
 digraph MOVE2R {
 label="MOVE2R";
 rankdir=LR;
+bgcolor="transparent";
 node [style=filled];
 
 START -> q [label="b → b, R"];
