@@ -39,21 +39,124 @@
  *   </body>
  * </html>
  * ```
- * @param {string} input_string
- * @param {string} tm_name
- * @param {number} grammar_version
- * @returns {string}
  */
 export function tm_string_to_dot(input_string: string, tm_name: string, grammar_version: number): string;
+/**
+ * Enum to easily differentiate tape type.
+ */
+export enum TapeType {
+  /**
+   * Work tape
+   */
+  Work = 0,
+  /**
+   * Main tape
+   */
+  Main = 1,
+}
+/**
+ * Turing Machine simulation object. This object is made to be usable
+ * from JavaScript in the web via WebAssembly.
+ */
+export class Simu {
+  private constructor();
+  free(): void;
+  /**
+   * Simulation object constructor.
+   *
+   * After this call, the returned object can directly be used
+   * to run the parsed machine.
+   */
+  static new(input_string: string, grammar_version: number, main_tape: Uint8Array, work_tape: Uint8Array, fun_env: string[]): Simu;
+  /**
+   * Checks if the Simulation's TM has not started yet.
+   * NB: this is NOT a check for the START state.
+   */
+  is_start(): boolean;
+  /**
+   * Checks if the Simulation's TM has reached the END state.
+   */
+  is_end(): boolean;
+  /**
+   * Checks if the Simulation's TM has reached the ERROR state.
+   */
+  is_error(): boolean;
+  /**
+   * TODO: documentation
+   */
+  static edit_main_tape(): void;
+  /**
+   * TODO: documentation
+   */
+  static edit_work_tape(): void;
+  /**
+   * Verifies that the current main tape has the expected result given
+   * in arguments.
+   *
+   * Returns true if on END state and the expected output matches the main tape.
+   */
+  verify_output(expected: Uint8Array): boolean;
+  /**
+   * Returns the current state ID of the simulated Turing Machine.
+   */
+  get_current_state(): string;
+  /**
+   * Returns the current position of the main tape's head of the simulated TM.
+   */
+  head_pos_main(): number;
+  /**
+   * Returns the current position of the work tape's head of the simulated TM.
+   */
+  head_pos_work(): number;
+  /**
+   * Returns the main tape
+   */
+  get_main_tape(): Uint8Array;
+  /**
+   * Returns the work tape
+   */
+  get_work_tape(): Uint8Array;
+}
+/**
+ * Struct containing an edition of a tape cell.
+ */
+export class TapeEdit {
+  private constructor();
+  free(): void;
+}
+/**
+ * Struct used to store Tape edits
+ */
+export class TmEdit {
+  private constructor();
+  free(): void;
+}
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
 
 export interface InitOutput {
   readonly memory: WebAssembly.Memory;
-  readonly tm_string_to_dot: (a: number, b: number, c: number, d: number, e: number) => Array;
+  readonly __wbg_tapeedit_free: (a: number, b: number) => void;
+  readonly __wbg_tmedit_free: (a: number, b: number) => void;
+  readonly __wbg_simu_free: (a: number, b: number) => void;
+  readonly simu_new: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number) => [number, number, number];
+  readonly simu_is_start: (a: number) => number;
+  readonly simu_is_end: (a: number) => number;
+  readonly simu_is_error: (a: number) => number;
+  readonly simu_edit_main_tape: () => void;
+  readonly simu_edit_work_tape: () => void;
+  readonly simu_verify_output: (a: number, b: number, c: number) => number;
+  readonly simu_get_current_state: (a: number) => [number, number];
+  readonly simu_head_pos_main: (a: number) => number;
+  readonly simu_head_pos_work: (a: number) => number;
+  readonly simu_get_main_tape: (a: number) => [number, number];
+  readonly simu_get_work_tape: (a: number) => [number, number];
+  readonly tm_string_to_dot: (a: number, b: number, c: number, d: number, e: number) => [number, number, number, number];
   readonly __wbindgen_export_0: WebAssembly.Table;
   readonly __wbindgen_malloc: (a: number, b: number) => number;
   readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
+  readonly __externref_table_alloc: () => number;
+  readonly __externref_table_dealloc: (a: number) => void;
   readonly __wbindgen_free: (a: number, b: number, c: number) => void;
   readonly __wbindgen_start: () => void;
 }
