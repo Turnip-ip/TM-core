@@ -1,7 +1,7 @@
 // **MOVE_M(i)**
 // input: arbitrary main tape
 // output: same tape but with the head moved by i cells.
-// everything is on the main tape: the working tape is arbitrary
+// everything is on the main tape: the work tape is arbitrary
 
 // Simply move right by 2
 START

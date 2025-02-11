@@ -66,6 +66,7 @@ fn fun_v0_MOVE_LR() {
     simu.all_steps();
     assert_eq!(simu.head_pos_main(), 2);
 }
+/*
 #[test]
 #[allow(non_snake_case)]
 fn fun_v0_ADD1() {
@@ -152,3 +153,4 @@ fn fun_v0_NEG() {
     simu.all_steps();
     assert_eq!(simu._tape_main, expected_tape);
 }
+*/

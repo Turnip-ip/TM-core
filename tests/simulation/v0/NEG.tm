@@ -34,5 +34,5 @@ q7
 | 1 -> (0,S), qinc
 
 qinc
-| _ -> ADD1(1), END
+| _ -> ADD1(), END
 

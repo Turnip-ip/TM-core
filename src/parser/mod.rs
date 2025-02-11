@@ -114,7 +114,7 @@ pub fn get_parsed_file(input_string: &str, grammar_version: i8) -> Result<Vec<St
                                 })
                             }
 
-                            // Add the missing ending states
+                            // Return the states
                             states
                         }))
                     },
@@ -152,9 +152,7 @@ pub fn get_parsed_file(input_string: &str, grammar_version: i8) -> Result<Vec<St
                                 })
                             }
 
-                            // Add the missing ending states
-                            states.push(State { name: "END".to_string(), transitions: vec![]});
-                            states.push(State { name: "ERROR".to_string(), transitions: vec![]});
+                            // Return the states
                             states
                         }))
                     },
@@ -192,9 +190,7 @@ pub fn get_parsed_file(input_string: &str, grammar_version: i8) -> Result<Vec<St
                                 })
                             }
 
-                            // Add the missing ending states
-                            states.push(State { name: "END".to_string(), transitions: vec![]});
-                            states.push(State { name: "ERROR".to_string(), transitions: vec![]});
+                            // Return the states
                             states
                         }))
                     },

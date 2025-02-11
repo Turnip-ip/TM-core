@@ -6,7 +6,7 @@ pub mod turing_machines;
 mod main_tests {
     use crate::dot_generation;
     use crate::parser;
-    use crate::turing_machines::TM;
+    use crate::turing_machines::{Simu, TM};
     use pretty_assertions::assert_eq;
     use std::fs;
 
@@ -27,5 +27,24 @@ mod main_tests {
         )
     }
 
-    // TODO: full v1 generation
+    // TODO: full v1 test generation
+
+    #[test]
+    #[allow(non_snake_case)]
+    fn simu_prev_step() {
+        let input_string: String =
+            fs::read_to_string("tests/simulation/v0/ADD1.tm").expect("cannot read file..");
+        let main_tape = vec![1, 0, 0, 0, 0, 0, 0, 0];
+        let work_tape = vec![0, 0, 0, 0, 0, 0, 0, 0];
+        let fun_env: Vec<String> = vec![String::from("MOVE")];
+        // Construct TM Simulation
+        let mut simu = Simu::new(&input_string, 0, main_tape, work_tape, fun_env).unwrap();
+        assert_eq!(simu.get_current_state(), "START");
+        simu.next_step();
+        assert_eq!(simu.get_current_state(), "q7");
+        simu.prev_step();
+        assert_eq!(simu.get_current_state(), "START");
+        simu.all_steps();
+        assert_eq!(simu.get_current_state(), "END");
+    }
 }

@@ -1,7 +1,7 @@
 // **WRITE_M(i)**
 // input: arbitrary main tape
 // output: same tape but with i where the head was
-// everything is on the main tape: the working tape is arbitrary
+// everything is on the main tape: the work tape is arbitrary
 
 //here we use only one tape
 START

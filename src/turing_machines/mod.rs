@@ -381,6 +381,9 @@ impl TM {
             let state_id: State = i as State;
             state_of_string.insert(state.name.clone(), state_id);
             string_of_state.insert(state_id, state.name.clone());
+            // DEBUG
+            let name = state.name.clone(); // DEBUG
+            dbg!(format!("Created entry for State ID: {state_id} ({name})")); // DEBUG
         }
 
         // Transform valid_fun array into a better structure
@@ -409,22 +412,11 @@ impl TM {
         for state in v.iter() {
             let state_name: String = state.name.clone();
             let state_id: State = *state_of_string.get(&state_name).unwrap();
+            // DEBUG
+            let name = state.name.clone(); // DEBUG
+            dbg!(format!("Currently handled State ID: {state_id} ({name})")); // DEBUG
 
-            // Build a set of unvisited read characters to easily iterate
-            // When we encounter a 'b' representing any value
-            /* TODO: optim
-            let mut not_seen_read: HashMap<Gamma, HashSet<Gamma>> = HashMap::new();
-            not_seen_read.reserve(Gamma::MAX as usize);
-            for bm in 0..=Gamma::MAX {
-                not_seen_read.insert(
-                    bm,
-                    HashSet::with_capacity_and_hasher(Gamma::MAX as usize, RandomState::new()),
-                );
-                for bw in 0..=Gamma::MAX {
-                    not_seen_read.get_mut(&bm).unwrap().insert(bw);
-                }
-            }
-            */
+            // TODO: optim, and basic bits case
             let mut already_covered: HashSet<(Gamma, Gamma)> =
                 HashSet::with_capacity(Gamma::MAX as usize);
             for read_main in 0..Gamma::MAX {
