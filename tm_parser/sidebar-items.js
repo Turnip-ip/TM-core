@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":["dot_parsing"]};
+window.SIDEBAR_ITEMS = {"mod":["dot_generation","parser","turing_machines"]};

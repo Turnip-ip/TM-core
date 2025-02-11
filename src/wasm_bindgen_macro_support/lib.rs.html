@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/wasm-bindgen-macro-support-0.2.95/src/lib.rs`."><title>lib.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-492a78a4a87dcc01.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="wasm_bindgen_macro_support" data-themes="" data-resource-suffix="" data-rustdoc-version="1.82.0 (f6e511eec 2024-10-15)" data-channel="1.82.0" data-search-js="search-a99f1315e7cc5121.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-921df33f47b8780c.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-3b12f09e550e0385.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/wasm-bindgen-macro-support-0.2.100/src/lib.rs`."><title>lib.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-42caa33d.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="wasm_bindgen_macro_support" data-themes="" data-resource-suffix="" data-rustdoc-version="1.84.1 (e71f9a9a9 2025-01-27)" data-channel="1.84.1" data-search-js="search-92e6798f.js" data-settings-js="settings-0f613d39.js" ><script src="../../static.files/storage-59e33391.js"></script><script defer src="../../static.files/src-script-56102188.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-5f194d8c.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-893ab5e7.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">wasm_bindgen_macro_support/</div>lib.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -168,7 +169,39 @@
 <a href="#168" id="168">168</a>
 <a href="#169" id="169">169</a>
 <a href="#170" id="170">170</a>
-</pre></div><pre class="rust"><code><span class="doccomment">//! This crate contains the part of the implementation of the `#[wasm_bindgen]` optsibute that is
+<a href="#171" id="171">171</a>
+<a href="#172" id="172">172</a>
+<a href="#173" id="173">173</a>
+<a href="#174" id="174">174</a>
+<a href="#175" id="175">175</a>
+<a href="#176" id="176">176</a>
+<a href="#177" id="177">177</a>
+<a href="#178" id="178">178</a>
+<a href="#179" id="179">179</a>
+<a href="#180" id="180">180</a>
+<a href="#181" id="181">181</a>
+<a href="#182" id="182">182</a>
+<a href="#183" id="183">183</a>
+<a href="#184" id="184">184</a>
+<a href="#185" id="185">185</a>
+<a href="#186" id="186">186</a>
+<a href="#187" id="187">187</a>
+<a href="#188" id="188">188</a>
+<a href="#189" id="189">189</a>
+<a href="#190" id="190">190</a>
+<a href="#191" id="191">191</a>
+<a href="#192" id="192">192</a>
+<a href="#193" id="193">193</a>
+<a href="#194" id="194">194</a>
+<a href="#195" id="195">195</a>
+<a href="#196" id="196">196</a>
+<a href="#197" id="197">197</a>
+<a href="#198" id="198">198</a>
+<a href="#199" id="199">199</a>
+<a href="#200" id="200">200</a>
+<a href="#201" id="201">201</a>
+<a href="#202" id="202">202</a>
+<a href="#203" id="203">203</a></pre></div><pre class="rust"><code><span class="doccomment">//! This crate contains the part of the implementation of the `#[wasm_bindgen]` optsibute that is
 //! not in the shared backend crate.
 
 </span><span class="attr">#![doc(html_root_url = <span class="string">"https://docs.rs/wasm-bindgen-macro-support/0.2"</span>)]
@@ -182,9 +215,10 @@
 <span class="kw">extern crate </span>wasm_bindgen_shared <span class="kw">as </span>shared;
 
 <span class="kw">pub use </span><span class="kw">crate</span>::parser::BindgenAttrs;
-<span class="kw">use </span><span class="kw">crate</span>::parser::MacroParse;
+<span class="kw">use </span><span class="kw">crate</span>::parser::{ConvertToAst, MacroParse};
 <span class="kw">use </span>backend::{Diagnostic, TryToTokens};
 <span class="kw">use </span>proc_macro2::TokenStream;
+<span class="kw">use </span>quote::quote;
 <span class="kw">use </span>quote::ToTokens;
 <span class="kw">use </span>quote::TokenStreamExt;
 <span class="kw">use </span>syn::parse::{Parse, ParseStream, <span class="prelude-ty">Result </span><span class="kw">as </span>SynResult};
@@ -194,9 +228,25 @@
 <span class="doccomment">/// Takes the parsed input from a `#[wasm_bindgen]` macro and returns the generated bindings
 </span><span class="kw">pub fn </span>expand(attr: TokenStream, input: TokenStream) -&gt; <span class="prelude-ty">Result</span>&lt;TokenStream, Diagnostic&gt; {
     parser::reset_attrs_used();
-    <span class="kw">let </span>item = syn::parse2::&lt;syn::Item&gt;(input)<span class="question-mark">?</span>;
-    <span class="kw">let </span>opts = syn::parse2(attr)<span class="question-mark">?</span>;
+    <span class="comment">// if struct is encountered, add `derive` attribute and let everything happen there (workaround
+    // to help parsing cfg_attr correctly).
+    </span><span class="kw">let </span>item = syn::parse2::&lt;syn::Item&gt;(input)<span class="question-mark">?</span>;
+    <span class="kw">if let </span>syn::Item::Struct(s) = item {
+        <span class="kw">let </span>opts: BindgenAttrs = syn::parse2(attr.clone())<span class="question-mark">?</span>;
+        <span class="kw">let </span>wasm_bindgen = opts
+            .wasm_bindgen()
+            .cloned()
+            .unwrap_or_else(|| <span class="macro">syn::parse_quote!</span> { wasm_bindgen });
 
+        <span class="kw">let </span>item = <span class="macro">quote!</span> {
+            <span class="attr">#[derive(#wasm_bindgen::__rt::BindgenedStruct)]
+            #[wasm_bindgen(#attr)]
+            </span>#s
+        };
+        <span class="kw">return </span><span class="prelude-val">Ok</span>(item);
+    }
+
+    <span class="kw">let </span>opts = syn::parse2(attr)<span class="question-mark">?</span>;
     <span class="kw">let </span><span class="kw-2">mut </span>tokens = proc_macro2::TokenStream::new();
     <span class="kw">let </span><span class="kw-2">mut </span>program = backend::ast::Program::default();
     item.macro_parse(<span class="kw-2">&amp;mut </span>program, (<span class="prelude-val">Some</span>(opts), <span class="kw-2">&amp;mut </span>tokens))<span class="question-mark">?</span>;
@@ -337,5 +387,21 @@
                 .unwrap_or_else(|| <span class="macro">syn::parse_quote!</span> { wasm_bindgen_futures }),
         })
     }
+}
+
+<span class="kw">pub fn </span>expand_struct_marker(item: TokenStream) -&gt; <span class="prelude-ty">Result</span>&lt;TokenStream, Diagnostic&gt; {
+    parser::reset_attrs_used();
+
+    <span class="kw">let </span><span class="kw-2">mut </span>s: syn::ItemStruct = syn::parse2(item)<span class="question-mark">?</span>;
+
+    <span class="kw">let </span><span class="kw-2">mut </span>program = backend::ast::Program::default();
+    program.structs.push((<span class="kw-2">&amp;mut </span>s).convert(<span class="kw-2">&amp;</span>program)<span class="question-mark">?</span>);
+
+    <span class="kw">let </span><span class="kw-2">mut </span>tokens = proc_macro2::TokenStream::new();
+    program.try_to_tokens(<span class="kw-2">&amp;mut </span>tokens)<span class="question-mark">?</span>;
+
+    parser::check_unused_attrs(<span class="kw-2">&amp;mut </span>tokens);
+
+    <span class="prelude-val">Ok</span>(tokens)
 }
 </code></pre></div></section></main></body></html>

@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/wasm-bindgen-backend-0.2.95/src/codegen.rs`."><title>codegen.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-492a78a4a87dcc01.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="wasm_bindgen_backend" data-themes="" data-resource-suffix="" data-rustdoc-version="1.82.0 (f6e511eec 2024-10-15)" data-channel="1.82.0" data-search-js="search-a99f1315e7cc5121.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-921df33f47b8780c.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-3b12f09e550e0385.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/wasm-bindgen-backend-0.2.100/src/codegen.rs`."><title>codegen.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-42caa33d.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="wasm_bindgen_backend" data-themes="" data-resource-suffix="" data-rustdoc-version="1.84.1 (e71f9a9a9 2025-01-27)" data-channel="1.84.1" data-search-js="search-92e6798f.js" data-settings-js="settings-0f613d39.js" ><script src="../../static.files/storage-59e33391.js"></script><script defer src="../../static.files/src-script-56102188.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-5f194d8c.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-893ab5e7.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">wasm_bindgen_backend/</div>codegen.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1910,17 +1911,79 @@
 <a href="#1910" id="1910">1910</a>
 <a href="#1911" id="1911">1911</a>
 <a href="#1912" id="1912">1912</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::ast;
+<a href="#1913" id="1913">1913</a>
+<a href="#1914" id="1914">1914</a>
+<a href="#1915" id="1915">1915</a>
+<a href="#1916" id="1916">1916</a>
+<a href="#1917" id="1917">1917</a>
+<a href="#1918" id="1918">1918</a>
+<a href="#1919" id="1919">1919</a>
+<a href="#1920" id="1920">1920</a>
+<a href="#1921" id="1921">1921</a>
+<a href="#1922" id="1922">1922</a>
+<a href="#1923" id="1923">1923</a>
+<a href="#1924" id="1924">1924</a>
+<a href="#1925" id="1925">1925</a>
+<a href="#1926" id="1926">1926</a>
+<a href="#1927" id="1927">1927</a>
+<a href="#1928" id="1928">1928</a>
+<a href="#1929" id="1929">1929</a>
+<a href="#1930" id="1930">1930</a>
+<a href="#1931" id="1931">1931</a>
+<a href="#1932" id="1932">1932</a>
+<a href="#1933" id="1933">1933</a>
+<a href="#1934" id="1934">1934</a>
+<a href="#1935" id="1935">1935</a>
+<a href="#1936" id="1936">1936</a>
+<a href="#1937" id="1937">1937</a>
+<a href="#1938" id="1938">1938</a>
+<a href="#1939" id="1939">1939</a>
+<a href="#1940" id="1940">1940</a>
+<a href="#1941" id="1941">1941</a>
+<a href="#1942" id="1942">1942</a>
+<a href="#1943" id="1943">1943</a>
+<a href="#1944" id="1944">1944</a>
+<a href="#1945" id="1945">1945</a>
+<a href="#1946" id="1946">1946</a>
+<a href="#1947" id="1947">1947</a>
+<a href="#1948" id="1948">1948</a>
+<a href="#1949" id="1949">1949</a>
+<a href="#1950" id="1950">1950</a>
+<a href="#1951" id="1951">1951</a>
+<a href="#1952" id="1952">1952</a>
+<a href="#1953" id="1953">1953</a>
+<a href="#1954" id="1954">1954</a>
+<a href="#1955" id="1955">1955</a>
+<a href="#1956" id="1956">1956</a>
+<a href="#1957" id="1957">1957</a>
+<a href="#1958" id="1958">1958</a>
+<a href="#1959" id="1959">1959</a>
+<a href="#1960" id="1960">1960</a>
+<a href="#1961" id="1961">1961</a>
+<a href="#1962" id="1962">1962</a>
+<a href="#1963" id="1963">1963</a>
+<a href="#1964" id="1964">1964</a>
+<a href="#1965" id="1965">1965</a>
+<a href="#1966" id="1966">1966</a>
+<a href="#1967" id="1967">1967</a>
+<a href="#1968" id="1968">1968</a>
+<a href="#1969" id="1969">1969</a>
+<a href="#1970" id="1970">1970</a>
+<a href="#1971" id="1971">1971</a>
+<a href="#1972" id="1972">1972</a>
+<a href="#1973" id="1973">1973</a>
+<a href="#1974" id="1974">1974</a>
+<a href="#1975" id="1975">1975</a>
+<a href="#1976" id="1976">1976</a></pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::ast;
 <span class="kw">use </span><span class="kw">crate</span>::encode;
 <span class="kw">use </span><span class="kw">crate</span>::encode::EncodeChunk;
 <span class="kw">use </span><span class="kw">crate</span>::Diagnostic;
-<span class="kw">use </span>once_cell::sync::Lazy;
 <span class="kw">use </span>proc_macro2::{Ident, Span, TokenStream};
 <span class="kw">use </span>quote::format_ident;
 <span class="kw">use </span>quote::quote_spanned;
 <span class="kw">use </span>quote::{quote, ToTokens};
+<span class="kw">use </span>std::cell::RefCell;
 <span class="kw">use </span>std::collections::{HashMap, HashSet};
-<span class="kw">use </span>std::sync::Mutex;
 <span class="kw">use </span>syn::parse_quote;
 <span class="kw">use </span>syn::spanned::Spanned;
 <span class="kw">use </span>wasm_bindgen_shared <span class="kw">as </span>shared;
@@ -2075,7 +2138,7 @@
         <span class="kw">let </span>prefix_json_bytes = syn::LitByteStr::new(<span class="kw-2">&amp;</span>prefix_json_bytes, Span::call_site());
 
         (<span class="macro">quote!</span> {
-            <span class="attr">#[cfg(all(target_arch = <span class="string">"wasm32"</span>, target_os = <span class="string">"unknown"</span>))]
+            <span class="attr">#[cfg(all(target_arch = <span class="string">"wasm32"</span>, any(target_os = <span class="string">"unknown"</span>, target_os = <span class="string">"none"</span>)))]
             #[automatically_derived]
             </span><span class="kw">const _</span>: () = {
                 <span class="kw">use </span>#wasm_bindgen::__rt::{flat_len, flat_byte_slices};
@@ -2113,9 +2176,10 @@
                 #program
                 #extern_fn
 
-                <span class="kw">static </span>__VAL: #wasm_bindgen::__rt::Lazy&lt;String&gt; = #wasm_bindgen::__rt::Lazy::new(|| <span class="kw">unsafe </span>{
-                    &lt;#wasm_bindgen::__rt::alloc::string::String <span class="kw">as </span>#wasm_bindgen::convert::FromWasmAbi&gt;::from_abi(#name().join())
-                });
+                <span class="kw">static </span>__VAL: #wasm_bindgen::__rt::LazyLock&lt;#wasm_bindgen::__rt::alloc::string::String&gt; =
+                    #wasm_bindgen::__rt::LazyLock::new(|| <span class="kw">unsafe </span>{
+                        &lt;#wasm_bindgen::__rt::alloc::string::String <span class="kw">as </span>#wasm_bindgen::convert::FromWasmAbi&gt;::from_abi(#name().join())
+                    });
 
                 #wasm_bindgen::__rt::alloc::string::String::clone(<span class="kw-2">&amp;</span>__VAL)
             }
@@ -2137,9 +2201,15 @@
         <span class="kw">let </span>wasm_bindgen = <span class="kw-2">&amp;</span><span class="self">self</span>.wasm_bindgen;
         (<span class="macro">quote!</span> {
             <span class="attr">#[automatically_derived]
+            </span><span class="kw">impl </span>#wasm_bindgen::__rt::marker::SupportsConstructor <span class="kw">for </span>#name {}
+            <span class="attr">#[automatically_derived]
+            </span><span class="kw">impl </span>#wasm_bindgen::__rt::marker::SupportsInstanceProperty <span class="kw">for </span>#name {}
+            <span class="attr">#[automatically_derived]
+            </span><span class="kw">impl </span>#wasm_bindgen::__rt::marker::SupportsStaticProperty <span class="kw">for </span>#name {}
+
+            <span class="attr">#[automatically_derived]
             </span><span class="kw">impl </span>#wasm_bindgen::describe::WasmDescribe <span class="kw">for </span>#name {
                 <span class="kw">fn </span>describe() {
-                    <span class="kw">use </span>#wasm_bindgen::__wbindgen_if_not_std;
                     <span class="kw">use </span>#wasm_bindgen::describe::<span class="kw-2">*</span>;
                     inform(RUST_STRUCT);
                     inform(#name_len);
@@ -2187,12 +2257,12 @@
                     <span class="kw">let </span>ptr = #wasm_bindgen::convert::IntoWasmAbi::into_abi(value);
 
                     <span class="attr">#[link(wasm_import_module = <span class="string">"__wbindgen_placeholder__"</span>)]
-                    #[cfg(all(target_arch = <span class="string">"wasm32"</span>, target_os = <span class="string">"unknown"</span>))]
+                    #[cfg(all(target_arch = <span class="string">"wasm32"</span>, any(target_os = <span class="string">"unknown"</span>, target_os = <span class="string">"none"</span>)))]
                     </span><span class="kw">extern </span><span class="string">"C" </span>{
                         <span class="kw">fn </span>#new_fn(ptr: u32) -&gt; u32;
                     }
 
-                    <span class="attr">#[cfg(not(all(target_arch = <span class="string">"wasm32"</span>, target_os = <span class="string">"unknown"</span>)))]
+                    <span class="attr">#[cfg(not(all(target_arch = <span class="string">"wasm32"</span>, any(target_os = <span class="string">"unknown"</span>, target_os = <span class="string">"none"</span>))))]
                     </span><span class="kw">unsafe fn </span>#new_fn(<span class="kw">_</span>: u32) -&gt; u32 {
                         <span class="macro">panic!</span>(<span class="string">"cannot convert to JsValue outside of the Wasm target"</span>)
                     }
@@ -2204,14 +2274,14 @@
                 }
             }
 
-            <span class="attr">#[cfg(all(target_arch = <span class="string">"wasm32"</span>, target_os = <span class="string">"unknown"</span>))]
+            <span class="attr">#[cfg(all(target_arch = <span class="string">"wasm32"</span>, any(target_os = <span class="string">"unknown"</span>, target_os = <span class="string">"none"</span>)))]
             #[automatically_derived]
             </span><span class="kw">const _</span>: () = {
+                #<span class="macro">wasm_bindgen::__wbindgen_coverage!</span> {
                 <span class="attr">#[no_mangle]
                 #[doc(hidden)]
                 </span><span class="comment">// `allow_delayed` is whether it's ok to not actually free the `ptr` immediately
                 // if it's still borrowed.
-                </span><span class="attr">#[cfg_attr(wasm_bindgen_unstable_test_coverage, coverage(off))]
                 </span><span class="kw">pub unsafe extern </span><span class="string">"C" </span><span class="kw">fn </span>#free_fn(ptr: u32, allow_delayed: u32) {
                     <span class="kw">use </span>#wasm_bindgen::__rt::alloc::rc::Rc;
 
@@ -2225,6 +2295,7 @@
                         <span class="comment">// Claim ownership of the value, which will panic if it's borrowed.
                         </span><span class="kw">let _ </span>= &lt;#name <span class="kw">as </span>#wasm_bindgen::convert::FromWasmAbi&gt;::from_abi(ptr);
                     }
+                }
                 }
             };
 
@@ -2293,12 +2364,12 @@
                     <span class="kw">let </span>idx = #wasm_bindgen::convert::IntoWasmAbi::into_abi(<span class="kw-2">&amp;</span>value);
 
                     <span class="attr">#[link(wasm_import_module = <span class="string">"__wbindgen_placeholder__"</span>)]
-                    #[cfg(all(target_arch = <span class="string">"wasm32"</span>, target_os = <span class="string">"unknown"</span>))]
+                    #[cfg(all(target_arch = <span class="string">"wasm32"</span>, any(target_os = <span class="string">"unknown"</span>, target_os = <span class="string">"none"</span>)))]
                     </span><span class="kw">extern </span><span class="string">"C" </span>{
                         <span class="kw">fn </span>#unwrap_fn(ptr: u32) -&gt; u32;
                     }
 
-                    <span class="attr">#[cfg(not(all(target_arch = <span class="string">"wasm32"</span>, target_os = <span class="string">"unknown"</span>)))]
+                    <span class="attr">#[cfg(not(all(target_arch = <span class="string">"wasm32"</span>, any(target_os = <span class="string">"unknown"</span>, target_os = <span class="string">"none"</span>))))]
                     </span><span class="kw">unsafe fn </span>#unwrap_fn(<span class="kw">_</span>: u32) -&gt; u32 {
                         <span class="macro">panic!</span>(<span class="string">"cannot convert from JsValue outside of the Wasm target"</span>)
                     }
@@ -2405,9 +2476,9 @@
         (<span class="macro">quote!</span> {
             <span class="attr">#[automatically_derived]
             </span><span class="kw">const _</span>: () = {
-                <span class="attr">#[cfg_attr(all(target_arch = <span class="string">"wasm32"</span>, target_os = <span class="string">"unknown"</span>), no_mangle)]
+                #<span class="macro">wasm_bindgen::__wbindgen_coverage!</span> {
+                <span class="attr">#[cfg_attr(all(target_arch = <span class="string">"wasm32"</span>, any(target_os = <span class="string">"unknown"</span>, target_os = <span class="string">"none"</span>)), no_mangle)]
                 #[doc(hidden)]
-                #[cfg_attr(wasm_bindgen_unstable_test_coverage, coverage(off))]
                 </span><span class="kw">pub unsafe extern </span><span class="string">"C" </span><span class="kw">fn </span>#getter(js: u32)
                     -&gt; #wasm_bindgen::convert::WasmRet&lt;&lt;#ty <span class="kw">as </span>#wasm_bindgen::convert::IntoWasmAbi&gt;::Abi&gt;
                 {
@@ -2421,6 +2492,7 @@
                     assert_not_null(js);
                     <span class="kw">let </span>val = #val;
                     &lt;#ty <span class="kw">as </span>IntoWasmAbi&gt;::into_abi(val).into()
+                }
                 }
             };
         })
@@ -2444,12 +2516,12 @@
         <span class="kw">let </span>(args, names) = splat(wasm_bindgen, <span class="kw-2">&amp;</span>Ident::new(<span class="string">"val"</span>, rust_name.span()), <span class="kw-2">&amp;</span>abi);
 
         (<span class="macro">quote!</span> {
-            <span class="attr">#[cfg(all(target_arch = <span class="string">"wasm32"</span>, target_os = <span class="string">"unknown"</span>))]
+            <span class="attr">#[cfg(all(target_arch = <span class="string">"wasm32"</span>, any(target_os = <span class="string">"unknown"</span>, target_os = <span class="string">"none"</span>)))]
             #[automatically_derived]
             </span><span class="kw">const _</span>: () = {
+                #<span class="macro">wasm_bindgen::__wbindgen_coverage!</span> {
                 <span class="attr">#[no_mangle]
                 #[doc(hidden)]
-                #[cfg_attr(wasm_bindgen_unstable_test_coverage, coverage(off))]
                 </span><span class="kw">pub unsafe extern </span><span class="string">"C" </span><span class="kw">fn </span>#setter(
                     js: u32,
                     #(#args,)*
@@ -2462,6 +2534,7 @@
                     <span class="kw">let </span>val = &lt;#abi <span class="kw">as </span>#wasm_bindgen::convert::WasmAbi&gt;::join(#(#names),<span class="kw-2">*</span>);
                     <span class="kw">let </span>val = &lt;#ty <span class="kw">as </span>FromWasmAbi&gt;::from_abi(val);
                     (<span class="kw-2">*</span>js).borrow_mut().#rust_name = val;
+                }
                 }
             };
         })
@@ -2540,7 +2613,7 @@
 
         <span class="kw">let </span><span class="kw-2">mut </span>argtys = Vec::new();
         <span class="kw">for </span>(i, arg) <span class="kw">in </span><span class="self">self</span>.function.arguments.iter().enumerate() {
-            argtys.push(<span class="kw-2">&amp;*</span>arg.ty);
+            argtys.push(<span class="kw-2">&amp;*</span>arg.pat_type.ty);
             <span class="kw">let </span>i = i + offset;
             <span class="kw">let </span>ident = Ident::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"arg{}"</span>, i), Span::call_site());
             <span class="kw">fn </span>unwrap_nested_types(ty: <span class="kw-2">&amp;</span>syn::Type) -&gt; <span class="kw-2">&amp;</span>syn::Type {
@@ -2550,7 +2623,7 @@
                     <span class="kw">_ </span>=&gt; ty,
                 }
             }
-            <span class="kw">let </span>ty = unwrap_nested_types(<span class="kw-2">&amp;</span>arg.ty);
+            <span class="kw">let </span>ty = unwrap_nested_types(<span class="kw-2">&amp;</span>arg.pat_type.ty);
 
             <span class="kw">match </span><span class="kw-2">&amp;</span>ty {
                 syn::Type::Reference(syn::TypeReference {
@@ -2623,7 +2696,12 @@
             elems: Default::default(),
             paren_token: Default::default(),
         });
-        <span class="kw">let </span>syn_ret = <span class="self">self</span>.function.ret.as_ref().unwrap_or(<span class="kw-2">&amp;</span>syn_unit);
+        <span class="kw">let </span>syn_ret = <span class="self">self
+            </span>.function
+            .ret
+            .as_ref()
+            .map(|ret| <span class="kw-2">&amp;</span>ret.r#type)
+            .unwrap_or(<span class="kw-2">&amp;</span>syn_unit);
         <span class="kw">if let </span>syn::Type::Reference(<span class="kw">_</span>) = syn_ret {
             <span class="macro">bail_span!</span>(syn_ret, <span class="string">"cannot return a borrowed ref with #[wasm_bindgen]"</span>,)
         }
@@ -2692,26 +2770,58 @@
         <span class="kw">let </span>nargs = <span class="self">self</span>.function.arguments.len() <span class="kw">as </span>u32;
         <span class="kw">let </span>attrs = <span class="kw-2">&amp;</span><span class="self">self</span>.function.rust_attrs;
 
-        <span class="kw">let </span>start_check = <span class="kw">if </span><span class="self">self</span>.start {
-            <span class="macro">quote!</span> { <span class="kw">const </span>_ASSERT: <span class="kw">fn</span>() = || -&gt; #projection::Abi { <span class="kw">loop </span>{} }; }
-        } <span class="kw">else </span>{
-            <span class="macro">quote!</span> {}
+        <span class="kw">let </span><span class="kw-2">mut </span>checks = Vec::new();
+        <span class="kw">if </span><span class="self">self</span>.start {
+            checks.push(<span class="macro">quote!</span> { <span class="kw">const </span>_ASSERT: <span class="kw">fn</span>() = || -&gt; #projection::Abi { <span class="kw">loop </span>{} }; });
         };
+
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(class) = <span class="self">self</span>.rust_class.as_ref() {
+            <span class="comment">// little helper function to make sure the check points to the
+            // location of the function causing the assert to fail
+            </span><span class="kw">let </span><span class="kw-2">mut </span>add_check = |token_stream| {
+                checks.push(respan(token_stream, <span class="kw-2">&amp;</span><span class="self">self</span>.rust_name));
+            };
+
+            <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.method_kind {
+                ast::MethodKind::Constructor =&gt; {
+                    add_check(<span class="macro">quote!</span> {
+                        <span class="kw">let _</span>: #wasm_bindgen::__rt::marker::CheckSupportsConstructor&lt;#class&gt;;
+                    });
+                }
+                ast::MethodKind::Operation(operation) =&gt; <span class="kw">match </span>operation.kind {
+                    ast::OperationKind::Getter(<span class="kw">_</span>) | ast::OperationKind::Setter(<span class="kw">_</span>) =&gt; {
+                        <span class="kw">if </span>operation.is_static {
+                            add_check(<span class="macro">quote!</span> {
+                                <span class="kw">let _</span>: #wasm_bindgen::__rt::marker::CheckSupportsStaticProperty&lt;#class&gt;;
+                            });
+                        } <span class="kw">else </span>{
+                            add_check(<span class="macro">quote!</span> {
+                                <span class="kw">let _</span>: #wasm_bindgen::__rt::marker::CheckSupportsInstanceProperty&lt;#class&gt;;
+                            });
+                        }
+                    }
+                    <span class="kw">_ </span>=&gt; {}
+                },
+            }
+        }
 
         (<span class="macro">quote!</span> {
             <span class="attr">#[automatically_derived]
             </span><span class="kw">const _</span>: () = {
+                #<span class="macro">wasm_bindgen::__wbindgen_coverage!</span> {
                 #(#attrs)*
                 <span class="attr">#[cfg_attr(
-                    all(target_arch = <span class="string">"wasm32"</span>, target_os = <span class="string">"unknown"</span>),
+                    all(target_arch = <span class="string">"wasm32"</span>, any(target_os = <span class="string">"unknown"</span>, target_os = <span class="string">"none"</span>)),
                     export_name = #export_name,
                 )]
-                #[cfg_attr(wasm_bindgen_unstable_test_coverage, coverage(off))]
                 </span><span class="kw">pub unsafe extern </span><span class="string">"C" </span><span class="kw">fn </span>#generated_name(#(#args),<span class="kw-2">*</span>) -&gt; #wasm_bindgen::convert::WasmRet&lt;#projection::Abi&gt; {
-                    #start_check
+                    <span class="kw">const _</span>: () = {
+                        #(#checks)*
+                    };
 
                     <span class="kw">let </span>#ret = #call;
                     #convert_ret
+                }
                 }
             };
         })
@@ -2978,11 +3088,11 @@
                 </span><span class="kw">impl </span>JsCast <span class="kw">for </span>#rust_name {
                     <span class="kw">fn </span>instanceof(val: <span class="kw-2">&amp;</span>JsValue) -&gt; bool {
                         <span class="attr">#[link(wasm_import_module = <span class="string">"__wbindgen_placeholder__"</span>)]
-                        #[cfg(all(target_arch = <span class="string">"wasm32"</span>, target_os = <span class="string">"unknown"</span>))]
+                        #[cfg(all(target_arch = <span class="string">"wasm32"</span>, any(target_os = <span class="string">"unknown"</span>, target_os = <span class="string">"none"</span>)))]
                         </span><span class="kw">extern </span><span class="string">"C" </span>{
                             <span class="kw">fn </span>#instanceof_shim(val: u32) -&gt; u32;
                         }
-                        <span class="attr">#[cfg(not(all(target_arch = <span class="string">"wasm32"</span>, target_os = <span class="string">"unknown"</span>)))]
+                        <span class="attr">#[cfg(not(all(target_arch = <span class="string">"wasm32"</span>, any(target_os = <span class="string">"unknown"</span>, target_os = <span class="string">"none"</span>))))]
                         </span><span class="kw">unsafe fn </span>#instanceof_shim(<span class="kw">_</span>: u32) -&gt; u32 {
                             <span class="macro">panic!</span>(<span class="string">"cannot check instanceof on non-wasm targets"</span>);
                         }
@@ -3153,8 +3263,7 @@
 
             <span class="attr">#[automatically_derived]
             </span><span class="kw">impl </span>#wasm_bindgen::describe::WasmDescribe <span class="kw">for </span>#enum_name {
-                <span class="attr">#[cfg_attr(wasm_bindgen_unstable_test_coverage, coverage(off))]
-                </span><span class="kw">fn </span>describe() {
+                <span class="kw">fn </span>describe() {
                     <span class="kw">use </span>#wasm_bindgen::describe::<span class="kw-2">*</span>;
                     inform(STRING_ENUM);
                     inform(#name_len);
@@ -3195,7 +3304,7 @@
             ast::ImportFunctionKind::Normal =&gt; {}
         }
         <span class="kw">let </span>vis = <span class="kw-2">&amp;</span><span class="self">self</span>.function.rust_vis;
-        <span class="kw">let </span>ret = <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.function.ret {
+        <span class="kw">let </span>ret = <span class="kw">match </span><span class="self">self</span>.function.ret.as_ref().map(|ret| <span class="kw-2">&amp;</span>ret.r#type) {
             <span class="prelude-val">Some</span>(ty) =&gt; <span class="macro">quote!</span> { -&gt; #ty },
             <span class="prelude-val">None </span>=&gt; <span class="macro">quote!</span>(),
         };
@@ -3209,8 +3318,8 @@
         <span class="kw">let </span>wasm_bindgen_futures = <span class="kw-2">&amp;</span><span class="self">self</span>.wasm_bindgen_futures;
 
         <span class="kw">for </span>(i, arg) <span class="kw">in </span><span class="self">self</span>.function.arguments.iter().enumerate() {
-            <span class="kw">let </span>ty = <span class="kw-2">&amp;</span>arg.ty;
-            <span class="kw">let </span>name = <span class="kw">match </span><span class="kw-2">&amp;*</span>arg.pat {
+            <span class="kw">let </span>ty = <span class="kw-2">&amp;</span>arg.pat_type.ty;
+            <span class="kw">let </span>name = <span class="kw">match </span><span class="kw-2">&amp;*</span>arg.pat_type.pat {
                 syn::Pat::Ident(syn::PatIdent {
                     by_ref: <span class="prelude-val">None</span>,
                     ident,
@@ -3219,7 +3328,7 @@
                 }) =&gt; ident.clone(),
                 syn::Pat::Wild(<span class="kw">_</span>) =&gt; syn::Ident::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"__genarg_{}"</span>, i), Span::call_site()),
                 <span class="kw">_ </span>=&gt; <span class="macro">bail_span!</span>(
-                    arg.pat,
+                    arg.pat_type.pat,
                     <span class="string">"unsupported pattern in #[wasm_bindgen] imported function"</span>,
                 ),
             };
@@ -3405,7 +3514,7 @@
     wasm_bindgen: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>syn::Path,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; ToTokens <span class="kw">for </span>DescribeImport&lt;<span class="lifetime">'a</span>&gt; {
+<span class="kw">impl </span>ToTokens <span class="kw">for </span>DescribeImport&lt;<span class="lifetime">'_</span>&gt; {
     <span class="kw">fn </span>to_tokens(<span class="kw-2">&amp;</span><span class="self">self</span>, tokens: <span class="kw-2">&amp;mut </span>TokenStream) {
         <span class="kw">let </span>f = <span class="kw">match </span><span class="kw-2">*</span><span class="self">self</span>.kind {
             ast::ImportKind::Function(<span class="kw-2">ref </span>f) =&gt; f,
@@ -3414,7 +3523,7 @@
             ast::ImportKind::Type(<span class="kw">_</span>) =&gt; <span class="kw">return</span>,
             ast::ImportKind::Enum(<span class="kw">_</span>) =&gt; <span class="kw">return</span>,
         };
-        <span class="kw">let </span>argtys = f.function.arguments.iter().map(|arg| <span class="kw-2">&amp;</span>arg.ty);
+        <span class="kw">let </span>argtys = f.function.arguments.iter().map(|arg| <span class="kw-2">&amp;</span>arg.pat_type.ty);
         <span class="kw">let </span>nargs = f.function.arguments.len() <span class="kw">as </span>u32;
         <span class="kw">let </span>inform_ret = <span class="kw">match </span><span class="kw-2">&amp;</span>f.js_ret {
             <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>t) =&gt; <span class="macro">quote!</span> { &lt;#t <span class="kw">as </span>WasmDescribe&gt;::describe(); },
@@ -3447,10 +3556,15 @@
         <span class="kw">let </span>name_len = name_str.len() <span class="kw">as </span>u32;
         <span class="kw">let </span>name_chars = name_str.chars().map(|c| c <span class="kw">as </span>u32);
         <span class="kw">let </span>hole = <span class="kw-2">&amp;</span><span class="self">self</span>.hole;
+        <span class="kw">let </span>underlying = <span class="kw">if </span><span class="self">self</span>.signed {
+            <span class="macro">quote!</span> { i32 }
+        } <span class="kw">else </span>{
+            <span class="macro">quote!</span> { u32 }
+        };
         <span class="kw">let </span>cast_clauses = <span class="self">self</span>.variants.iter().map(|variant| {
             <span class="kw">let </span>variant_name = <span class="kw-2">&amp;</span>variant.name;
             <span class="macro">quote!</span> {
-                <span class="kw">if </span>js == #enum_name::#variant_name <span class="kw">as </span>u32 {
+                <span class="kw">if </span>js == #enum_name::#variant_name <span class="kw">as </span>#underlying {
                     #enum_name::#variant_name
                 }
             }
@@ -3460,20 +3574,20 @@
         (<span class="macro">quote!</span> {
             <span class="attr">#[automatically_derived]
             </span><span class="kw">impl </span>#wasm_bindgen::convert::IntoWasmAbi <span class="kw">for </span>#enum_name {
-                <span class="kw">type </span>Abi = u32;
+                <span class="kw">type </span>Abi = #underlying;
 
                 <span class="attr">#[inline]
-                </span><span class="kw">fn </span>into_abi(<span class="self">self</span>) -&gt; u32 {
-                    <span class="self">self </span><span class="kw">as </span>u32
+                </span><span class="kw">fn </span>into_abi(<span class="self">self</span>) -&gt; #underlying {
+                    <span class="self">self </span><span class="kw">as </span>#underlying
                 }
             }
 
             <span class="attr">#[automatically_derived]
             </span><span class="kw">impl </span>#wasm_bindgen::convert::FromWasmAbi <span class="kw">for </span>#enum_name {
-                <span class="kw">type </span>Abi = u32;
+                <span class="kw">type </span>Abi = #underlying;
 
                 <span class="attr">#[inline]
-                </span><span class="kw">unsafe fn </span>from_abi(js: u32) -&gt; <span class="self">Self </span>{
+                </span><span class="kw">unsafe fn </span>from_abi(js: #underlying) -&gt; <span class="self">Self </span>{
                     #(#cast_clauses <span class="kw">else</span>)* {
                         #wasm_bindgen::throw_str(<span class="string">"invalid enum value passed"</span>)
                     }
@@ -3483,19 +3597,18 @@
             <span class="attr">#[automatically_derived]
             </span><span class="kw">impl </span>#wasm_bindgen::convert::OptionFromWasmAbi <span class="kw">for </span>#enum_name {
                 <span class="attr">#[inline]
-                </span><span class="kw">fn </span>is_none(val: <span class="kw-2">&amp;</span>u32) -&gt; bool { <span class="kw-2">*</span>val == #hole }
+                </span><span class="kw">fn </span>is_none(val: <span class="kw-2">&amp;</span><span class="self">Self</span>::Abi) -&gt; bool { <span class="kw-2">*</span>val == #hole <span class="kw">as </span>#underlying }
             }
 
             <span class="attr">#[automatically_derived]
             </span><span class="kw">impl </span>#wasm_bindgen::convert::OptionIntoWasmAbi <span class="kw">for </span>#enum_name {
                 <span class="attr">#[inline]
-                </span><span class="kw">fn </span>none() -&gt; <span class="self">Self</span>::Abi { #hole }
+                </span><span class="kw">fn </span>none() -&gt; <span class="self">Self</span>::Abi { #hole <span class="kw">as </span>#underlying }
             }
 
             <span class="attr">#[automatically_derived]
             </span><span class="kw">impl </span>#wasm_bindgen::describe::WasmDescribe <span class="kw">for </span>#enum_name {
-                <span class="attr">#[cfg_attr(wasm_bindgen_unstable_test_coverage, coverage(off))]
-                </span><span class="kw">fn </span>describe() {
+                <span class="kw">fn </span>describe() {
                     <span class="kw">use </span>#wasm_bindgen::describe::<span class="kw-2">*</span>;
                     inform(ENUM);
                     inform(#name_len);
@@ -3509,7 +3622,7 @@
                 </span>#wasm_bindgen::JsValue
             {
                 <span class="kw">fn </span>from(value: #enum_name) -&gt; <span class="self">Self </span>{
-                    #wasm_bindgen::JsValue::from_f64((value <span class="kw">as </span>u32).into())
+                    #wasm_bindgen::JsValue::from_f64((value <span class="kw">as </span>#underlying).into())
                 }
             }
 
@@ -3520,7 +3633,7 @@
                 <span class="kw">fn </span>try_from_js_value(value: #wasm_bindgen::JsValue)
                     -&gt; #wasm_bindgen::__rt::core::result::Result&lt;<span class="self">Self</span>, &lt;#enum_name <span class="kw">as </span>#wasm_bindgen::convert::TryFromJsValue&gt;::Error&gt; {
                     <span class="kw">use </span>#wasm_bindgen::__rt::core::convert::TryFrom;
-                    <span class="kw">let </span>js = f64::try_from(<span class="kw-2">&amp;</span>value)<span class="question-mark">? </span><span class="kw">as </span>u32;
+                    <span class="kw">let </span>js = f64::try_from(<span class="kw-2">&amp;</span>value)<span class="question-mark">? </span><span class="kw">as </span>#underlying;
 
                     #wasm_bindgen::__rt::core::result::Result::Ok(
                         #(#try_from_cast_clauses <span class="kw">else</span>)* {
@@ -3582,7 +3695,7 @@
     <span class="kw">fn </span>to_tokens(<span class="kw-2">&amp;</span><span class="self">self</span>, into: <span class="kw-2">&amp;mut </span>TokenStream) {
         <span class="kw">let </span>ty = <span class="kw-2">&amp;</span><span class="self">self</span>.ty;
 
-        <span class="kw">if </span><span class="self">self</span>.thread_local {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(thread_local) = <span class="self">self</span>.thread_local {
             thread_local_import(
                 <span class="kw-2">&amp;</span><span class="self">self</span>.vis,
                 <span class="kw-2">&amp;</span><span class="self">self</span>.rust_name,
@@ -3590,6 +3703,7 @@
                 ty,
                 ty,
                 <span class="kw-2">&amp;</span><span class="self">self</span>.shim,
+                thread_local,
             )
             .to_tokens(into)
         } <span class="kw">else </span>{
@@ -3602,14 +3716,14 @@
 
             into.extend(<span class="macro">quote!</span> {
                 <span class="attr">#[automatically_derived]
-                #[deprecated = <span class="string">"use with `#[wasm_bindgen(thread_local)]` instead"</span>]
+                #[deprecated = <span class="string">"use with `#[wasm_bindgen(thread_local_v2)]` instead"</span>]
             </span>});
             into.extend(
                 <span class="macro">quote_spanned!</span> { name.span() =&gt; #vis <span class="kw">static </span>#name: #wasm_bindgen::JsStatic&lt;#ty&gt; = {
                         <span class="kw">fn </span>init() -&gt; #ty {
                             #init
                         }
-                        <span class="macro">thread_local!</span>(<span class="kw">static </span>_VAL: #ty = init(););
+                        #<span class="macro">wasm_bindgen::__rt::std::thread_local!</span>(<span class="kw">static </span>_VAL: #ty = init(););
                         #wasm_bindgen::JsStatic {
                             __inner: <span class="kw-2">&amp;</span>_VAL,
                         }
@@ -3642,6 +3756,7 @@
             <span class="kw-2">&amp;</span>actual_ty,
             <span class="kw-2">&amp;</span><span class="self">self</span>.ty,
             <span class="kw-2">&amp;</span><span class="self">self</span>.shim,
+            <span class="self">self</span>.thread_local,
         )
         .to_tokens(into);
     }
@@ -3654,15 +3769,29 @@
     actual_ty: <span class="kw-2">&amp;</span>syn::Type,
     ty: <span class="kw-2">&amp;</span>syn::Type,
     shim_name: <span class="kw-2">&amp;</span>Ident,
+    thread_local: ast::ThreadLocal,
 ) -&gt; TokenStream {
     <span class="kw">let </span>init = static_init(wasm_bindgen, ty, shim_name);
 
-    <span class="macro">quote!</span> {
-        <span class="macro">thread_local!</span> {
-            <span class="attr">#[automatically_derived]
-            </span>#vis <span class="kw">static </span>#name: #actual_ty = {
-                #init
-            };
+    <span class="kw">match </span>thread_local {
+        ast::ThreadLocal::V1 =&gt; <span class="macro">quote!</span> {
+            #<span class="macro">wasm_bindgen::__rt::std::thread_local!</span> {
+                <span class="attr">#[automatically_derived]
+                #[deprecated = <span class="string">"use with `#[wasm_bindgen(thread_local_v2)]` instead"</span>]
+                </span>#vis <span class="kw">static </span>#name: #actual_ty = {
+                    #init
+                };
+            }
+        },
+        ast::ThreadLocal::V2 =&gt; {
+            <span class="macro">quote!</span> {
+                #vis <span class="kw">static </span>#name: #wasm_bindgen::JsThreadLocal&lt;#actual_ty&gt; = {
+                    <span class="kw">fn </span>init() -&gt; #actual_ty {
+                        #init
+                    }
+                    #<span class="macro">wasm_bindgen::__wbindgen_thread_local!</span>(#wasm_bindgen, #actual_ty)
+                };
+            }
         }
     }
 }
@@ -3673,12 +3802,12 @@
     };
     <span class="macro">quote!</span> {
         <span class="attr">#[link(wasm_import_module = <span class="string">"__wbindgen_placeholder__"</span>)]
-        #[cfg(all(target_arch = <span class="string">"wasm32"</span>, target_os = <span class="string">"unknown"</span>))]
+        #[cfg(all(target_arch = <span class="string">"wasm32"</span>, any(target_os = <span class="string">"unknown"</span>, target_os = <span class="string">"none"</span>)))]
         </span><span class="kw">extern </span><span class="string">"C" </span>{
             <span class="kw">fn </span>#shim_name() -&gt; #abi_ret;
         }
 
-        <span class="attr">#[cfg(not(all(target_arch = <span class="string">"wasm32"</span>, target_os = <span class="string">"unknown"</span>)))]
+        <span class="attr">#[cfg(not(all(target_arch = <span class="string">"wasm32"</span>, any(target_os = <span class="string">"unknown"</span>, target_os = <span class="string">"none"</span>))))]
         </span><span class="kw">unsafe fn </span>#shim_name() -&gt; #abi_ret {
             <span class="macro">panic!</span>(<span class="string">"cannot access imported statics on non-wasm targets"</span>)
         }
@@ -3698,7 +3827,7 @@
     wasm_bindgen: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>syn::Path,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>, T: ToTokens&gt; ToTokens <span class="kw">for </span>Descriptor&lt;<span class="lifetime">'a</span>, T&gt; {
+<span class="kw">impl</span>&lt;T: ToTokens&gt; ToTokens <span class="kw">for </span>Descriptor&lt;<span class="lifetime">'_</span>, T&gt; {
     <span class="kw">fn </span>to_tokens(<span class="kw-2">&amp;</span><span class="self">self</span>, tokens: <span class="kw-2">&amp;mut </span>TokenStream) {
         <span class="comment">// It's possible for the same descriptor to be emitted in two different
         // modules (aka a value imported twice in a crate, each in a separate
@@ -3708,15 +3837,13 @@
         // It's up to the descriptors themselves to ensure they have unique
         // names for unique items imported, currently done via `ShortHash` and
         // hashing appropriate data into the symbol name.
-        </span><span class="kw">static </span>DESCRIPTORS_EMITTED: Lazy&lt;Mutex&lt;HashSet&lt;String&gt;&gt;&gt; = Lazy::new(Default::default);
+        </span><span class="macro">thread_local!</span> {
+            <span class="kw">static </span>DESCRIPTORS_EMITTED: RefCell&lt;HashSet&lt;String&gt;&gt; = RefCell::default();
+        }
 
         <span class="kw">let </span>ident = <span class="self">self</span>.ident;
 
-        <span class="kw">if </span>!DESCRIPTORS_EMITTED
-            .lock()
-            .unwrap()
-            .insert(ident.to_string())
-        {
+        <span class="kw">if </span>!DESCRIPTORS_EMITTED.with(|list| list.borrow_mut().insert(ident.to_string())) {
             <span class="kw">return</span>;
         }
 
@@ -3725,18 +3852,19 @@
         <span class="kw">let </span>attrs = <span class="kw-2">&amp;</span><span class="self">self</span>.attrs;
         <span class="kw">let </span>wasm_bindgen = <span class="kw-2">&amp;</span><span class="self">self</span>.wasm_bindgen;
         (<span class="macro">quote!</span> {
-            <span class="attr">#[cfg(all(target_arch = <span class="string">"wasm32"</span>, target_os = <span class="string">"unknown"</span>))]
+            <span class="attr">#[cfg(all(target_arch = <span class="string">"wasm32"</span>, any(target_os = <span class="string">"unknown"</span>, target_os = <span class="string">"none"</span>)))]
             #[automatically_derived]
             </span><span class="kw">const _</span>: () = {
+                #<span class="macro">wasm_bindgen::__wbindgen_coverage!</span> {
                 #(#attrs)*
                 <span class="attr">#[no_mangle]
                 #[doc(hidden)]
-                #[cfg_attr(wasm_bindgen_unstable_test_coverage, coverage(off))]
                 </span><span class="kw">pub extern </span><span class="string">"C" </span><span class="kw">fn </span>#name() {
                     <span class="kw">use </span>#wasm_bindgen::describe::<span class="kw-2">*</span>;
                     <span class="comment">// See definition of `link_mem_intrinsics` for what this is doing
                     </span>#wasm_bindgen::__rt::link_mem_intrinsics();
                     #inner
+                }
                 }
             };
         })
@@ -3752,14 +3880,14 @@
     abi_ret: TokenStream,
 ) -&gt; TokenStream {
     <span class="macro">quote!</span> {
-        <span class="attr">#[cfg(all(target_arch = <span class="string">"wasm32"</span>, target_os = <span class="string">"unknown"</span>))]
+        <span class="attr">#[cfg(all(target_arch = <span class="string">"wasm32"</span>, any(target_os = <span class="string">"unknown"</span>, target_os = <span class="string">"none"</span>)))]
         </span>#(#attrs)*
         <span class="attr">#[link(wasm_import_module = <span class="string">"__wbindgen_placeholder__"</span>)]
         </span><span class="kw">extern </span><span class="string">"C" </span>{
             <span class="kw">fn </span>#import_name(#(#abi_arguments),<span class="kw-2">*</span>) -&gt; #abi_ret;
         }
 
-        <span class="attr">#[cfg(not(all(target_arch = <span class="string">"wasm32"</span>, target_os = <span class="string">"unknown"</span>)))]
+        <span class="attr">#[cfg(not(all(target_arch = <span class="string">"wasm32"</span>, any(target_os = <span class="string">"unknown"</span>, target_os = <span class="string">"none"</span>))))]
         </span><span class="kw">unsafe fn </span>#import_name(#(#abi_arguments),<span class="kw-2">*</span>) -&gt; #abi_ret {
             #(
                 drop(#abi_argument_names);
@@ -3806,9 +3934,9 @@
 
     <span class="kw">for </span>(i, token) <span class="kw">in </span>spans.into_iter().enumerate() {
         <span class="kw">if </span>i == <span class="number">0 </span>{
-            first_span = token.span();
+            first_span = Span::call_site().located_at(token.span());
         }
-        last_span = token.span();
+        last_span = Span::call_site().located_at(token.span());
     }
 
     <span class="kw">let </span><span class="kw-2">mut </span>new_tokens = Vec::new();

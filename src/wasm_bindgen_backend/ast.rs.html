@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/wasm-bindgen-backend-0.2.95/src/ast.rs`."><title>ast.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-492a78a4a87dcc01.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="wasm_bindgen_backend" data-themes="" data-resource-suffix="" data-rustdoc-version="1.82.0 (f6e511eec 2024-10-15)" data-channel="1.82.0" data-search-js="search-a99f1315e7cc5121.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-921df33f47b8780c.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-3b12f09e550e0385.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/wasm-bindgen-backend-0.2.100/src/ast.rs`."><title>ast.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-42caa33d.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="wasm_bindgen_backend" data-themes="" data-resource-suffix="" data-rustdoc-version="1.84.1 (e71f9a9a9 2025-01-27)" data-channel="1.84.1" data-search-js="search-92e6798f.js" data-settings-js="settings-0f613d39.js" ><script src="../../static.files/storage-59e33391.js"></script><script defer src="../../static.files/src-script-56102188.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-5f194d8c.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-893ab5e7.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">wasm_bindgen_backend/</div>ast.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -561,7 +562,50 @@
 <a href="#561" id="561">561</a>
 <a href="#562" id="562">562</a>
 <a href="#563" id="563">563</a>
-</pre></div><pre class="rust"><code><span class="doccomment">//! A representation of the Abstract Syntax Tree of a Rust program,
+<a href="#564" id="564">564</a>
+<a href="#565" id="565">565</a>
+<a href="#566" id="566">566</a>
+<a href="#567" id="567">567</a>
+<a href="#568" id="568">568</a>
+<a href="#569" id="569">569</a>
+<a href="#570" id="570">570</a>
+<a href="#571" id="571">571</a>
+<a href="#572" id="572">572</a>
+<a href="#573" id="573">573</a>
+<a href="#574" id="574">574</a>
+<a href="#575" id="575">575</a>
+<a href="#576" id="576">576</a>
+<a href="#577" id="577">577</a>
+<a href="#578" id="578">578</a>
+<a href="#579" id="579">579</a>
+<a href="#580" id="580">580</a>
+<a href="#581" id="581">581</a>
+<a href="#582" id="582">582</a>
+<a href="#583" id="583">583</a>
+<a href="#584" id="584">584</a>
+<a href="#585" id="585">585</a>
+<a href="#586" id="586">586</a>
+<a href="#587" id="587">587</a>
+<a href="#588" id="588">588</a>
+<a href="#589" id="589">589</a>
+<a href="#590" id="590">590</a>
+<a href="#591" id="591">591</a>
+<a href="#592" id="592">592</a>
+<a href="#593" id="593">593</a>
+<a href="#594" id="594">594</a>
+<a href="#595" id="595">595</a>
+<a href="#596" id="596">596</a>
+<a href="#597" id="597">597</a>
+<a href="#598" id="598">598</a>
+<a href="#599" id="599">599</a>
+<a href="#600" id="600">600</a>
+<a href="#601" id="601">601</a>
+<a href="#602" id="602">602</a>
+<a href="#603" id="603">603</a>
+<a href="#604" id="604">604</a>
+<a href="#605" id="605">605</a>
+<a href="#606" id="606">606</a>
+<a href="#607" id="607">607</a></pre></div><pre class="rust"><code><span class="doccomment">//! A representation of the Abstract Syntax Tree of a Rust program,
 //! with all the added metadata necessary to generate Wasm bindings
 //! for it.
 
@@ -838,8 +882,17 @@
     </span><span class="kw">pub </span>js_name: String,
     <span class="doccomment">/// Path to wasm_bindgen
     </span><span class="kw">pub </span>wasm_bindgen: Path,
-    <span class="doccomment">/// [`true`] if using the new `thread_local` representation.
-    </span><span class="kw">pub </span>thread_local: bool,
+    <span class="doccomment">/// Version of `thread_local`, if any.
+    </span><span class="kw">pub </span>thread_local: <span class="prelude-ty">Option</span>&lt;ThreadLocal&gt;,
+}
+
+<span class="doccomment">/// Which version of the `thread_local` attribute is enabled.
+</span><span class="attr">#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+</span><span class="kw">pub enum </span>ThreadLocal {
+    <span class="doccomment">/// V1.
+    </span>V1,
+    <span class="doccomment">/// V2.
+    </span>V2,
 }
 
 <span class="doccomment">/// The type of a static string being imported
@@ -860,6 +913,8 @@
     </span><span class="kw">pub </span>js_sys: Path,
     <span class="doccomment">/// The string to export.
     </span><span class="kw">pub </span>string: String,
+    <span class="doccomment">/// Version of `thread_local`.
+    </span><span class="kw">pub </span>thread_local: ThreadLocal,
 }
 
 <span class="doccomment">/// The metadata for a type being imported
@@ -906,8 +961,12 @@
     </span><span class="kw">pub </span>variants: Vec&lt;Ident&gt;,
     <span class="doccomment">/// The JS string values of the variants
     </span><span class="kw">pub </span>variant_values: Vec&lt;String&gt;,
+    <span class="doccomment">/// The doc comments on this enum, if any
+    </span><span class="kw">pub </span>comments: Vec&lt;String&gt;,
     <span class="doccomment">/// Attributes to apply to the Rust enum
     </span><span class="kw">pub </span>rust_attrs: Vec&lt;syn::Attribute&gt;,
+    <span class="doccomment">/// Whether to generate a typescript definition for this enum
+    </span><span class="kw">pub </span>generate_typescript: bool,
     <span class="doccomment">/// Path to wasm_bindgen
     </span><span class="kw">pub </span>wasm_bindgen: Path,
 }
@@ -923,9 +982,9 @@
     <span class="doccomment">/// Whether the function has a js_name attribute
     </span><span class="kw">pub </span>renamed_via_js_name: bool,
     <span class="doccomment">/// The arguments to the function
-    </span><span class="kw">pub </span>arguments: Vec&lt;syn::PatType&gt;,
-    <span class="doccomment">/// The return type of the function, if provided
-    </span><span class="kw">pub </span>ret: <span class="prelude-ty">Option</span>&lt;syn::Type&gt;,
+    </span><span class="kw">pub </span>arguments: Vec&lt;FunctionArgumentData&gt;,
+    <span class="doccomment">/// The data of return type of the function
+    </span><span class="kw">pub </span>ret: <span class="prelude-ty">Option</span>&lt;FunctionReturnData&gt;,
     <span class="doccomment">/// Any custom attributes being applied to the function
     </span><span class="kw">pub </span>rust_attrs: Vec&lt;syn::Attribute&gt;,
     <span class="doccomment">/// The visibility of this function in Rust
@@ -940,6 +999,32 @@
     </span><span class="kw">pub </span>generate_jsdoc: bool,
     <span class="doccomment">/// Whether this is a function with a variadict parameter
     </span><span class="kw">pub </span>variadic: bool,
+}
+
+<span class="doccomment">/// Information about a function's return
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"extra-traits"</span>, derive(Debug))]
+#[derive(Clone)]
+</span><span class="kw">pub struct </span>FunctionReturnData {
+    <span class="doccomment">/// Specifies the type of the function's return
+    </span><span class="kw">pub </span>r#type: syn::Type,
+    <span class="doccomment">/// Specifies the JS return type override
+    </span><span class="kw">pub </span>js_type: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="doccomment">/// Specifies the return description
+    </span><span class="kw">pub </span>desc: <span class="prelude-ty">Option</span>&lt;String&gt;,
+}
+
+<span class="doccomment">/// Information about a function's argument
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"extra-traits"</span>, derive(Debug))]
+#[derive(Clone)]
+</span><span class="kw">pub struct </span>FunctionArgumentData {
+    <span class="doccomment">/// Specifies the type of the function's argument
+    </span><span class="kw">pub </span>pat_type: syn::PatType,
+    <span class="doccomment">/// Specifies the JS argument name override
+    </span><span class="kw">pub </span>js_name: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="doccomment">/// Specifies the JS function argument type override
+    </span><span class="kw">pub </span>js_type: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="doccomment">/// Specifies the argument description
+    </span><span class="kw">pub </span>desc: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
 
 <span class="doccomment">/// Information about a Struct being exported
@@ -1004,6 +1089,9 @@
     </span><span class="kw">pub </span>rust_name: Ident,
     <span class="doccomment">/// The name of this enum in JS code
     </span><span class="kw">pub </span>js_name: String,
+    <span class="doccomment">/// Whether the variant values and hole are signed, meaning that they
+    /// represent the bits of a `i32` value.
+    </span><span class="kw">pub </span>signed: bool,
     <span class="doccomment">/// The variants provided by this enum
     </span><span class="kw">pub </span>variants: Vec&lt;Variant&gt;,
     <span class="doccomment">/// The doc comments on this enum, if any

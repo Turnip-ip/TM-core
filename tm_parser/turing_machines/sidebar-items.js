@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["Action","Fun","Movement","TapeType"],"struct":["BaseAction","Outcome","Simu","TM","TapeEdit","TmEdit"],"type":["Gamma","State","TapePos"]};
