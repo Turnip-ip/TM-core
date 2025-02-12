@@ -51,7 +51,6 @@ fn fun_v1_MOVE_LR_M() {
     simu.all_steps(); // Should stand still
     assert_eq!(simu.head_pos_main(), 2);
 }
-/*
 #[test]
 #[allow(non_snake_case)]
 fn fun_v1_ADD1_M() {
@@ -122,7 +121,6 @@ fn fun_v1_NEG_M() {
     simu.all_steps();
     assert_eq!(simu._tape_main, expected_tape);
 }
-*/
 
 // Work tape
 #[test]
@@ -175,7 +173,6 @@ fn fun_v1_MOVE_LR_W() {
     simu.all_steps(); // Should stand still
     assert_eq!(simu.head_pos_work(), 2);
 }
-/*
 #[test]
 #[allow(non_snake_case)]
 fn fun_v1_ADD1_W() {
@@ -246,4 +243,3 @@ fn fun_v1_NEG_W() {
     simu.all_steps();
     assert_eq!(simu._tape_work, expected_tape);
 }
-*/

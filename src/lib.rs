@@ -27,7 +27,20 @@ mod main_tests {
         )
     }
 
-    // TODO: full v1 test generation
+    #[test]
+    #[allow(non_snake_case)]
+    fn v1_full_generation() {
+        let input_string: String =
+            fs::read_to_string("tests/dot/v1/add.tm").expect("cannot read file..");
+        let states: Vec<parser::State> = parser::get_parsed_file(&input_string, 1).unwrap();
+        // Transform into a Turing Machine
+        assert!(TM::from_state_vector(states, vec![], 1).is_err());
+        // Transform into DOT code
+        assert_eq!(
+            dot_generation::tm_string_to_dot(&input_string, "ADD", 1).unwrap(),
+            fs::read_to_string("tests/dot/v1/add.tm.result").expect("cannot read file..")
+        )
+    }
 
     #[test]
     #[allow(non_snake_case)]
