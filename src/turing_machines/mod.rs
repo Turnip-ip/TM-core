@@ -411,7 +411,10 @@ impl TM {
         // Iterate on all states (and their id) to properly fill in delta
         for state in v.iter() {
             let state_name: String = state.name.clone();
-            let state_id: State = *state_of_string.get(&state_name).unwrap();
+            let state_id: State = match state_of_string.get(&state_name) {
+                Some(id) => *id,
+                None => return Err(format!("Unknown state {state_name}.")),
+            };
             // DEBUG
             let name = state.name.clone(); // DEBUG
             dbg!(format!("Currently handled State ID: {state_id} ({name})")); // DEBUG
@@ -489,7 +492,10 @@ impl TM {
                                 letter_work: parsed_write_work.unwrap_or_default(),
                                 mov_work: parsed_head_move_work,
                             }),
-                            target: *state_of_string.get(&target_name).unwrap(),
+                            target: match state_of_string.get(&target_name) {
+                                Some(id) => *id,
+                                None => return Err(format!("Given target state {target_name} is not a defined state (state {state_name}, transition {j})."))
+                            },
                         }
                     }
                     parser::WriteEnv::Fun(write_funs) => {
