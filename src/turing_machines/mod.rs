@@ -12,6 +12,8 @@ use wasm_bindgen::prelude::wasm_bindgen;
 mod v0_tests;
 #[cfg(test)]
 mod v1_tests;
+#[cfg(test)]
+mod v2_tests;
 
 /// Possible Turing Machine head movements
 #[derive(Debug, Clone, Copy)]
