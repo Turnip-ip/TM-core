@@ -87,106 +87,128 @@ pub enum Fun {
     /// Writes the given letter from Gamma to the work tape at the current
     /// head position.
     WriteWork(Gamma),
-    /// TODO
+    /// Adds one to the byte (8 bits) currently under the main tape head, and 7 following bits
     IncrMainBits(),
     /// Adds one to the letter currently under the main tape head
     IncrMainByte(),
-    /// TODO
+    /// Adds one to the byte (8 bits) currently under the work tape head, and 7 following bits
     IncrWorkBits(),
     /// Adds one to the letter currently under the work tape head
     IncrWorkByte(),
-    /// TODO
+    /// Subtracts one to the byte (8 bits) currently under the main tape head, and 7 following bits
     DecrMainBits(),
     /// Subtracts one to the letter currently under the main tape head
     DecrMainByte(),
-    /// TODO
+    /// Subtracts one to the byte (8 bits) currently under the work tape head, and 7 following bits
     DecrWorkBits(),
     /// Subtracts one to the letter currently under the work tape head
     DecrWorkByte(),
-    /// TODO
+    /// Performs a bitwise not on 8 following bits currently under the main tape head
     BitwiseNotMainBits(),
     /// Performs a bitwise not on the letter currently under the main tape head
     BitwiseNotMainByte(),
-    /// TODO
+    /// Performs a bitwise not on 8 following bits currently under the work tape head
     BitwiseNotWorkBits(),
     /// Performs a bitwise not on the letter currently under the work tape head
     BitwiseNotWorkByte(),
-    /// TODO
+    /// Reads the next two letters A and B on the main tape (2 times 8 bits),
+    /// puts A + B in the third position (8 bits again), and goes back to the
+    /// head position in which it was before this function
     AddBits(),
     /// Reads the next two letters A and B on the main tape, puts A + B in the third
     /// position, and goes back to the head position in which it was before this function
     AddByte(),
-    /// TODO
+    /// Reads the next two letters A and B on the main tape (2 times 8 bits),
+    /// puts A - B in the third position (8 bits again), and goes back to the
+    /// head position in which it was before this function
     SubBits(),
     /// Reads the next two letters A and B on the main tape, puts A - B in the third
     /// position, and goes back to the head position in which it was before this function
     SubByte(),
-    /// TODO
+    /// Reads the next two letters A and B on the main tape (2 times 8 bits),
+    /// puts A * B in the third position (8 bits again), and goes back to the
+    /// head position in which it was before this function
     MulBits(),
     /// Reads the next two letters A and B on the main tape, puts A * B in the third
     /// position, and goes back to the head position in which it was before this function
     MulByte(),
-    /// TODO
+    /// Reads the next two letters A and B on the main tape (2 times 8 bits),
+    /// puts A % B in the third position (8 bits again), and goes back to the
+    /// head position in which it was before this function
     ModBits(),
     /// Reads the next two letters A and B on the main tape, puts A % B in the third
     /// position, and goes back to the head position in which it was before this function
     ModByte(),
-    /// TODO
+    /// Reads the next two letters A and B on the main tape (2 times 8 bits),
+    /// puts A / B in the third position (8 bits again), and goes back to the
+    /// head position in which it was before this function
     DivBits(),
     /// Reads the next two letters A and B on the main tape, puts A / B in the third
     /// position, and goes back to the head position in which it was before this function
     DivByte(),
-    /// TODO
+    /// Performs a bitwise or on the next two 8 bits on the main tape, puts the result in the third
+    /// position, and goes back to the head position in which it was before this function
     BitwiseOrBits(),
     /// Performs a bitwise or on the next two letters on the main tape, puts the result in the third
     /// position, and goes back to the head position in which it was before this function
     BitwiseOrByte(),
-    /// TODO
+    /// Performs a bitwise and on the next two 8 bits on the main tape, puts the result in the third
+    /// position, and goes back to the head position in which it was before this function
     BitwiseAndBits(),
     /// Performs a bitwise and on the next two letters on the main tape, puts the result in the third
     /// position, and goes back to the head position in which it was before this function
     BitwiseAndByte(),
-    /// TODO
+    /// Performs a bitwise xor on the next two 8 bits on the main tape, puts the result in the third
+    /// position, and goes back to the head position in which it was before this function
     BitwiseXorBits(),
     /// Performs a bitwise xor on the next two letters on the main tape, puts the result in the third
     /// position, and goes back to the head position in which it was before this function
     BitwiseXorByte(),
-    /// TODO
+    /// Performs a bitwise nand on the next two 8 bits on the main tape, puts the result in the third
+    /// position, and goes back to the head position in which it was before this function
     BitwiseNandBits(),
     /// Performs a bitwise nand on the next two letters on the main tape, puts the result in the third
     /// position, and goes back to the head position in which it was before this function
     BitwiseNandByte(),
-    /// TODO
+    /// Compares the next two 8 bits A and B on the main tape, if A >= B, puts 1 in the third
+    /// position, otherwise puts 0. Finally, goes back to the head position in which it was before
+    /// this function
     GeqBits(),
     /// Compares the next two letters A and B on the main tape, if A >= B, puts 1 in the third
     /// position, otherwise puts 0. Finally, goes back to the head position in which it was before
     /// this function
     GeqByte(),
-    /// TODO
+    /// Compares the next two 8 bits A and B on the main tape, if A <= B, puts 1 in the third
+    /// position, otherwise puts 0. Finally, goes back to the head position in which it was before
+    /// this function
     LeqBits(),
     /// Compares the next two letters A and B on the main tape, if A <= B, puts 1 in the third
     /// position, otherwise puts 0. Finally, goes back to the head position in which it was before
     /// this function
     LeqByte(),
-    /// TODO
+    /// Compares the next two 8 bits A and B on the main tape, if A > B, puts 1 in the third
+    /// position, otherwise puts 0. Finally, goes back to the head position in which it was before
     GtBits(),
     /// Compares the next two letters A and B on the main tape, if A > B, puts 1 in the third
     /// position, otherwise puts 0. Finally, goes back to the head position in which it was before
     /// this function
     GtByte(),
-    /// TODO
+    /// Compares the next two 8 bits A and B on the main tape, if A < B, puts 1 in the third
+    /// position, otherwise puts 0. Finally, goes back to the head position in which it was before
     LtBits(),
     /// Compares the next two letters A and B on the main tape, if A < B, puts 1 in the third
     /// position, otherwise puts 0. Finally, goes back to the head position in which it was before
     /// this function
     LtByte(),
-    /// TODO
+    /// Compares the next two 8 bits A and B on the main tape, if A = B, puts 1 in the third
+    /// position, otherwise puts 0. Finally, goes back to the head position in which it was before
     EqBits(),
     /// Compares the next two letters A and B on the main tape, if A = B, puts 1 in the third
     /// position, otherwise puts 0. Finally, goes back to the head position in which it was before
     /// this function
     EqByte(),
-    /// TODO
+    /// Compares the next two 8 bits A and B on the main tape, if A != B, puts 1 in the third
+    /// position, otherwise puts 0. Finally, goes back to the head position in which it was before
     NeqBits(),
     /// Compares the next two letters A and B on the main tape, if A != B, puts 1 in the third
     /// position, otherwise puts 0. Finally, goes back to the head position in which it was before
@@ -1518,16 +1540,21 @@ impl Simu {
     }
 }
 
-// #[wasm_bindgen]
+#[wasm_bindgen]
 impl Simu {
-    /// TODO: documentation
-    pub fn edit_main_tape() {
-        todo!()
-    }
-
-    /// TODO: documentation
-    pub fn edit_work_tape() {
-        todo!()
+    /// Exposed function that resets the simulation
+    /// - sets the current state back to START
+    /// - sets the tapes to the given values
+    /// - sets the head positions to 0
+    pub fn reset(&mut self, main_tape: Vec<Gamma>, work_tape: Vec<Gamma>) {
+        self._cur_state = self._tm.state_of_string(String::from("START"));
+        self._tape_main = main_tape;
+        self._tape_work = work_tape;
+        self._head_pos_main = 0;
+        self._head_pos_work = 0;
+        // Clear edits
+        self._past_edits.clear();
+        self._future_edits.clear();
     }
 }
 

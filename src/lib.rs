@@ -60,4 +60,31 @@ mod main_tests {
         simu.all_steps();
         assert_eq!(simu.get_current_state(), "END");
     }
+
+    #[test]
+    #[allow(non_snake_case)]
+    fn simu_reset() {
+        let input_string: String =
+            fs::read_to_string("tests/simulation/v1/ADD1_M.tm").expect("cannot read file..");
+        let fun_env: Vec<String> = vec![
+            String::from("MOVE_L_M"),
+            String::from("MOVE_R_M"),
+            String::from("MOVE_M"),
+        ];
+        // Construct TM Simulation
+        let mut simu = Simu::new(
+            &input_string,
+            1,
+            vec![1, 0, 0, 0, 0, 0, 0, 0],
+            vec![0, 0, 0, 0, 0, 0, 0, 0],
+            fun_env,
+        )
+        .unwrap();
+        simu.all_steps();
+        assert_eq!(simu.verify_output(&[1, 0, 0, 0, 0, 0, 0, 1]), true);
+
+        simu.reset(vec![0, 0, 0, 0, 0, 1, 1, 1], vec![0, 0, 0, 0, 0, 0, 0, 0]);
+        simu.all_steps();
+        assert_eq!(simu.verify_output(&[0, 0, 0, 0, 1, 0, 0, 0]), true);
+    }
 }
