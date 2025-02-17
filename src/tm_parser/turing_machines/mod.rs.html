@@ -1590,7 +1590,8 @@
 <a href="#1589" id="1589">1589</a>
 <a href="#1590" id="1590">1590</a>
 <a href="#1591" id="1591">1591</a>
-<a href="#1592" id="1592">1592</a></pre></div><pre class="rust"><code><span class="doccomment">//! Module to use when simulating Turing Machines. This module defines
+<a href="#1592" id="1592">1592</a>
+<a href="#1593" id="1593">1593</a></pre></div><pre class="rust"><code><span class="doccomment">//! Module to use when simulating Turing Machines. This module defines
 //! the Simu object that can be used via WebAssembly to simulate TMs.
 //!
 //! This module depends on the Turnip parser module.
@@ -3008,7 +3009,8 @@
     }
 }
 
-<span class="kw">impl </span>Simu {
+<span class="attr">#[wasm_bindgen]
+</span><span class="kw">impl </span>Simu {
     <span class="doccomment">/// Runs a single step (i.e. takes a single transition) of the
     /// simulated Turing Machine.
     </span><span class="kw">pub fn </span>next_step(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
@@ -3109,7 +3111,7 @@
     }
 }
 
-<span class="attr">#[wasm_bindgen]
+<span class="comment">// #[wasm_bindgen]
 </span><span class="kw">impl </span>Simu {
     <span class="doccomment">/// TODO: documentation
     </span><span class="kw">pub fn </span>edit_main_tape() {
