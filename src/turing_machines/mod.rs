@@ -670,6 +670,7 @@ impl TM {
                 Some(id) => *id,
                 None => return Err(format!("Unknown state {state_name}.")),
             };
+            println!("state {state_name}"); // DEBUG
 
             // Build a set of unvisited read characters to easily iterate
             // When we encounter a 'b' representing any value
@@ -686,16 +687,17 @@ impl TM {
                 }
             }
             */
-            let mut already_covered: HashSet<(Gamma, Gamma)> =
+            let mut not_covered: HashSet<(Gamma, Gamma)> =
                 HashSet::with_capacity(Gamma::MAX as usize);
             for read_main in 0..Gamma::MAX {
                 for read_work in 0..Gamma::MAX {
-                    already_covered.insert((read_main, read_work));
+                    not_covered.insert((read_main, read_work));
                 }
             }
 
             // Iterate on all transition of each state
             for (j, trans) in state.transitions.iter().enumerate() {
+                println!("transition {j}"); // DEBUG
                 let read_main: String = trans.read.main.clone();
                 let read_work: String = trans.read.work.clone();
 
@@ -716,6 +718,7 @@ impl TM {
                 let base_outcome: Outcome = match trans.write.clone() {
                     parser::WriteEnv::Pairs { main, work } => {
                         // Handle Main tape arguments
+                        dbg!(main.written.clone()); // DEBUG
                         let parsed_write_main = main.written.parse::<Gamma>();
                         if parsed_write_main.is_err() {
                             // We have a variable
@@ -734,6 +737,7 @@ impl TM {
                             };
 
                         // Handle Work tape arguments
+                        dbg!(work.written.clone()); // DEBUG
                         let parsed_write_work = work.written.parse::<Gamma>();
                         if parsed_write_work.is_err() {
                             // We have a variable
@@ -786,7 +790,7 @@ impl TM {
                                 )))
                             }
 
-                            // TODO: handle grammar version checking
+                            // TODO: fully handle grammar version checking
                             // In place functions:
                             // v0: WRITE(.), MOVE_R(.), MOVE_L(.), ADD1(.), SUB1(.), NEG()
                             // v1: WRITE_M(.), MOVE_R_M(.), MOVE_L_M(.), ADD1_M(.), SUB1_M(.), NEG_M()
@@ -1146,7 +1150,7 @@ impl TM {
                 2. if ... for a specific u8 for main BUT letter for work
                     => for all remaining work letters bw
                        we set the same outcome for delta[state][main][bw]
-                3. if ... for a specific u8 for work BUT letter for work
+                3. if ... for a specific u8 for work BUT letter for main
                     => for all remaining main letters bm
                        we set the same outcome for delta[state][bm][work]
                 4. else
@@ -1174,7 +1178,7 @@ impl TM {
                         let read_work_letter: Gamma = parsed_read_work.unwrap();
 
                         // Remove from the HashMap
-                        if already_covered.remove(&(read_main_letter, read_work_letter)) {
+                        if not_covered.remove(&(read_main_letter, read_work_letter)) {
                             delta[state_id as usize][read_main_letter as usize]
                                 [read_work_letter as usize] = base_outcome;
                         } else {
@@ -1193,9 +1197,10 @@ impl TM {
                         }
 
                         let read_main_letter: Gamma = parsed_read_main.unwrap();
+                        println!("{read_main_letter}"); // DEBUG
                         let mut all_covered: bool = true;
                         for read_work_letter in 0..Gamma::MAX {
-                            if already_covered.remove(&(read_main_letter, read_work_letter)) {
+                            if not_covered.remove(&(read_main_letter, read_work_letter)) {
                                 let outcome: &mut Outcome = &mut delta[state_id as usize]
                                     [read_main_letter as usize]
                                     [read_work_letter as usize];
@@ -1204,7 +1209,7 @@ impl TM {
                                     Action::BaseAction(ba) => {
                                         // Update the letter to write from the default outcome.
                                         outcome.action = Action::BaseAction(BaseAction {
-                                            letter_main: read_main_letter,
+                                            letter_main: ba.letter_main,
                                             mov_main: ba.mov_main,
                                             letter_work: read_work_letter,
                                             mov_work: ba.mov_work,
@@ -1237,7 +1242,7 @@ impl TM {
                         let read_work_letter: Gamma = parsed_read_work.unwrap();
                         let mut all_covered: bool = true;
                         for read_main_letter in 0..Gamma::MAX {
-                            if already_covered.remove(&(read_main_letter, read_work_letter)) {
+                            if not_covered.remove(&(read_main_letter, read_work_letter)) {
                                 let outcome: &mut Outcome = &mut delta[state_id as usize]
                                     [read_main_letter as usize]
                                     [read_work_letter as usize];
@@ -1248,7 +1253,7 @@ impl TM {
                                         outcome.action = Action::BaseAction(BaseAction {
                                             letter_main: read_main_letter,
                                             mov_main: ba.mov_main,
-                                            letter_work: read_work_letter,
+                                            letter_work: ba.letter_work,
                                             mov_work: ba.mov_work,
                                         });
                                     }
@@ -1276,7 +1281,7 @@ impl TM {
 
                         for read_main_letter in 0..Gamma::MAX {
                             for read_work_letter in 0..Gamma::MAX {
-                                if already_covered.remove(&(read_main_letter, read_work_letter)) {
+                                if not_covered.remove(&(read_main_letter, read_work_letter)) {
                                     let outcome: &mut Outcome = &mut delta[state_id as usize]
                                         [read_main_letter as usize]
                                         [read_work_letter as usize];
@@ -1470,13 +1475,13 @@ impl Simu {
 
                 self._tape_main[head_pos_main_usize] = act.letter_main;
                 println!(
-                    "Act Main = Read: {:?}, Written: {:?}, Head Move: {:?}",
-                    tape_letter_main, act.letter_main, act.mov_main
+                    "Act Main = Read: {:?}, Written: {:?}, Head Move: {:?}, Init Head Pos: {:?}",
+                    tape_letter_main, act.letter_main, act.mov_main, head_pos_main_usize
                 );
                 self._tape_work[head_pos_work_usize] = act.letter_work;
                 println!(
-                    "Act Work = Read: {:?}, Written: {:?}, Head Move: {:?}",
-                    tape_letter_work, act.letter_work, act.mov_work
+                    "Act Work = Read: {:?}, Written: {:?}, Head Move: {:?}, Init Head Pos: {:?}",
+                    tape_letter_work, act.letter_work, act.mov_work, head_pos_work_usize
                 );
                 self._head_pos_main = match act.mov_main {
                     // TODO check bounds
