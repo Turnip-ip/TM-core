@@ -283,16 +283,25 @@ export class Simu {
         return ret !== 0;
     }
     /**
-     * TODO: documentation
+     * Runs a single step (i.e. takes a single transition) of the
+     * simulated Turing Machine.
      */
-    static edit_main_tape() {
-        wasm.simu_edit_main_tape();
+    next_step() {
+        wasm.simu_next_step(this.__wbg_ptr);
     }
     /**
-     * TODO: documentation
+     * Rewinds the Turing Machine one step back.
      */
-    static edit_work_tape() {
-        wasm.simu_edit_work_tape();
+    prev_step() {
+        wasm.simu_prev_step(this.__wbg_ptr);
+    }
+    /**
+     * Runs the whole Turing Machine for a maxiumum number of iterations.
+     *
+     * We simply call `_next_step` in a while not finished loop.
+     */
+    all_steps() {
+        wasm.simu_all_steps(this.__wbg_ptr);
     }
     /**
      * Verifies that the current main tape has the expected result given

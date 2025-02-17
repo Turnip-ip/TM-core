@@ -82,13 +82,20 @@ export class Simu {
    */
   is_error(): boolean;
   /**
-   * TODO: documentation
+   * Runs a single step (i.e. takes a single transition) of the
+   * simulated Turing Machine.
    */
-  static edit_main_tape(): void;
+  next_step(): void;
   /**
-   * TODO: documentation
+   * Rewinds the Turing Machine one step back.
    */
-  static edit_work_tape(): void;
+  prev_step(): void;
+  /**
+   * Runs the whole Turing Machine for a maxiumum number of iterations.
+   *
+   * We simply call `_next_step` in a while not finished loop.
+   */
+  all_steps(): void;
   /**
    * Verifies that the current main tape has the expected result given
    * in arguments.
@@ -143,8 +150,9 @@ export interface InitOutput {
   readonly simu_is_start: (a: number) => number;
   readonly simu_is_end: (a: number) => number;
   readonly simu_is_error: (a: number) => number;
-  readonly simu_edit_main_tape: () => void;
-  readonly simu_edit_work_tape: () => void;
+  readonly simu_next_step: (a: number) => void;
+  readonly simu_prev_step: (a: number) => void;
+  readonly simu_all_steps: (a: number) => void;
   readonly simu_verify_output: (a: number, b: number, c: number) => number;
   readonly simu_get_current_state: (a: number) => [number, number];
   readonly simu_head_pos_main: (a: number) => number;
