@@ -1591,7 +1591,34 @@
 <a href="#1590" id="1590">1590</a>
 <a href="#1591" id="1591">1591</a>
 <a href="#1592" id="1592">1592</a>
-<a href="#1593" id="1593">1593</a></pre></div><pre class="rust"><code><span class="doccomment">//! Module to use when simulating Turing Machines. This module defines
+<a href="#1593" id="1593">1593</a>
+<a href="#1594" id="1594">1594</a>
+<a href="#1595" id="1595">1595</a>
+<a href="#1596" id="1596">1596</a>
+<a href="#1597" id="1597">1597</a>
+<a href="#1598" id="1598">1598</a>
+<a href="#1599" id="1599">1599</a>
+<a href="#1600" id="1600">1600</a>
+<a href="#1601" id="1601">1601</a>
+<a href="#1602" id="1602">1602</a>
+<a href="#1603" id="1603">1603</a>
+<a href="#1604" id="1604">1604</a>
+<a href="#1605" id="1605">1605</a>
+<a href="#1606" id="1606">1606</a>
+<a href="#1607" id="1607">1607</a>
+<a href="#1608" id="1608">1608</a>
+<a href="#1609" id="1609">1609</a>
+<a href="#1610" id="1610">1610</a>
+<a href="#1611" id="1611">1611</a>
+<a href="#1612" id="1612">1612</a>
+<a href="#1613" id="1613">1613</a>
+<a href="#1614" id="1614">1614</a>
+<a href="#1615" id="1615">1615</a>
+<a href="#1616" id="1616">1616</a>
+<a href="#1617" id="1617">1617</a>
+<a href="#1618" id="1618">1618</a>
+<a href="#1619" id="1619">1619</a>
+<a href="#1620" id="1620">1620</a></pre></div><pre class="rust"><code><span class="doccomment">//! Module to use when simulating Turing Machines. This module defines
 //! the Simu object that can be used via WebAssembly to simulate TMs.
 //!
 //! This module depends on the Turnip parser module.
@@ -1680,106 +1707,128 @@
     <span class="doccomment">/// Writes the given letter from Gamma to the work tape at the current
     /// head position.
     </span>WriteWork(Gamma),
-    <span class="doccomment">/// TODO
+    <span class="doccomment">/// Adds one to the byte (8 bits) currently under the main tape head, and 7 following bits
     </span>IncrMainBits(),
     <span class="doccomment">/// Adds one to the letter currently under the main tape head
     </span>IncrMainByte(),
-    <span class="doccomment">/// TODO
+    <span class="doccomment">/// Adds one to the byte (8 bits) currently under the work tape head, and 7 following bits
     </span>IncrWorkBits(),
     <span class="doccomment">/// Adds one to the letter currently under the work tape head
     </span>IncrWorkByte(),
-    <span class="doccomment">/// TODO
+    <span class="doccomment">/// Subtracts one to the byte (8 bits) currently under the main tape head, and 7 following bits
     </span>DecrMainBits(),
     <span class="doccomment">/// Subtracts one to the letter currently under the main tape head
     </span>DecrMainByte(),
-    <span class="doccomment">/// TODO
+    <span class="doccomment">/// Subtracts one to the byte (8 bits) currently under the work tape head, and 7 following bits
     </span>DecrWorkBits(),
     <span class="doccomment">/// Subtracts one to the letter currently under the work tape head
     </span>DecrWorkByte(),
-    <span class="doccomment">/// TODO
+    <span class="doccomment">/// Performs a bitwise not on 8 following bits currently under the main tape head
     </span>BitwiseNotMainBits(),
     <span class="doccomment">/// Performs a bitwise not on the letter currently under the main tape head
     </span>BitwiseNotMainByte(),
-    <span class="doccomment">/// TODO
+    <span class="doccomment">/// Performs a bitwise not on 8 following bits currently under the work tape head
     </span>BitwiseNotWorkBits(),
     <span class="doccomment">/// Performs a bitwise not on the letter currently under the work tape head
     </span>BitwiseNotWorkByte(),
-    <span class="doccomment">/// TODO
+    <span class="doccomment">/// Reads the next two letters A and B on the main tape (2 times 8 bits),
+    /// puts A + B in the third position (8 bits again), and goes back to the
+    /// head position in which it was before this function
     </span>AddBits(),
     <span class="doccomment">/// Reads the next two letters A and B on the main tape, puts A + B in the third
     /// position, and goes back to the head position in which it was before this function
     </span>AddByte(),
-    <span class="doccomment">/// TODO
+    <span class="doccomment">/// Reads the next two letters A and B on the main tape (2 times 8 bits),
+    /// puts A - B in the third position (8 bits again), and goes back to the
+    /// head position in which it was before this function
     </span>SubBits(),
     <span class="doccomment">/// Reads the next two letters A and B on the main tape, puts A - B in the third
     /// position, and goes back to the head position in which it was before this function
     </span>SubByte(),
-    <span class="doccomment">/// TODO
+    <span class="doccomment">/// Reads the next two letters A and B on the main tape (2 times 8 bits),
+    /// puts A * B in the third position (8 bits again), and goes back to the
+    /// head position in which it was before this function
     </span>MulBits(),
     <span class="doccomment">/// Reads the next two letters A and B on the main tape, puts A * B in the third
     /// position, and goes back to the head position in which it was before this function
     </span>MulByte(),
-    <span class="doccomment">/// TODO
+    <span class="doccomment">/// Reads the next two letters A and B on the main tape (2 times 8 bits),
+    /// puts A % B in the third position (8 bits again), and goes back to the
+    /// head position in which it was before this function
     </span>ModBits(),
     <span class="doccomment">/// Reads the next two letters A and B on the main tape, puts A % B in the third
     /// position, and goes back to the head position in which it was before this function
     </span>ModByte(),
-    <span class="doccomment">/// TODO
+    <span class="doccomment">/// Reads the next two letters A and B on the main tape (2 times 8 bits),
+    /// puts A / B in the third position (8 bits again), and goes back to the
+    /// head position in which it was before this function
     </span>DivBits(),
     <span class="doccomment">/// Reads the next two letters A and B on the main tape, puts A / B in the third
     /// position, and goes back to the head position in which it was before this function
     </span>DivByte(),
-    <span class="doccomment">/// TODO
+    <span class="doccomment">/// Performs a bitwise or on the next two 8 bits on the main tape, puts the result in the third
+    /// position, and goes back to the head position in which it was before this function
     </span>BitwiseOrBits(),
     <span class="doccomment">/// Performs a bitwise or on the next two letters on the main tape, puts the result in the third
     /// position, and goes back to the head position in which it was before this function
     </span>BitwiseOrByte(),
-    <span class="doccomment">/// TODO
+    <span class="doccomment">/// Performs a bitwise and on the next two 8 bits on the main tape, puts the result in the third
+    /// position, and goes back to the head position in which it was before this function
     </span>BitwiseAndBits(),
     <span class="doccomment">/// Performs a bitwise and on the next two letters on the main tape, puts the result in the third
     /// position, and goes back to the head position in which it was before this function
     </span>BitwiseAndByte(),
-    <span class="doccomment">/// TODO
+    <span class="doccomment">/// Performs a bitwise xor on the next two 8 bits on the main tape, puts the result in the third
+    /// position, and goes back to the head position in which it was before this function
     </span>BitwiseXorBits(),
     <span class="doccomment">/// Performs a bitwise xor on the next two letters on the main tape, puts the result in the third
     /// position, and goes back to the head position in which it was before this function
     </span>BitwiseXorByte(),
-    <span class="doccomment">/// TODO
+    <span class="doccomment">/// Performs a bitwise nand on the next two 8 bits on the main tape, puts the result in the third
+    /// position, and goes back to the head position in which it was before this function
     </span>BitwiseNandBits(),
     <span class="doccomment">/// Performs a bitwise nand on the next two letters on the main tape, puts the result in the third
     /// position, and goes back to the head position in which it was before this function
     </span>BitwiseNandByte(),
-    <span class="doccomment">/// TODO
+    <span class="doccomment">/// Compares the next two 8 bits A and B on the main tape, if A &gt;= B, puts 1 in the third
+    /// position, otherwise puts 0. Finally, goes back to the head position in which it was before
+    /// this function
     </span>GeqBits(),
     <span class="doccomment">/// Compares the next two letters A and B on the main tape, if A &gt;= B, puts 1 in the third
     /// position, otherwise puts 0. Finally, goes back to the head position in which it was before
     /// this function
     </span>GeqByte(),
-    <span class="doccomment">/// TODO
+    <span class="doccomment">/// Compares the next two 8 bits A and B on the main tape, if A &lt;= B, puts 1 in the third
+    /// position, otherwise puts 0. Finally, goes back to the head position in which it was before
+    /// this function
     </span>LeqBits(),
     <span class="doccomment">/// Compares the next two letters A and B on the main tape, if A &lt;= B, puts 1 in the third
     /// position, otherwise puts 0. Finally, goes back to the head position in which it was before
     /// this function
     </span>LeqByte(),
-    <span class="doccomment">/// TODO
+    <span class="doccomment">/// Compares the next two 8 bits A and B on the main tape, if A &gt; B, puts 1 in the third
+    /// position, otherwise puts 0. Finally, goes back to the head position in which it was before
     </span>GtBits(),
     <span class="doccomment">/// Compares the next two letters A and B on the main tape, if A &gt; B, puts 1 in the third
     /// position, otherwise puts 0. Finally, goes back to the head position in which it was before
     /// this function
     </span>GtByte(),
-    <span class="doccomment">/// TODO
+    <span class="doccomment">/// Compares the next two 8 bits A and B on the main tape, if A &lt; B, puts 1 in the third
+    /// position, otherwise puts 0. Finally, goes back to the head position in which it was before
     </span>LtBits(),
     <span class="doccomment">/// Compares the next two letters A and B on the main tape, if A &lt; B, puts 1 in the third
     /// position, otherwise puts 0. Finally, goes back to the head position in which it was before
     /// this function
     </span>LtByte(),
-    <span class="doccomment">/// TODO
+    <span class="doccomment">/// Compares the next two 8 bits A and B on the main tape, if A = B, puts 1 in the third
+    /// position, otherwise puts 0. Finally, goes back to the head position in which it was before
     </span>EqBits(),
     <span class="doccomment">/// Compares the next two letters A and B on the main tape, if A = B, puts 1 in the third
     /// position, otherwise puts 0. Finally, goes back to the head position in which it was before
     /// this function
     </span>EqByte(),
-    <span class="doccomment">/// TODO
+    <span class="doccomment">/// Compares the next two 8 bits A and B on the main tape, if A != B, puts 1 in the third
+    /// position, otherwise puts 0. Finally, goes back to the head position in which it was before
     </span>NeqBits(),
     <span class="doccomment">/// Compares the next two letters A and B on the main tape, if A != B, puts 1 in the third
     /// position, otherwise puts 0. Finally, goes back to the head position in which it was before
@@ -3111,16 +3160,21 @@
     }
 }
 
-<span class="comment">// #[wasm_bindgen]
+<span class="attr">#[wasm_bindgen]
 </span><span class="kw">impl </span>Simu {
-    <span class="doccomment">/// TODO: documentation
-    </span><span class="kw">pub fn </span>edit_main_tape() {
-        <span class="macro">todo!</span>()
-    }
-
-    <span class="doccomment">/// TODO: documentation
-    </span><span class="kw">pub fn </span>edit_work_tape() {
-        <span class="macro">todo!</span>()
+    <span class="doccomment">/// Exposed function that resets the simulation
+    /// - sets the current state back to START
+    /// - sets the tapes to the given values
+    /// - sets the head positions to 0
+    </span><span class="kw">pub fn </span>reset(<span class="kw-2">&amp;mut </span><span class="self">self</span>, main_tape: Vec&lt;Gamma&gt;, work_tape: Vec&lt;Gamma&gt;) {
+        <span class="self">self</span>._cur_state = <span class="self">self</span>._tm.state_of_string(String::from(<span class="string">"START"</span>));
+        <span class="self">self</span>._tape_main = main_tape;
+        <span class="self">self</span>._tape_work = work_tape;
+        <span class="self">self</span>._head_pos_main = <span class="number">0</span>;
+        <span class="self">self</span>._head_pos_work = <span class="number">0</span>;
+        <span class="comment">// Clear edits
+        </span><span class="self">self</span>._past_edits.clear();
+        <span class="self">self</span>._future_edits.clear();
     }
 }
 
