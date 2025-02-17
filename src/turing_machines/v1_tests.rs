@@ -51,7 +51,6 @@ fn fun_v1_MOVE_LR_M() {
     simu.all_steps(); // Should stand still
     assert_eq!(simu.head_pos_main(), 2);
 }
-/*
 #[test]
 #[allow(non_snake_case)]
 fn fun_v1_ADD1_M() {
@@ -87,7 +86,7 @@ fn fun_v1_SUB1_M() {
         fs::read_to_string("tests/simulation/v1/SUB1_M.tm").expect("cannot read file..");
     let main_tape: Vec<super::Gamma> = vec![1, 0, 1, 0, 1, 0, 0, 0]; // 168
     let work_tape: Vec<super::Gamma> = vec![0, 0, 0, 0, 0, 0, 0, 0]; // 0
-    let fun_env: Vec<String> = vec![String::from("MOVE_M"), String::from("WRITE_M")];
+    let fun_env: Vec<String> = vec![String::from("MOVE_L_M"), String::from("MOVE_R_M")];
     // Create a simulation
     let mut simu = super::Simu::new(&input_string, 1, main_tape, work_tape, fun_env).unwrap();
     let expected_tape: Vec<super::Gamma> = vec![1, 0, 1, 0, 0, 1, 1, 1]; // 167
@@ -101,7 +100,7 @@ fn fun_v1_SUB1_M_OVERFLOW() {
         fs::read_to_string("tests/simulation/v1/SUB1_M.tm").expect("cannot read file..");
     let main_tape: Vec<super::Gamma> = vec![0, 0, 0, 0, 0, 0, 0, 0]; // 0
     let work_tape: Vec<super::Gamma> = vec![0, 0, 0, 0, 0, 0, 0, 0]; // 0
-    let fun_env: Vec<String> = vec![String::from("MOVE"), String::from("WRITE")];
+    let fun_env: Vec<String> = vec![String::from("MOVE_R_M"), String::from("MOVE_L_M")];
     // Create a simulation
     let mut simu = super::Simu::new(&input_string, 1, main_tape, work_tape, fun_env).unwrap();
     let expected_tape: Vec<super::Gamma> = vec![1, 1, 1, 1, 1, 1, 1, 1]; // 255
@@ -115,14 +114,13 @@ fn fun_v1_NEG_M() {
         fs::read_to_string("tests/simulation/v1/NEG_M.tm").expect("cannot read file..");
     let main_tape: Vec<super::Gamma> = vec![0, 0, 0, 1, 0, 1, 0, 0]; // 20
     let work_tape: Vec<super::Gamma> = vec![0, 0, 0, 0, 0, 0, 0, 0]; // 0
-    let fun_env: Vec<String> = vec![String::from("MOVE_M"), String::from("WRITE_M")];
+    let fun_env: Vec<String> = vec![String::from("MOVE_R_M"), String::from("ADD1_M")];
     // Create a simulation
     let mut simu = super::Simu::new(&input_string, 1, main_tape, work_tape, fun_env).unwrap();
     let expected_tape: Vec<super::Gamma> = vec![1, 1, 1, 0, 1, 1, 0, 0]; // -20
     simu.all_steps();
     assert_eq!(simu._tape_main, expected_tape);
 }
-*/
 
 // Work tape
 #[test]
@@ -175,15 +173,14 @@ fn fun_v1_MOVE_LR_W() {
     simu.all_steps(); // Should stand still
     assert_eq!(simu.head_pos_work(), 2);
 }
-/*
 #[test]
 #[allow(non_snake_case)]
 fn fun_v1_ADD1_W() {
     let input_string: String =
-        fs::read_to_string("tests/simulation/v1/ADD1_M.tm").expect("cannot read file..");
+        fs::read_to_string("tests/simulation/v1/ADD1_W.tm").expect("cannot read file..");
     let main_tape: Vec<super::Gamma> = vec![0, 0, 0, 0, 0, 0, 0, 0]; // 0
     let work_tape: Vec<super::Gamma> = vec![1, 0, 1, 0, 0, 1, 1, 1]; // 167
-    let fun_env: Vec<String> = vec![String::from("MOVE_W"), String::from("WRITE_W")];
+    let fun_env: Vec<String> = vec![String::from("MOVE_W")];
     // Create a simulation
     let mut simu = super::Simu::new(&input_string, 1, main_tape, work_tape, fun_env).unwrap();
     let expected_tape: Vec<super::Gamma> = vec![1, 0, 1, 0, 1, 0, 0, 0]; // 168
@@ -197,7 +194,7 @@ fn fun_v1_ADD1_W_OVERFLOW() {
         fs::read_to_string("tests/simulation/v1/ADD1_W.tm").expect("cannot read file..");
     let main_tape: Vec<super::Gamma> = vec![0, 0, 0, 0, 0, 0, 0, 0]; // 0
     let work_tape: Vec<super::Gamma> = vec![1, 1, 1, 1, 1, 1, 1, 1]; // 255
-    let fun_env: Vec<String> = vec![String::from("MOVE_W"), String::from("WRITE_W")];
+    let fun_env: Vec<String> = vec![String::from("MOVE_W")];
     // Create a simulation
     let mut simu = super::Simu::new(&input_string, 1, main_tape, work_tape, fun_env).unwrap();
     let expected_tape: Vec<super::Gamma> = vec![0, 0, 0, 0, 0, 0, 0, 0]; // 0
@@ -211,7 +208,7 @@ fn fun_v1_SUB1_W() {
         fs::read_to_string("tests/simulation/v1/SUB1_W.tm").expect("cannot read file..");
     let main_tape: Vec<super::Gamma> = vec![0, 0, 0, 0, 0, 0, 0, 0]; // 168
     let work_tape: Vec<super::Gamma> = vec![1, 0, 1, 0, 1, 0, 0, 0]; // 0
-    let fun_env: Vec<String> = vec![String::from("MOVE_W"), String::from("WRITE_W")];
+    let fun_env: Vec<String> = vec![String::from("MOVE_L_W"), String::from("MOVE_R_W")];
     // Create a simulation
     let mut simu = super::Simu::new(&input_string, 1, main_tape, work_tape, fun_env).unwrap();
     let expected_tape: Vec<super::Gamma> = vec![1, 0, 1, 0, 0, 1, 1, 1]; // 167
@@ -225,7 +222,7 @@ fn fun_v1_SUB1_W_OVERFLOW() {
         fs::read_to_string("tests/simulation/v1/SUB1_W.tm").expect("cannot read file..");
     let main_tape: Vec<super::Gamma> = vec![0, 0, 0, 0, 0, 0, 0, 0]; // 0
     let work_tape: Vec<super::Gamma> = vec![0, 0, 0, 0, 0, 0, 0, 0]; // 0
-    let fun_env: Vec<String> = vec![String::from("MOVE_W"), String::from("WRITE_W")];
+    let fun_env: Vec<String> = vec![String::from("MOVE_L_W"), String::from("MOVE_R_W")];
     // Create a simulation
     let mut simu = super::Simu::new(&input_string, 1, main_tape, work_tape, fun_env).unwrap();
     let expected_tape: Vec<super::Gamma> = vec![1, 1, 1, 1, 1, 1, 1, 1]; // 255
@@ -239,11 +236,10 @@ fn fun_v1_NEG_W() {
         fs::read_to_string("tests/simulation/v1/NEG_W.tm").expect("cannot read file..");
     let main_tape: Vec<super::Gamma> = vec![0, 0, 0, 0, 0, 0, 0, 0]; // 0
     let work_tape: Vec<super::Gamma> = vec![0, 0, 0, 1, 0, 1, 0, 0]; // 20
-    let fun_env: Vec<String> = vec![String::from("MOVE_W"), String::from("WRITE_W")];
+    let fun_env: Vec<String> = vec![String::from("MOVE_R_W"), String::from("ADD1_W")];
     // Create a simulation
     let mut simu = super::Simu::new(&input_string, 1, main_tape, work_tape, fun_env).unwrap();
     let expected_tape: Vec<super::Gamma> = vec![1, 1, 1, 0, 1, 1, 0, 0]; // -20
     simu.all_steps();
     assert_eq!(simu._tape_work, expected_tape);
 }
-*/
