@@ -1416,6 +1416,7 @@ impl Simu {
     }
 }
 
+#[wasm_bindgen]
 impl Simu {
     /// Runs a single step (i.e. takes a single transition) of the
     /// simulated Turing Machine.
@@ -1517,7 +1518,7 @@ impl Simu {
     }
 }
 
-#[wasm_bindgen]
+// #[wasm_bindgen]
 impl Simu {
     /// TODO: documentation
     pub fn edit_main_tape() {
