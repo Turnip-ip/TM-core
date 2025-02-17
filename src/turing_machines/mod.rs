@@ -235,7 +235,7 @@ fn bits_of_byte(
         .collect::<Vec<_>>();
     for i in 0..8 {
         let i = i as u8;
-        tape[i as usize + start_bits as usize] = b & (1 << (7 - i));
+        tape[i as usize + start_bits as usize] = (b & (1 << (7 - i))) >> (7 - i);
     }
     v
 }
