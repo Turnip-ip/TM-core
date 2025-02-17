@@ -304,6 +304,21 @@ export class Simu {
         wasm.simu_all_steps(this.__wbg_ptr);
     }
     /**
+     * Exposed function that resets the simulation
+     * - sets the current state back to START
+     * - sets the tapes to the given values
+     * - sets the head positions to 0
+     * @param {Uint8Array} main_tape
+     * @param {Uint8Array} work_tape
+     */
+    reset(main_tape, work_tape) {
+        const ptr0 = passArray8ToWasm0(main_tape, wasm.__wbindgen_malloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ptr1 = passArray8ToWasm0(work_tape, wasm.__wbindgen_malloc);
+        const len1 = WASM_VECTOR_LEN;
+        wasm.simu_reset(this.__wbg_ptr, ptr0, len0, ptr1, len1);
+    }
+    /**
      * Verifies that the current main tape has the expected result given
      * in arguments.
      *

@@ -11,6 +11,7 @@ export const simu_is_error: (a: number) => number;
 export const simu_next_step: (a: number) => void;
 export const simu_prev_step: (a: number) => void;
 export const simu_all_steps: (a: number) => void;
+export const simu_reset: (a: number, b: number, c: number, d: number, e: number) => void;
 export const simu_verify_output: (a: number, b: number, c: number) => number;
 export const simu_get_current_state: (a: number) => [number, number];
 export const simu_head_pos_main: (a: number) => number;

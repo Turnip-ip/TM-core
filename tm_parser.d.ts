@@ -97,6 +97,13 @@ export class Simu {
    */
   all_steps(): void;
   /**
+   * Exposed function that resets the simulation
+   * - sets the current state back to START
+   * - sets the tapes to the given values
+   * - sets the head positions to 0
+   */
+  reset(main_tape: Uint8Array, work_tape: Uint8Array): void;
+  /**
    * Verifies that the current main tape has the expected result given
    * in arguments.
    *
@@ -153,6 +160,7 @@ export interface InitOutput {
   readonly simu_next_step: (a: number) => void;
   readonly simu_prev_step: (a: number) => void;
   readonly simu_all_steps: (a: number) => void;
+  readonly simu_reset: (a: number, b: number, c: number, d: number, e: number) => void;
   readonly simu_verify_output: (a: number, b: number, c: number) => number;
   readonly simu_get_current_state: (a: number) => [number, number];
   readonly simu_head_pos_main: (a: number) => number;
