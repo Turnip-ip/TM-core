@@ -672,23 +672,10 @@ impl TM {
                 Some(id) => *id,
                 None => return Err(format!("Unknown state {state_name}.")),
             };
-            println!("state {state_name}"); // DEBUG
+            // println!("state {state_name}"); // DEBUG
 
             // Build a set of unvisited read characters to easily iterate
             // When we encounter a 'b' representing any value
-            /* TODO: optim
-            let mut not_seen_read: HashMap<Gamma, HashSet<Gamma>> = HashMap::new();
-            not_seen_read.reserve(Gamma::MAX as usize);
-            for bm in 0..=Gamma::MAX {
-                not_seen_read.insert(
-                    bm,
-                    HashSet::with_capacity_and_hasher(Gamma::MAX as usize, RandomState::new()),
-                );
-                for bw in 0..=Gamma::MAX {
-                    not_seen_read.get_mut(&bm).unwrap().insert(bw);
-                }
-            }
-            */
             let mut not_covered: HashSet<(Gamma, Gamma)> =
                 HashSet::with_capacity(Gamma::MAX as usize);
             for read_main in 0..Gamma::MAX {
@@ -699,7 +686,7 @@ impl TM {
 
             // Iterate on all transition of each state
             for (j, trans) in state.transitions.iter().enumerate() {
-                println!("transition {j}"); // DEBUG
+                // println!("transition {j}"); // DEBUG
                 let read_main: String = trans.read.main.clone();
                 let read_work: String = trans.read.work.clone();
 
@@ -720,7 +707,6 @@ impl TM {
                 let base_outcome: Outcome = match trans.write.clone() {
                     parser::WriteEnv::Pairs { main, work } => {
                         // Handle Main tape arguments
-                        dbg!(main.written.clone()); // DEBUG
                         let parsed_write_main = main.written.parse::<Gamma>();
                         if parsed_write_main.is_err() {
                             // We have a variable
@@ -739,7 +725,6 @@ impl TM {
                             };
 
                         // Handle Work tape arguments
-                        dbg!(work.written.clone()); // DEBUG
                         let parsed_write_work = work.written.parse::<Gamma>();
                         if parsed_write_work.is_err() {
                             // We have a variable
@@ -1199,7 +1184,6 @@ impl TM {
                         }
 
                         let read_main_letter: Gamma = parsed_read_main.unwrap();
-                        println!("{read_main_letter}"); // DEBUG
                         let mut all_covered: bool = true;
                         for read_work_letter in 0..Gamma::MAX {
                             if not_covered.remove(&(read_main_letter, read_work_letter)) {
@@ -1436,7 +1420,7 @@ impl Simu {
     /// Runs a single step (i.e. takes a single transition) of the
     /// simulated Turing Machine.
     pub fn next_step(&mut self) {
-        println!("State : {:?}", self._tm.string_of_state(self._cur_state)); // DEBUG
+        // println!("State : {:?}", self._tm.string_of_state(self._cur_state)); // DEBUG
 
         if !self._future_edits.is_empty() {
             let mut edits = self._future_edits.pop().unwrap();
@@ -1457,7 +1441,7 @@ impl Simu {
         };
 
         let oc = &tm.delta[cur_state_usize][tape_letter_main][tape_letter_work];
-        dbg!(&oc);
+        // dbg!(&oc);// DEBUG
         match &(oc.action) {
             Action::BaseAction(act) => {
                 let tape_edit_main = TapeEdit {
@@ -1476,15 +1460,9 @@ impl Simu {
                 reverse_tm_edit.tapes_edits.push(tape_edit_work);
 
                 self._tape_main[head_pos_main_usize] = act.letter_main;
-                println!(
-                    "Act Main = Read: {:?}, Written: {:?}, Head Move: {:?}, Init Head Pos: {:?}",
-                    tape_letter_main, act.letter_main, act.mov_main, head_pos_main_usize
-                );
+                // println!("Act Main = Read: {:?}, Written: {:?}, Head Move: {:?}, Init Head Pos: {:?}",tape_letter_main, act.letter_main, act.mov_main, head_pos_main_usize);// DEBUG
                 self._tape_work[head_pos_work_usize] = act.letter_work;
-                println!(
-                    "Act Work = Read: {:?}, Written: {:?}, Head Move: {:?}, Init Head Pos: {:?}",
-                    tape_letter_work, act.letter_work, act.mov_work, head_pos_work_usize
-                );
+                // println!("Act Work = Read: {:?}, Written: {:?}, Head Move: {:?}, Init Head Pos: {:?}", tape_letter_work, act.letter_work, act.mov_work, head_pos_work_usize);// DEBUG
                 self._head_pos_main = match act.mov_main {
                     // TODO check bounds
                     Movement::Left => self._head_pos_main - 1,
@@ -1516,9 +1494,6 @@ impl Simu {
         }
         self._cur_state = oc.target;
         self._past_edits.push(reverse_tm_edit);
-
-        println!("{:?}", self._tape_main); // DEBUG
-        println!("{:?}", self._tape_work); // DEBUG
     }
 
     /// Rewinds the Turing Machine one step back.
@@ -1534,9 +1509,8 @@ impl Simu {
     ///
     /// We simply call `_next_step` in a while not finished loop.
     pub fn all_steps(&mut self) {
-        let mut num_iter = 1000; // DEBUG value
+        let mut num_iter = 10000; // should be enough for a reasonable machine (i think)
         while !self.is_end() && !self.is_error() && num_iter > 0 {
-            println!("STEP {:?}\n", num_iter);
             self.next_step();
             num_iter -= 1;
         }
