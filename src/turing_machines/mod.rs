@@ -32,7 +32,7 @@ pub type Gamma = u8;
 
 /// Enum to easily differentiate tape type.
 #[wasm_bindgen]
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub enum TapeType {
     /// Work tape
     Work,
@@ -85,69 +85,111 @@ pub enum Fun {
     /// Writes the given letter from Gamma to the work tape at the current
     /// head position.
     WriteWork(Gamma),
+    /// TODO
+    IncrMainBits(),
     /// Adds one to the letter currently under the main tape head
-    IncrBitsMain(),
+    IncrMainByte(),
+    /// TODO
+    IncrWorkBits(),
     /// Adds one to the letter currently under the work tape head
-    IncrBitsWork(),
+    IncrWorkByte(),
+    /// TODO
+    DecrMainBits(),
     /// Subtracts one to the letter currently under the main tape head
-    DecrBitsMain(),
+    DecrMainByte(),
+    /// TODO
+    DecrWorkBits(),
     /// Subtracts one to the letter currently under the work tape head
-    DecrBitsWork(),
+    DecrWorkByte(),
+    /// TODO
+    BitwiseNotMainBits(),
     /// Performs a bitwise not on the letter currently under the main tape head
-    BitwiseNotMain(),
+    BitwiseNotMainByte(),
+    /// TODO
+    BitwiseNotWorkBits(),
     /// Performs a bitwise not on the letter currently under the work tape head
-    BitwiseNotWork(),
+    BitwiseNotWorkByte(),
+    /// TODO
+    AddBits(),
     /// Reads the next two letters A and B on the main tape, puts A + B in the third
     /// position, and goes back to the head position in which it was before this function
-    Add(),
+    AddByte(),
+    /// TODO
+    SubBits(),
     /// Reads the next two letters A and B on the main tape, puts A - B in the third
     /// position, and goes back to the head position in which it was before this function
-    Sub(),
+    SubByte(),
+    /// TODO
+    MulBits(),
     /// Reads the next two letters A and B on the main tape, puts A * B in the third
     /// position, and goes back to the head position in which it was before this function
-    Mul(),
+    MulByte(),
+    /// TODO
+    ModBits(),
     /// Reads the next two letters A and B on the main tape, puts A % B in the third
     /// position, and goes back to the head position in which it was before this function
-    Mod(),
+    ModByte(),
+    /// TODO
+    DivBits(),
     /// Reads the next two letters A and B on the main tape, puts A / B in the third
     /// position, and goes back to the head position in which it was before this function
-    Div(),
+    DivByte(),
+    /// TODO
+    BitwiseOrBits(),
     /// Performs a bitwise or on the next two letters on the main tape, puts the result in the third
     /// position, and goes back to the head position in which it was before this function
-    BitwiseOr(),
+    BitwiseOrByte(),
+    /// TODO
+    BitwiseAndBits(),
     /// Performs a bitwise and on the next two letters on the main tape, puts the result in the third
     /// position, and goes back to the head position in which it was before this function
-    BitwiseAnd(),
+    BitwiseAndByte(),
+    /// TODO
+    BitwiseXorBits(),
     /// Performs a bitwise xor on the next two letters on the main tape, puts the result in the third
     /// position, and goes back to the head position in which it was before this function
-    BitwiseXor(),
+    BitwiseXorByte(),
+    /// TODO
+    BitwiseNandBits(),
     /// Performs a bitwise nand on the next two letters on the main tape, puts the result in the third
     /// position, and goes back to the head position in which it was before this function
-    BitwiseNand(),
+    BitwiseNandByte(),
+    /// TODO
+    GeqBits(),
     /// Compares the next two letters A and B on the main tape, if A >= B, puts 1 in the third
     /// position, otherwise puts 0. Finally, goes back to the head position in which it was before
     /// this function
-    Geq(),
+    GeqByte(),
+    /// TODO
+    LeqBits(),
     /// Compares the next two letters A and B on the main tape, if A <= B, puts 1 in the third
     /// position, otherwise puts 0. Finally, goes back to the head position in which it was before
     /// this function
-    Leq(),
+    LeqByte(),
+    /// TODO
+    GtBits(),
     /// Compares the next two letters A and B on the main tape, if A > B, puts 1 in the third
     /// position, otherwise puts 0. Finally, goes back to the head position in which it was before
     /// this function
-    Gt(),
+    GtByte(),
+    /// TODO
+    LtBits(),
     /// Compares the next two letters A and B on the main tape, if A < B, puts 1 in the third
     /// position, otherwise puts 0. Finally, goes back to the head position in which it was before
     /// this function
-    Lt(),
+    LtByte(),
+    /// TODO
+    EqBits(),
     /// Compares the next two letters A and B on the main tape, if A = B, puts 1 in the third
     /// position, otherwise puts 0. Finally, goes back to the head position in which it was before
     /// this function
-    Eq(),
+    EqByte(),
+    /// TODO
+    NeqBits(),
     /// Compares the next two letters A and B on the main tape, if A != B, puts 1 in the third
     /// position, otherwise puts 0. Finally, goes back to the head position in which it was before
     /// this function
-    Neq(),
+    NeqByte(),
 }
 
 impl TapeType {
@@ -158,12 +200,44 @@ impl TapeType {
         _tape: &[Gamma],
     ) -> Vec<TapeEdit> {
         vec![TapeEdit {
-            tape_type: self.clone(),
+            tape_type: *self,
             index_of_edit: pos_edit,
             new_letter: _tape[pos_edit as usize],
             new_index: pos_head,
         }]
     }
+}
+
+// if type cannot enforce size 8, get rid of it
+fn byte_of_bits(tape: &[Gamma], start_bits: TapePos) -> u8 {
+    let mut s = 0;
+    for i in 0..8 {
+        s *= 2;
+        s += tape[(i + start_bits) as usize];
+    }
+    s
+}
+
+fn bits_of_byte(
+    tape: &mut [Gamma],
+    start_bits: TapePos,
+    tape_type: TapeType,
+    b: u8,
+    pos_head: TapePos,
+) -> Vec<TapeEdit> {
+    let v = (0..8)
+        .map(|i| TapeEdit {
+            tape_type,
+            index_of_edit: start_bits + i,
+            new_letter: tape[(start_bits + i) as usize],
+            new_index: pos_head,
+        })
+        .collect::<Vec<_>>();
+    for i in 0..8 {
+        let i = i as u8;
+        tape[i as usize + start_bits as usize] = b & (1 << (7 - i));
+    }
+    v
 }
 
 impl Fun {
@@ -196,93 +270,217 @@ impl Fun {
                 _tape_work[*pos_work as usize] = *u;
                 v
             }
-            Fun::IncrBitsMain() => {
+            Fun::IncrMainBits() => {
+                let a = byte_of_bits(_tape_main, *pos_main).wrapping_add(1_u8);
+                bits_of_byte(_tape_main, *pos_main, TapeType::Main, a, *pos_main)
+            }
+            Fun::IncrMainByte() => {
                 let v = TapeType::Main.basic_tape_edit(*pos_main, *pos_main, _tape_main);
                 _tape_main[*pos_main as usize] = _tape_main[*pos_main as usize].wrapping_add(1_u8);
                 v
             }
-            Fun::IncrBitsWork() => {
+            Fun::IncrWorkBits() => {
+                let a = byte_of_bits(_tape_work, *pos_work).wrapping_add(1_u8);
+                bits_of_byte(_tape_work, *pos_work, TapeType::Work, a, *pos_work)
+            }
+            Fun::IncrWorkByte() => {
                 let v = TapeType::Work.basic_tape_edit(*pos_work, *pos_work, _tape_work);
                 _tape_work[*pos_work as usize] = _tape_work[*pos_work as usize].wrapping_add(1_u8);
                 v
             }
-            Fun::DecrBitsMain() => {
+            Fun::DecrMainBits() => {
+                let a = byte_of_bits(_tape_main, *pos_main).wrapping_sub(1_u8);
+                bits_of_byte(_tape_main, *pos_main, TapeType::Main, a, *pos_main)
+            }
+            Fun::DecrMainByte() => {
                 let v = TapeType::Main.basic_tape_edit(*pos_main, *pos_main, _tape_main);
-                _tape_main[*pos_main as usize] =
-                    _tape_main[*pos_main as usize].wrapping_sub(1 as Gamma);
+                _tape_main[*pos_main as usize] = _tape_main[*pos_main as usize].wrapping_sub(1_u8);
                 v
             }
-            Fun::DecrBitsWork() => {
+            Fun::DecrWorkBits() => {
+                let a = byte_of_bits(_tape_work, *pos_work).wrapping_sub(1_u8);
+                bits_of_byte(_tape_work, *pos_work, TapeType::Work, a, *pos_work)
+            }
+            Fun::DecrWorkByte() => {
                 let v = TapeType::Work.basic_tape_edit(*pos_work, *pos_work, _tape_work);
-                _tape_work[*pos_work as usize] =
-                    _tape_work[*pos_work as usize].wrapping_sub(1 as Gamma);
+                _tape_work[*pos_work as usize] = _tape_work[*pos_work as usize].wrapping_sub(1_u8);
                 v
             }
-            Fun::BitwiseNotMain() => {
+            Fun::BitwiseNotMainBits() => {
+                let a = byte_of_bits(_tape_main, *pos_main);
+                bits_of_byte(_tape_main, *pos_main, TapeType::Main, !a, *pos_main)
+            }
+            Fun::BitwiseNotMainByte() => {
                 let v = TapeType::Main.basic_tape_edit(*pos_main, *pos_main, _tape_main);
                 _tape_main[*pos_main as usize] = !_tape_main[*pos_main as usize];
                 v
             }
-            Fun::BitwiseNotWork() => {
+            Fun::BitwiseNotWorkBits() => {
+                let a = byte_of_bits(_tape_work, *pos_work);
+                bits_of_byte(_tape_work, *pos_work, TapeType::Work, !a, *pos_work)
+            }
+            Fun::BitwiseNotWorkByte() => {
                 let v = TapeType::Work.basic_tape_edit(*pos_work, *pos_work, _tape_work);
                 _tape_work[*pos_work as usize] = !_tape_work[*pos_work as usize];
                 v
             }
-            Fun::Add() => {
+            Fun::AddBits() => {
+                let a = byte_of_bits(_tape_main, *pos_main);
+                let b = byte_of_bits(_tape_main, *pos_main + 8);
+
+                bits_of_byte(
+                    _tape_main,
+                    *pos_main + 16,
+                    TapeType::Main,
+                    a.wrapping_add(b),
+                    *pos_main,
+                )
+            }
+            Fun::AddByte() => {
                 let v = TapeType::Main.basic_tape_edit(*pos_main + 2, *pos_main, _tape_main);
                 let pmu = *pos_main as usize;
-                _tape_main[pmu + 2] = _tape_main[pmu] + _tape_main[pmu + 1];
+                _tape_main[pmu + 2] = _tape_main[pmu].wrapping_add(_tape_main[pmu + 1]);
                 v
             }
-            Fun::Sub() => {
+            Fun::SubBits() => {
+                let a = byte_of_bits(_tape_main, *pos_main);
+                let b = byte_of_bits(_tape_main, *pos_main + 8);
+
+                bits_of_byte(
+                    _tape_main,
+                    *pos_main + 16,
+                    TapeType::Main,
+                    a.wrapping_sub(b),
+                    *pos_main,
+                )
+            }
+            Fun::SubByte() => {
                 let v = TapeType::Main.basic_tape_edit(*pos_main + 2, *pos_main, _tape_main);
                 let pmu = *pos_main as usize;
-                _tape_main[pmu + 2] = _tape_main[pmu] - _tape_main[pmu + 1];
+                _tape_main[pmu + 2] = _tape_main[pmu].wrapping_sub(_tape_main[pmu + 1]);
                 v
             }
-            Fun::Mul() => {
+            Fun::MulBits() => {
+                let a = byte_of_bits(_tape_main, *pos_main);
+                let b = byte_of_bits(_tape_main, *pos_main + 8);
+
+                bits_of_byte(
+                    _tape_main,
+                    *pos_main + 16,
+                    TapeType::Main,
+                    a.wrapping_mul(b),
+                    *pos_main,
+                )
+            }
+            Fun::MulByte() => {
                 let v = TapeType::Main.basic_tape_edit(*pos_main + 2, *pos_main, _tape_main);
                 let pmu = *pos_main as usize;
-                _tape_main[pmu + 2] = _tape_main[pmu] * _tape_main[pmu + 1];
+                _tape_main[pmu + 2] = _tape_main[pmu].wrapping_mul(_tape_main[pmu + 1]);
                 v
             }
-            Fun::Mod() => {
+            Fun::ModBits() => {
+                let a = byte_of_bits(_tape_main, *pos_main);
+                let b = byte_of_bits(_tape_main, *pos_main + 8);
+
+                bits_of_byte(
+                    _tape_main,
+                    *pos_main + 16,
+                    TapeType::Main,
+                    a.wrapping_rem(b),
+                    *pos_main,
+                )
+            }
+            Fun::ModByte() => {
                 let v = TapeType::Main.basic_tape_edit(*pos_main + 2, *pos_main, _tape_main);
                 let pmu = *pos_main as usize;
-                _tape_main[pmu + 2] = _tape_main[pmu] % _tape_main[pmu + 1];
+                _tape_main[pmu + 2] = _tape_main[pmu].wrapping_rem(_tape_main[pmu + 1]);
                 v
             }
-            Fun::Div() => {
+            Fun::DivBits() => {
+                let a = byte_of_bits(_tape_main, *pos_main);
+                let b = byte_of_bits(_tape_main, *pos_main + 8);
+
+                bits_of_byte(
+                    _tape_main,
+                    *pos_main + 16,
+                    TapeType::Main,
+                    a.wrapping_div(b),
+                    *pos_main,
+                )
+            }
+            Fun::DivByte() => {
                 let v = TapeType::Main.basic_tape_edit(*pos_main + 2, *pos_main, _tape_main);
                 let pmu = *pos_main as usize;
-                _tape_main[pmu + 2] = _tape_main[pmu] / _tape_main[pmu + 1];
+                _tape_main[pmu + 2] = _tape_main[pmu].wrapping_div(_tape_main[pmu + 1]);
                 v
             }
-            Fun::BitwiseOr() => {
+            Fun::BitwiseOrBits() => {
+                let a = byte_of_bits(_tape_main, *pos_main);
+                let b = byte_of_bits(_tape_main, *pos_main + 8);
+
+                bits_of_byte(_tape_main, *pos_main + 16, TapeType::Main, a | b, *pos_main)
+            }
+            Fun::BitwiseOrByte() => {
                 let v = TapeType::Main.basic_tape_edit(*pos_main + 2, *pos_main, _tape_main);
                 let pmu = *pos_main as usize;
                 _tape_main[pmu + 2] = _tape_main[pmu] | _tape_main[pmu + 1];
                 v
             }
-            Fun::BitwiseAnd() => {
+            Fun::BitwiseAndBits() => {
+                let a = byte_of_bits(_tape_main, *pos_main);
+                let b = byte_of_bits(_tape_main, *pos_main + 8);
+
+                bits_of_byte(_tape_main, *pos_main + 16, TapeType::Main, a & b, *pos_main)
+            }
+            Fun::BitwiseAndByte() => {
                 let v = TapeType::Main.basic_tape_edit(*pos_main + 2, *pos_main, _tape_main);
                 let pmu = *pos_main as usize;
                 _tape_main[pmu + 2] = _tape_main[pmu] & _tape_main[pmu + 1];
                 v
             }
-            Fun::BitwiseXor() => {
+            Fun::BitwiseXorBits() => {
+                let a = byte_of_bits(_tape_main, *pos_main);
+                let b = byte_of_bits(_tape_main, *pos_main + 8);
+
+                bits_of_byte(_tape_main, *pos_main + 16, TapeType::Main, a ^ b, *pos_main)
+            }
+            Fun::BitwiseXorByte() => {
                 let v = TapeType::Main.basic_tape_edit(*pos_main + 2, *pos_main, _tape_main);
                 let pmu = *pos_main as usize;
                 _tape_main[pmu + 2] = _tape_main[pmu] ^ _tape_main[pmu + 1];
                 v
             }
-            Fun::BitwiseNand() => {
+            Fun::BitwiseNandBits() => {
+                let a = byte_of_bits(_tape_main, *pos_main);
+                let b = byte_of_bits(_tape_main, *pos_main + 8);
+
+                bits_of_byte(
+                    _tape_main,
+                    *pos_main + 16,
+                    TapeType::Main,
+                    !(a & b),
+                    *pos_main,
+                )
+            }
+            Fun::BitwiseNandByte() => {
                 let v = TapeType::Main.basic_tape_edit(*pos_main + 2, *pos_main, _tape_main);
                 let pmu = *pos_main as usize;
                 _tape_main[pmu + 2] = !(_tape_main[pmu] & _tape_main[pmu + 1]);
                 v
             }
-            Fun::Geq() => {
+            Fun::GeqBits() => {
+                let a = byte_of_bits(_tape_main, *pos_main);
+                let b = byte_of_bits(_tape_main, *pos_main + 8);
+
+                bits_of_byte(
+                    _tape_main,
+                    *pos_main + 16,
+                    TapeType::Main,
+                    if a >= b { 1_u8 } else { 0_u8 },
+                    *pos_main,
+                )
+            }
+            Fun::GeqByte() => {
                 let v = TapeType::Main.basic_tape_edit(*pos_main + 2, *pos_main, _tape_main);
                 let pmu = *pos_main as usize;
                 _tape_main[pmu + 2] = 0;
@@ -291,7 +489,19 @@ impl Fun {
                 }
                 v
             }
-            Fun::Leq() => {
+            Fun::LeqBits() => {
+                let a = byte_of_bits(_tape_main, *pos_main);
+                let b = byte_of_bits(_tape_main, *pos_main + 8);
+
+                bits_of_byte(
+                    _tape_main,
+                    *pos_main + 16,
+                    TapeType::Main,
+                    if a <= b { 1_u8 } else { 0_u8 },
+                    *pos_main,
+                )
+            }
+            Fun::LeqByte() => {
                 let v = TapeType::Main.basic_tape_edit(*pos_main + 2, *pos_main, _tape_main);
                 let pmu = *pos_main as usize;
                 _tape_main[pmu + 2] = 0;
@@ -300,7 +510,19 @@ impl Fun {
                 }
                 v
             }
-            Fun::Gt() => {
+            Fun::GtBits() => {
+                let a = byte_of_bits(_tape_main, *pos_main);
+                let b = byte_of_bits(_tape_main, *pos_main + 8);
+
+                bits_of_byte(
+                    _tape_main,
+                    *pos_main + 16,
+                    TapeType::Main,
+                    if a > b { 1_u8 } else { 0_u8 },
+                    *pos_main,
+                )
+            }
+            Fun::GtByte() => {
                 let v = TapeType::Main.basic_tape_edit(*pos_main + 2, *pos_main, _tape_main);
                 let pmu = *pos_main as usize;
                 _tape_main[pmu + 2] = 0;
@@ -309,7 +531,19 @@ impl Fun {
                 }
                 v
             }
-            Fun::Lt() => {
+            Fun::LtBits() => {
+                let a = byte_of_bits(_tape_main, *pos_main);
+                let b = byte_of_bits(_tape_main, *pos_main + 8);
+
+                bits_of_byte(
+                    _tape_main,
+                    *pos_main + 16,
+                    TapeType::Main,
+                    if a < b { 1_u8 } else { 0_u8 },
+                    *pos_main,
+                )
+            }
+            Fun::LtByte() => {
                 let v = TapeType::Main.basic_tape_edit(*pos_main + 2, *pos_main, _tape_main);
                 let pmu = *pos_main as usize;
                 _tape_main[pmu + 2] = 0;
@@ -318,7 +552,19 @@ impl Fun {
                 }
                 v
             }
-            Fun::Eq() => {
+            Fun::EqBits() => {
+                let a = byte_of_bits(_tape_main, *pos_main);
+                let b = byte_of_bits(_tape_main, *pos_main + 8);
+
+                bits_of_byte(
+                    _tape_main,
+                    *pos_main + 16,
+                    TapeType::Main,
+                    if a == b { 1_u8 } else { 0_u8 },
+                    *pos_main,
+                )
+            }
+            Fun::EqByte() => {
                 let v = TapeType::Main.basic_tape_edit(*pos_main + 2, *pos_main, _tape_main);
                 let pmu = *pos_main as usize;
                 _tape_main[pmu + 2] = 0;
@@ -327,7 +573,19 @@ impl Fun {
                 }
                 v
             }
-            Fun::Neq() => {
+            Fun::NeqBits() => {
+                let a = byte_of_bits(_tape_main, *pos_main);
+                let b = byte_of_bits(_tape_main, *pos_main + 8);
+
+                bits_of_byte(
+                    _tape_main,
+                    *pos_main + 16,
+                    TapeType::Main,
+                    if a != b { 1_u8 } else { 0_u8 },
+                    *pos_main,
+                )
+            }
+            Fun::NeqByte() => {
                 let v = TapeType::Main.basic_tape_edit(*pos_main + 2, *pos_main, _tape_main);
                 let pmu = *pos_main as usize;
                 _tape_main[pmu + 2] = 0;
@@ -381,9 +639,6 @@ impl TM {
             let state_id: State = i as State;
             state_of_string.insert(state.name.clone(), state_id);
             string_of_state.insert(state_id, state.name.clone());
-            // DEBUG
-            let name = state.name.clone(); // DEBUG
-            dbg!(format!("Created entry for State ID: {state_id} ({name})")); // DEBUG
         }
 
         // Transform valid_fun array into a better structure
@@ -415,11 +670,22 @@ impl TM {
                 Some(id) => *id,
                 None => return Err(format!("Unknown state {state_name}.")),
             };
-            // DEBUG
-            let name = state.name.clone(); // DEBUG
-            dbg!(format!("Currently handled State ID: {state_id} ({name})")); // DEBUG
 
-            // TODO: optim, and basic bits case
+            // Build a set of unvisited read characters to easily iterate
+            // When we encounter a 'b' representing any value
+            /* TODO: optim
+            let mut not_seen_read: HashMap<Gamma, HashSet<Gamma>> = HashMap::new();
+            not_seen_read.reserve(Gamma::MAX as usize);
+            for bm in 0..=Gamma::MAX {
+                not_seen_read.insert(
+                    bm,
+                    HashSet::with_capacity_and_hasher(Gamma::MAX as usize, RandomState::new()),
+                );
+                for bw in 0..=Gamma::MAX {
+                    not_seen_read.get_mut(&bm).unwrap().insert(bw);
+                }
+            }
+            */
             let mut already_covered: HashSet<(Gamma, Gamma)> =
                 HashSet::with_capacity(Gamma::MAX as usize);
             for read_main in 0..Gamma::MAX {
@@ -587,7 +853,7 @@ impl TM {
                                                 "{fun_name} must receive 0 argument."
                                             ))
                                         }
-                                        &[Fun::IncrBitsMain()]
+                                        &[Fun::IncrMainBits()]
                                     }
                                     "SUB1" => {
                                         if !f.args.is_empty() {
@@ -595,7 +861,7 @@ impl TM {
                                                 "{fun_name} must receive 0 argument."
                                             ))
                                         }
-                                        &[Fun::DecrBitsMain()]
+                                        &[Fun::DecrMainBits()]
                                     }
                                     "NEG" => {
                                         if !f.args.is_empty() {
@@ -603,7 +869,7 @@ impl TM {
                                                 "{fun_name} must receive 0 argument."
                                             ))
                                         }
-                                        &[Fun::BitwiseNotMain(), Fun::IncrBitsMain()]
+                                        &[Fun::BitwiseNotMainBits(), Fun::IncrMainBits()]
                                     }
                                     _ => {
                                         return Err(format!(
@@ -683,7 +949,7 @@ impl TM {
                                                 "{fun_name} must receive 0 argument."
                                             ))
                                         }
-                                        &[Fun::IncrBitsMain()]
+                                        if grammar_version == 1 {&[Fun::IncrMainBits()]} else {&[Fun::IncrMainByte()]}
                                     }
                                     "SUB1_M" => {
                                         if !f.args.is_empty() {
@@ -691,7 +957,7 @@ impl TM {
                                                 "{fun_name} must receive 0 argument."
                                             ))
                                         }
-                                        &[Fun::DecrBitsMain()]
+                                        if grammar_version == 1 {&[Fun::DecrMainBits()]} else {&[Fun::DecrMainByte()]}
                                     }
                                     "NEG_M" => {
                                         if !f.args.is_empty() {
@@ -699,7 +965,8 @@ impl TM {
                                                 "{fun_name} must receive 0 argument."
                                             ))
                                         }
-                                        &[Fun::BitwiseNotMain(),Fun::IncrBitsMain()]
+                                        if grammar_version == 1 {&[Fun::BitwiseNotMainBits(),Fun::IncrMainBits()]}
+                                        else {&[Fun::BitwiseNotMainByte(),Fun::IncrMainByte()]}
                                     }
 
                                     // v1 - Work tape
@@ -765,7 +1032,7 @@ impl TM {
                                                 "{fun_name} must receive 0 argument."
                                             ))
                                         }
-                                        &[Fun::IncrBitsWork()]
+                                        if grammar_version == 1 {&[Fun::IncrWorkBits()]} else {&[Fun::IncrWorkByte()]}
                                     }
                                     "SUB1_W" => {
                                         if !f.args.is_empty() {
@@ -773,7 +1040,7 @@ impl TM {
                                                 "{fun_name} must receive 0 argument."
                                             ))
                                         }
-                                        &[Fun::DecrBitsWork()]
+                                        if grammar_version == 1 {&[Fun::DecrWorkBits()]} else {&[Fun::DecrWorkByte()]}
                                     }
                                     "NEG_W" => {
                                         if !f.args.is_empty() {
@@ -781,7 +1048,8 @@ impl TM {
                                                 "{fun_name} must receive 0 argument."
                                             ))
                                         }
-                                        &[Fun::BitwiseNotWork(),Fun::IncrBitsWork()]
+                                        if grammar_version == 1 {&[Fun::BitwiseNotWorkBits(),Fun::IncrWorkBits()]}
+                                        else {&[Fun::BitwiseNotWorkByte(),Fun::IncrWorkByte()]}
                                     }
                                     // Functions that read arguments from the tape
                                     // TODO: EXP,IS_PRIME,LEN_SYRACUSE
@@ -791,7 +1059,7 @@ impl TM {
                                                 "{fun_name} must receive 0 argument."
                                             ))
                                         }
-                                        &[Fun::Add()]
+                                        if grammar_version == 1 {&[Fun::AddBits()]} else {&[Fun::AddByte()]}
                                     }
                                     "SUB" => {
                                         if !f.args.is_empty() {
@@ -799,7 +1067,7 @@ impl TM {
                                                 "{fun_name} must receive 0 argument."
                                             ))
                                         }
-                                        &[Fun::Sub()]
+                                        if grammar_version == 1 {&[Fun::SubBits()]} else {&[Fun::SubByte()]}
                                     }
                                     "GEQ" => {
                                         if !f.args.is_empty() {
@@ -807,7 +1075,7 @@ impl TM {
                                                 "{fun_name} must receive 0 argument."
                                             ))
                                         }
-                                        &[Fun::Geq()]
+                                        if grammar_version == 1 {&[Fun::GeqBits()]} else {&[Fun::GeqByte()]}
                                     }
                                     "LEQ" => {
                                         if !f.args.is_empty() {
@@ -815,7 +1083,7 @@ impl TM {
                                                 "{fun_name} must receive 0 argument."
                                             ))
                                         }
-                                        &[Fun::Leq()]
+                                        if grammar_version == 1 {&[Fun::LeqBits()]} else {&[Fun::LeqByte()]}
                                     }
                                     "MUL" => {
                                         if !f.args.is_empty() {
@@ -823,7 +1091,7 @@ impl TM {
                                                 "{fun_name} must receive 0 argument."
                                             ))
                                         }
-                                        &[Fun::Mul()]
+                                        if grammar_version == 1 {&[Fun::MulBits()]} else {&[Fun::MulByte()]}
                                     }
                                     "MOD" => {
                                         if !f.args.is_empty() {
@@ -831,7 +1099,7 @@ impl TM {
                                                 "{fun_name} must receive 0 argument."
                                             ))
                                         }
-                                        &[Fun::Mod()]
+                                        if grammar_version == 1 {&[Fun::ModBits()]} else {&[Fun::ModByte()]}
                                     }
                                     "DIV" => {
                                         if !f.args.is_empty() {
@@ -839,7 +1107,7 @@ impl TM {
                                                 "{fun_name} must receive 0 argument."
                                             ))
                                         }
-                                        &[Fun::Div()]
+                                        if grammar_version == 1 {&[Fun::DivBits()]} else {&[Fun::DivByte()]}
                                     }
                                     "EXP" => {
                                         todo!()
