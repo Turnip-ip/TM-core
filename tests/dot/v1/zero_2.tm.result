@@ -1,0 +1,28 @@
+digraph ZERO_2 {
+label="ZERO_2";
+rankdir=LR;
+bgcolor="transparent";
+node [style=filled];
+
+START -> q1 [label="_, _ → (0, R), (0, R)"];
+q1 -> q2 [label="_, _ → (0, R), (0, R)"];
+q2 -> q3 [label="_, _ → (0, R), (0, R)"];
+q3 -> q4 [label="_, _ → (0, R), (0, R)"];
+q4 -> q5 [label="_, _ → (0, R), (0, R)"];
+q5 -> q6 [label="_, _ → (0, R), (0, R)"];
+q6 -> q7 [label="_, _ → (0, R), (0, R)"];
+q7 -> qend [label="_, _ → (0, L), (0, L)"];
+qend -> END [label="_, _ → [MOVE_M(-6), MOVE_W(-6)]"];
+
+START [id="START",shape=cds,fillcolor="#38ef59"];
+END [id="END",shape=doublecircle,fillcolor="#efa038"];
+ERROR [id="ERROR",shape=hexagon,fillcolor="#f37db6"];
+q1 [id="q1"];
+q2 [id="q2"];
+q3 [id="q3"];
+q4 [id="q4"];
+q5 [id="q5"];
+q6 [id="q6"];
+q7 [id="q7"];
+qend [id="qend"];
+}

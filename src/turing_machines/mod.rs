@@ -82,11 +82,17 @@ pub enum Fun {
     /// Moves the work tape head by a (neg or pos) amount of cells.
     MvWork(i32),
     /// Writes the given letter from Gamma to the main tape at the current
+    /// 8 bits pointed at the head position.
+    WriteMainBits(Gamma),
+    /// Writes the given letter from Gamma to the main tape at the current
     /// head position.
-    WriteMain(Gamma),
+    WriteMainByte(Gamma),
+    /// Writes the given letter from Gamma to the work tape at the current
+    /// 8 bits pointed at the head position.
+    WriteWorkBits(Gamma),
     /// Writes the given letter from Gamma to the work tape at the current
     /// head position.
-    WriteWork(Gamma),
+    WriteWorkByte(Gamma),
     /// Adds one to the byte (8 bits) currently under the main tape head, and 7 following bits
     IncrMainBits(),
     /// Adds one to the letter currently under the main tape head
@@ -284,12 +290,18 @@ impl Fun {
                 *pos_work = (*pos_work).wrapping_add(*i as u32);
                 v
             }
-            Fun::WriteMain(u) => {
+            Fun::WriteMainBits(u) => {
+                bits_of_byte(_tape_main, *pos_main, TapeType::Main, *u, *pos_main)
+            }
+            Fun::WriteMainByte(u) => {
                 let v = TapeType::Main.basic_tape_edit(*pos_main, *pos_main, _tape_main);
                 _tape_main[*pos_main as usize] = *u;
                 v
             }
-            Fun::WriteWork(u) => {
+            Fun::WriteWorkBits(u) => {
+                bits_of_byte(_tape_work, *pos_work, TapeType::Work, *u, *pos_work)
+            }
+            Fun::WriteWorkByte(u) => {
                 let v = TapeType::Work.basic_tape_edit(*pos_work, *pos_work, _tape_work);
                 _tape_work[*pos_work as usize] = *u;
                 v
@@ -822,7 +834,7 @@ impl TM {
                                                 "{fun_name} argument must be a bit but we got {i}."
                                             ))
                                         }
-                                        &[Fun::WriteMain(i as u8)]
+                                        &[Fun::WriteMainBits(i as u8)]
                                     }
                                     "MOVE" => {
                                         if f.args.len() != 1 {
@@ -901,18 +913,17 @@ impl TM {
                                             ))
                                         }
                                         let i = arg_to_int(&f.args[0])?;
-                                        if grammar_version == 1 {
-                                            if i != 0 && i != 1 {
-                                                return Err(format!(
-                                                    "WRITE argument must be a bit but we got {i}."
-                                                ))
-                                            }
-                                        } else if grammar_version == 2 && !(0..=255).contains(&i) {
-                                                return Err(format!(
-                                                    "WRITE argument must be a byte but we got {i}."
-                                                ))
+
+                                        if !(0..=255).contains(&i) {
+                                            return Err(format!(
+                                                "WRITE argument must be a byte but we got {i}."
+                                            ))
                                         }
-                                        &[Fun::WriteMain(i as u8)]
+                                        if grammar_version == 1 {
+                                             &[Fun::WriteMainBits(i as u8)]
+                                        } else {
+                                             &[Fun::WriteMainByte(i as u8)]
+                                        }
                                     }
                                     "COPY_TO_MAIN" => {
                                         // TODO
@@ -995,7 +1006,7 @@ impl TM {
                                                 "WRITE argument must be a byte but we got {i}."
                                             ))
                                         }
-                                        &[Fun::WriteWork(i as u8)]
+                                        &[Fun::WriteWorkBits(i as u8)]
                                     }
                                     "COPY_TO_WORK" => {
                                         // TODO

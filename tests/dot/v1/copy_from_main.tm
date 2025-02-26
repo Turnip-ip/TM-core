@@ -20,4 +20,4 @@ q6
   |b, _ -> (b, R), (b, R), qend
 qend
   |_, _ -> [MOVE_M(-7), MOVE_W(-7)], END
-// functions end by _M -> main tape / _W -> working tape / nothing: both tape??
+// functions end by _M -> main tape / _W -> working tape / nothing: only a signle main tape
