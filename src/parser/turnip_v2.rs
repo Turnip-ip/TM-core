@@ -7,9 +7,11 @@ use pest_derive::Parser;
 #[grammar = "parser/turnip_v2.pest"]
 pub struct TMParser;
 
-/// TODO: better documentation
-/// Surely to many to_string and as_str calls
-/// We have only one tape
+/// Util function to convert a v2 parsed transition into a Transition object
+/// from the module parser.
+///
+/// @note Surely to many to_string and as_str calls
+/// @note We have 2 tapes and work with byte cells.
 pub fn state_rule_to_transition(state_rule_pair: Pair<Rule>) -> super::Transition {
     use pest::iterators::Pairs;
 

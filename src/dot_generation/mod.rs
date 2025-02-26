@@ -12,6 +12,8 @@ use crate::parser;
 mod v0_tests;
 #[cfg(test)]
 mod v1_tests;
+#[cfg(test)]
+mod v2_tests;
 
 /// Private utility function to transform a given state into DOT graph transitions
 fn dot_from_state(state: parser::State, grammar_version: i8) -> Result<String, String> {
